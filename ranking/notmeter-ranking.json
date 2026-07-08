@@ -1,7 +1,7 @@
 {
   "Schema": "notmeter-dungeon-ranking-v1",
   "Version": 1,
-  "GeneratedAt": "2026-07-08T13:13:35.69193+00:00",
+  "GeneratedAt": "2026-07-08T13:15:55.8428329+00:00",
   "RankingBasis": "job_p75_dps",
   "MinimumPartySize": 5,
   "Dungeons": [
@@ -98,7 +98,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:35.8516777+09:00",
+      "GeneratedAt": "2026-07-08T22:15:55.8964939+09:00",
       "RecordCount": 423,
       "PlayerSampleCount": 4213,
       "Rows": [
@@ -194,7 +194,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.1438742+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.037402+09:00",
       "RecordCount": 1732,
       "PlayerSampleCount": 17114,
       "Rows": [
@@ -290,7 +290,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.2487237+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.136874+09:00",
       "RecordCount": 1878,
       "PlayerSampleCount": 18271,
       "Rows": [
@@ -386,7 +386,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.2564889+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.1461032+09:00",
       "RecordCount": 3,
       "PlayerSampleCount": 3,
       "Rows": [
@@ -419,7 +419,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.2756614+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.1686474+09:00",
       "RecordCount": 24,
       "PlayerSampleCount": 27,
       "Rows": [
@@ -497,7 +497,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.2956321+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.1963115+09:00",
       "RecordCount": 24,
       "PlayerSampleCount": 27,
       "Rows": [
@@ -575,7 +575,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.3033305+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.2066005+09:00",
       "RecordCount": 39,
       "PlayerSampleCount": 55,
       "Rows": [
@@ -653,7 +653,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.3223991+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.2286899+09:00",
       "RecordCount": 194,
       "PlayerSampleCount": 251,
       "Rows": [
@@ -740,7 +740,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.3420374+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.2510161+09:00",
       "RecordCount": 198,
       "PlayerSampleCount": 255,
       "Rows": [
@@ -827,7 +827,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.3497872+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.2589443+09:00",
       "RecordCount": 67,
       "PlayerSampleCount": 83,
       "Rows": [
@@ -914,7 +914,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.3705765+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.281611+09:00",
       "RecordCount": 551,
       "PlayerSampleCount": 795,
       "Rows": [
@@ -1010,7 +1010,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.3935559+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.3066902+09:00",
       "RecordCount": 667,
       "PlayerSampleCount": 944,
       "Rows": [
@@ -1106,7 +1106,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.4051743+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.3180032+09:00",
       "RecordCount": 232,
       "PlayerSampleCount": 586,
       "Rows": [
@@ -1202,7 +1202,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.4427129+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.3575016+09:00",
       "RecordCount": 1457,
       "PlayerSampleCount": 4940,
       "Rows": [
@@ -1298,7 +1298,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.4835596+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.3997175+09:00",
       "RecordCount": 1603,
       "PlayerSampleCount": 5839,
       "Rows": [
@@ -1394,7 +1394,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.4981784+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.4168648+09:00",
       "RecordCount": 400,
       "PlayerSampleCount": 2029,
       "Rows": [
@@ -1490,7 +1490,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.5453072+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.467196+09:00",
       "RecordCount": 1679,
       "PlayerSampleCount": 8466,
       "Rows": [
@@ -1586,7 +1586,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.5955423+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.5169679+09:00",
       "RecordCount": 1751,
       "PlayerSampleCount": 8571,
       "Rows": [
@@ -1682,7 +1682,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.6099513+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.5299829+09:00",
       "RecordCount": 339,
       "PlayerSampleCount": 1290,
       "Rows": [
@@ -1769,7 +1769,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.6378755+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.5586627+09:00",
       "RecordCount": 929,
       "PlayerSampleCount": 2341,
       "Rows": [
@@ -1856,7 +1856,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.6664014+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.5869882+09:00",
       "RecordCount": 929,
       "PlayerSampleCount": 2341,
       "Rows": [
@@ -1943,7 +1943,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.6769993+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.5983713+09:00",
       "RecordCount": 104,
       "PlayerSampleCount": 164,
       "Rows": [
@@ -2030,7 +2030,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.7039077+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.6250106+09:00",
       "RecordCount": 146,
       "PlayerSampleCount": 221,
       "Rows": [
@@ -2117,7 +2117,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.7277223+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.6521627+09:00",
       "RecordCount": 146,
       "PlayerSampleCount": 221,
       "Rows": [
@@ -2204,7 +2204,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.7436403+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.671521+09:00",
       "RecordCount": 276,
       "PlayerSampleCount": 2748,
       "Rows": [
@@ -2300,7 +2300,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.7988633+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.7465774+09:00",
       "RecordCount": 1265,
       "PlayerSampleCount": 12477,
       "Rows": [
@@ -2396,7 +2396,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.8567301+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.8238691+09:00",
       "RecordCount": 1382,
       "PlayerSampleCount": 13401,
       "Rows": [
@@ -2492,7 +2492,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.8635258+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.8324704+09:00",
       "RecordCount": 1,
       "PlayerSampleCount": 1,
       "Rows": [
@@ -2516,7 +2516,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.8780735+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.8513438+09:00",
       "RecordCount": 9,
       "PlayerSampleCount": 10,
       "Rows": [
@@ -2567,7 +2567,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.896947+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.8686241+09:00",
       "RecordCount": 9,
       "PlayerSampleCount": 10,
       "Rows": [
@@ -2618,7 +2618,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.9047476+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.8771471+09:00",
       "RecordCount": 18,
       "PlayerSampleCount": 28,
       "Rows": [
@@ -2696,7 +2696,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.9215992+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.8944351+09:00",
       "RecordCount": 100,
       "PlayerSampleCount": 130,
       "Rows": [
@@ -2783,7 +2783,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.9386551+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.9114969+09:00",
       "RecordCount": 104,
       "PlayerSampleCount": 134,
       "Rows": [
@@ -2870,7 +2870,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:36.9478736+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.9196343+09:00",
       "RecordCount": 47,
       "PlayerSampleCount": 57,
       "Rows": [
@@ -2939,7 +2939,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:36.9683049+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.9382038+09:00",
       "RecordCount": 388,
       "PlayerSampleCount": 552,
       "Rows": [
@@ -3035,7 +3035,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:36.9905147+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.956961+09:00",
       "RecordCount": 479,
       "PlayerSampleCount": 669,
       "Rows": [
@@ -3131,7 +3131,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.0007988+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.9658338+09:00",
       "RecordCount": 159,
       "PlayerSampleCount": 434,
       "Rows": [
@@ -3227,7 +3227,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.039097+09:00",
+      "GeneratedAt": "2026-07-08T22:15:56.9942529+09:00",
       "RecordCount": 1092,
       "PlayerSampleCount": 3878,
       "Rows": [
@@ -3323,7 +3323,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.0739055+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.0282938+09:00",
       "RecordCount": 1209,
       "PlayerSampleCount": 4608,
       "Rows": [
@@ -3419,7 +3419,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.085251+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.0403792+09:00",
       "RecordCount": 261,
       "PlayerSampleCount": 1369,
       "Rows": [
@@ -3515,7 +3515,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.1204294+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.0763968+09:00",
       "RecordCount": 1227,
       "PlayerSampleCount": 6270,
       "Rows": [
@@ -3611,7 +3611,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.1698757+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.1122804+09:00",
       "RecordCount": 1280,
       "PlayerSampleCount": 6343,
       "Rows": [
@@ -3707,7 +3707,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.1817093+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.1211083+09:00",
       "RecordCount": 210,
       "PlayerSampleCount": 758,
       "Rows": [
@@ -3794,7 +3794,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.2054785+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.1433176+09:00",
       "RecordCount": 611,
       "PlayerSampleCount": 1441,
       "Rows": [
@@ -3881,7 +3881,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.2303698+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.1648196+09:00",
       "RecordCount": 611,
       "PlayerSampleCount": 1441,
       "Rows": [
@@ -3968,7 +3968,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.2387278+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.175441+09:00",
       "RecordCount": 62,
       "PlayerSampleCount": 99,
       "Rows": [
@@ -4055,7 +4055,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.2569148+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.1931733+09:00",
       "RecordCount": 87,
       "PlayerSampleCount": 132,
       "Rows": [
@@ -4142,7 +4142,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.2770232+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.2131626+09:00",
       "RecordCount": 87,
       "PlayerSampleCount": 132,
       "Rows": [
@@ -4229,7 +4229,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.2885442+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.2244792+09:00",
       "RecordCount": 147,
       "PlayerSampleCount": 1465,
       "Rows": [
@@ -4325,7 +4325,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.3108628+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.2477067+09:00",
       "RecordCount": 467,
       "PlayerSampleCount": 4637,
       "Rows": [
@@ -4421,7 +4421,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.3360029+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.2715467+09:00",
       "RecordCount": 496,
       "PlayerSampleCount": 4870,
       "Rows": [
@@ -4517,7 +4517,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.3434933+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.279743+09:00",
       "RecordCount": 2,
       "PlayerSampleCount": 2,
       "Rows": [
@@ -4550,7 +4550,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.3530324+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.2905759+09:00",
       "RecordCount": 15,
       "PlayerSampleCount": 17,
       "Rows": [
@@ -4628,7 +4628,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.3634511+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3013332+09:00",
       "RecordCount": 15,
       "PlayerSampleCount": 17,
       "Rows": [
@@ -4706,7 +4706,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.369002+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3079153+09:00",
       "RecordCount": 21,
       "PlayerSampleCount": 27,
       "Rows": [
@@ -4775,7 +4775,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.3792079+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3188923+09:00",
       "RecordCount": 94,
       "PlayerSampleCount": 121,
       "Rows": [
@@ -4862,7 +4862,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.3917665+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3290993+09:00",
       "RecordCount": 94,
       "PlayerSampleCount": 121,
       "Rows": [
@@ -4949,7 +4949,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.4026517+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3360825+09:00",
       "RecordCount": 20,
       "PlayerSampleCount": 26,
       "Rows": [
@@ -5027,7 +5027,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.4175742+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3473494+09:00",
       "RecordCount": 163,
       "PlayerSampleCount": 243,
       "Rows": [
@@ -5123,7 +5123,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.4299335+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3583857+09:00",
       "RecordCount": 188,
       "PlayerSampleCount": 275,
       "Rows": [
@@ -5219,7 +5219,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.4386886+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3653729+09:00",
       "RecordCount": 73,
       "PlayerSampleCount": 152,
       "Rows": [
@@ -5306,7 +5306,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.4539561+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3782835+09:00",
       "RecordCount": 365,
       "PlayerSampleCount": 1062,
       "Rows": [
@@ -5402,7 +5402,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.4685919+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3912818+09:00",
       "RecordCount": 394,
       "PlayerSampleCount": 1231,
       "Rows": [
@@ -5498,7 +5498,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.4776032+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.3998947+09:00",
       "RecordCount": 139,
       "PlayerSampleCount": 660,
       "Rows": [
@@ -5594,7 +5594,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.4945505+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4180635+09:00",
       "RecordCount": 452,
       "PlayerSampleCount": 2196,
       "Rows": [
@@ -5690,7 +5690,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.5146084+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4347096+09:00",
       "RecordCount": 471,
       "PlayerSampleCount": 2228,
       "Rows": [
@@ -5786,7 +5786,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.5269398+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4424274+09:00",
       "RecordCount": 129,
       "PlayerSampleCount": 532,
       "Rows": [
@@ -5873,7 +5873,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.5427521+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4545687+09:00",
       "RecordCount": 318,
       "PlayerSampleCount": 900,
       "Rows": [
@@ -5960,7 +5960,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.5613228+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4709263+09:00",
       "RecordCount": 318,
       "PlayerSampleCount": 900,
       "Rows": [
@@ -6047,7 +6047,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:37.5717914+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4772849+09:00",
       "RecordCount": 42,
       "PlayerSampleCount": 65,
       "Rows": [
@@ -6134,7 +6134,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:37.5845831+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4881918+09:00",
       "RecordCount": 59,
       "PlayerSampleCount": 89,
       "Rows": [
@@ -6221,7 +6221,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:37.5963539+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.4978982+09:00",
       "RecordCount": 59,
       "PlayerSampleCount": 89,
       "Rows": [
@@ -6308,7 +6308,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:38.0839494+09:00",
+      "GeneratedAt": "2026-07-08T22:15:57.7755258+09:00",
       "RecordCount": 5631,
       "PlayerSampleCount": 28155,
       "Rows": [
@@ -6404,7 +6404,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:39.5532198+09:00",
+      "GeneratedAt": "2026-07-08T22:15:59.1220449+09:00",
       "RecordCount": 38286,
       "PlayerSampleCount": 191430,
       "Rows": [
@@ -6500,7 +6500,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:40.9660922+09:00",
+      "GeneratedAt": "2026-07-08T22:16:01.7913795+09:00",
       "RecordCount": 38286,
       "PlayerSampleCount": 191430,
       "Rows": [
@@ -6596,7 +6596,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:41.1608507+09:00",
+      "GeneratedAt": "2026-07-08T22:16:02.2898824+09:00",
       "RecordCount": 283,
       "PlayerSampleCount": 288,
       "Rows": [
@@ -6683,7 +6683,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:41.8285193+09:00",
+      "GeneratedAt": "2026-07-08T22:16:02.7590823+09:00",
       "RecordCount": 1052,
       "PlayerSampleCount": 1069,
       "Rows": [
@@ -6779,7 +6779,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:42.3533918+09:00",
+      "GeneratedAt": "2026-07-08T22:16:03.2100105+09:00",
       "RecordCount": 1052,
       "PlayerSampleCount": 1069,
       "Rows": [
@@ -6875,7 +6875,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:42.516786+09:00",
+      "GeneratedAt": "2026-07-08T22:16:03.3586335+09:00",
       "RecordCount": 670,
       "PlayerSampleCount": 738,
       "Rows": [
@@ -6971,7 +6971,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:43.1322441+09:00",
+      "GeneratedAt": "2026-07-08T22:16:03.8951366+09:00",
       "RecordCount": 2915,
       "PlayerSampleCount": 3211,
       "Rows": [
@@ -7067,7 +7067,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:43.6860589+09:00",
+      "GeneratedAt": "2026-07-08T22:16:04.3532201+09:00",
       "RecordCount": 2915,
       "PlayerSampleCount": 3211,
       "Rows": [
@@ -7163,7 +7163,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:43.827748+09:00",
+      "GeneratedAt": "2026-07-08T22:16:04.4743297+09:00",
       "RecordCount": 485,
       "PlayerSampleCount": 570,
       "Rows": [
@@ -7259,7 +7259,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:44.3947265+09:00",
+      "GeneratedAt": "2026-07-08T22:16:04.9306845+09:00",
       "RecordCount": 3799,
       "PlayerSampleCount": 4668,
       "Rows": [
@@ -7355,7 +7355,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:44.8930235+09:00",
+      "GeneratedAt": "2026-07-08T22:16:05.4163959+09:00",
       "RecordCount": 3799,
       "PlayerSampleCount": 4668,
       "Rows": [
@@ -7451,7 +7451,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:45.0636348+09:00",
+      "GeneratedAt": "2026-07-08T22:16:05.5740367+09:00",
       "RecordCount": 1712,
       "PlayerSampleCount": 3710,
       "Rows": [
@@ -7547,7 +7547,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:45.7468289+09:00",
+      "GeneratedAt": "2026-07-08T22:16:06.1670091+09:00",
       "RecordCount": 14952,
       "PlayerSampleCount": 34051,
       "Rows": [
@@ -7643,7 +7643,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:46.4153077+09:00",
+      "GeneratedAt": "2026-07-08T22:16:06.7321045+09:00",
       "RecordCount": 14952,
       "PlayerSampleCount": 34051,
       "Rows": [
@@ -7739,7 +7739,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:46.5935469+09:00",
+      "GeneratedAt": "2026-07-08T22:16:06.9064201+09:00",
       "RecordCount": 3943,
       "PlayerSampleCount": 10675,
       "Rows": [
@@ -7835,7 +7835,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:47.4058744+09:00",
+      "GeneratedAt": "2026-07-08T22:16:07.7605931+09:00",
       "RecordCount": 29537,
       "PlayerSampleCount": 81920,
       "Rows": [
@@ -7931,7 +7931,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:48.2098611+09:00",
+      "GeneratedAt": "2026-07-08T22:16:08.590473+09:00",
       "RecordCount": 29537,
       "PlayerSampleCount": 81920,
       "Rows": [
@@ -8027,7 +8027,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:48.3643467+09:00",
+      "GeneratedAt": "2026-07-08T22:16:08.7723511+09:00",
       "RecordCount": 3921,
       "PlayerSampleCount": 10198,
       "Rows": [
@@ -8123,7 +8123,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:49.0603967+09:00",
+      "GeneratedAt": "2026-07-08T22:16:09.4601307+09:00",
       "RecordCount": 21477,
       "PlayerSampleCount": 51035,
       "Rows": [
@@ -8219,7 +8219,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:49.7289299+09:00",
+      "GeneratedAt": "2026-07-08T22:16:10.0955568+09:00",
       "RecordCount": 21477,
       "PlayerSampleCount": 51035,
       "Rows": [
@@ -8315,7 +8315,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:49.8737345+09:00",
+      "GeneratedAt": "2026-07-08T22:16:10.2466641+09:00",
       "RecordCount": 1195,
       "PlayerSampleCount": 1852,
       "Rows": [
@@ -8402,7 +8402,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:50.3896005+09:00",
+      "GeneratedAt": "2026-07-08T22:16:10.7403616+09:00",
       "RecordCount": 4277,
       "PlayerSampleCount": 5731,
       "Rows": [
@@ -8489,7 +8489,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:50.8539145+09:00",
+      "GeneratedAt": "2026-07-08T22:16:11.2082559+09:00",
       "RecordCount": 4277,
       "PlayerSampleCount": 5731,
       "Rows": [
@@ -8576,7 +8576,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:51.0155701+09:00",
+      "GeneratedAt": "2026-07-08T22:16:11.357345+09:00",
       "RecordCount": 1985,
       "PlayerSampleCount": 9925,
       "Rows": [
@@ -8672,7 +8672,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:51.4933251+09:00",
+      "GeneratedAt": "2026-07-08T22:16:11.8394589+09:00",
       "RecordCount": 13274,
       "PlayerSampleCount": 66370,
       "Rows": [
@@ -8768,7 +8768,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:51.9709358+09:00",
+      "GeneratedAt": "2026-07-08T22:16:12.2795548+09:00",
       "RecordCount": 13274,
       "PlayerSampleCount": 66370,
       "Rows": [
@@ -8864,7 +8864,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:52.1825258+09:00",
+      "GeneratedAt": "2026-07-08T22:16:12.3926728+09:00",
       "RecordCount": 99,
       "PlayerSampleCount": 101,
       "Rows": [
@@ -8951,7 +8951,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:52.3986967+09:00",
+      "GeneratedAt": "2026-07-08T22:16:12.597677+09:00",
       "RecordCount": 342,
       "PlayerSampleCount": 347,
       "Rows": [
@@ -9047,7 +9047,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:52.6182691+09:00",
+      "GeneratedAt": "2026-07-08T22:16:12.7984888+09:00",
       "RecordCount": 342,
       "PlayerSampleCount": 347,
       "Rows": [
@@ -9143,7 +9143,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:52.7997928+09:00",
+      "GeneratedAt": "2026-07-08T22:16:12.936085+09:00",
       "RecordCount": 222,
       "PlayerSampleCount": 237,
       "Rows": [
@@ -9239,7 +9239,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:53.0800483+09:00",
+      "GeneratedAt": "2026-07-08T22:16:13.2021665+09:00",
       "RecordCount": 908,
       "PlayerSampleCount": 984,
       "Rows": [
@@ -9335,7 +9335,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:53.3150253+09:00",
+      "GeneratedAt": "2026-07-08T22:16:13.4716106+09:00",
       "RecordCount": 908,
       "PlayerSampleCount": 984,
       "Rows": [
@@ -9431,7 +9431,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:53.4443739+09:00",
+      "GeneratedAt": "2026-07-08T22:16:13.6103069+09:00",
       "RecordCount": 155,
       "PlayerSampleCount": 183,
       "Rows": [
@@ -9527,7 +9527,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:53.6644838+09:00",
+      "GeneratedAt": "2026-07-08T22:16:13.9072643+09:00",
       "RecordCount": 1218,
       "PlayerSampleCount": 1500,
       "Rows": [
@@ -9623,7 +9623,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:53.8863092+09:00",
+      "GeneratedAt": "2026-07-08T22:16:14.2479225+09:00",
       "RecordCount": 1218,
       "PlayerSampleCount": 1500,
       "Rows": [
@@ -9719,7 +9719,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:54.011894+09:00",
+      "GeneratedAt": "2026-07-08T22:16:14.4783959+09:00",
       "RecordCount": 598,
       "PlayerSampleCount": 1269,
       "Rows": [
@@ -9815,7 +9815,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:54.2698138+09:00",
+      "GeneratedAt": "2026-07-08T22:16:14.8545403+09:00",
       "RecordCount": 5006,
       "PlayerSampleCount": 11028,
       "Rows": [
@@ -9911,7 +9911,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:54.539163+09:00",
+      "GeneratedAt": "2026-07-08T22:16:15.1915749+09:00",
       "RecordCount": 5006,
       "PlayerSampleCount": 11028,
       "Rows": [
@@ -10007,7 +10007,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:54.6969854+09:00",
+      "GeneratedAt": "2026-07-08T22:16:15.375773+09:00",
       "RecordCount": 1393,
       "PlayerSampleCount": 3736,
       "Rows": [
@@ -10103,7 +10103,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:55.0304773+09:00",
+      "GeneratedAt": "2026-07-08T22:16:16.035295+09:00",
       "RecordCount": 10069,
       "PlayerSampleCount": 26935,
       "Rows": [
@@ -10199,7 +10199,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:55.3608422+09:00",
+      "GeneratedAt": "2026-07-08T22:16:16.4660732+09:00",
       "RecordCount": 10069,
       "PlayerSampleCount": 26935,
       "Rows": [
@@ -10295,7 +10295,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:55.5058105+09:00",
+      "GeneratedAt": "2026-07-08T22:16:16.6411874+09:00",
       "RecordCount": 1399,
       "PlayerSampleCount": 3652,
       "Rows": [
@@ -10391,7 +10391,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:55.7901255+09:00",
+      "GeneratedAt": "2026-07-08T22:16:17.0110797+09:00",
       "RecordCount": 7352,
       "PlayerSampleCount": 17082,
       "Rows": [
@@ -10487,7 +10487,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:56.11277+09:00",
+      "GeneratedAt": "2026-07-08T22:16:17.323152+09:00",
       "RecordCount": 7352,
       "PlayerSampleCount": 17082,
       "Rows": [
@@ -10583,7 +10583,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:56.259937+09:00",
+      "GeneratedAt": "2026-07-08T22:16:17.4605408+09:00",
       "RecordCount": 420,
       "PlayerSampleCount": 664,
       "Rows": [
@@ -10670,7 +10670,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:56.5008669+09:00",
+      "GeneratedAt": "2026-07-08T22:16:17.7225135+09:00",
       "RecordCount": 1451,
       "PlayerSampleCount": 1952,
       "Rows": [
@@ -10757,7 +10757,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:56.7420869+09:00",
+      "GeneratedAt": "2026-07-08T22:16:17.9528884+09:00",
       "RecordCount": 1451,
       "PlayerSampleCount": 1952,
       "Rows": [
@@ -10844,7 +10844,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:56.8962528+09:00",
+      "GeneratedAt": "2026-07-08T22:16:18.0886393+09:00",
       "RecordCount": 1819,
       "PlayerSampleCount": 9095,
       "Rows": [
@@ -10940,7 +10940,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:57.3555334+09:00",
+      "GeneratedAt": "2026-07-08T22:16:18.5406678+09:00",
       "RecordCount": 12556,
       "PlayerSampleCount": 62780,
       "Rows": [
@@ -11036,7 +11036,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:57.7692594+09:00",
+      "GeneratedAt": "2026-07-08T22:16:19.0637752+09:00",
       "RecordCount": 12556,
       "PlayerSampleCount": 62780,
       "Rows": [
@@ -11132,7 +11132,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:57.8940186+09:00",
+      "GeneratedAt": "2026-07-08T22:16:19.1831137+09:00",
       "RecordCount": 90,
       "PlayerSampleCount": 92,
       "Rows": [
@@ -11219,7 +11219,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:58.1413138+09:00",
+      "GeneratedAt": "2026-07-08T22:16:19.3947254+09:00",
       "RecordCount": 341,
       "PlayerSampleCount": 347,
       "Rows": [
@@ -11315,7 +11315,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:58.3659716+09:00",
+      "GeneratedAt": "2026-07-08T22:16:19.6078209+09:00",
       "RecordCount": 341,
       "PlayerSampleCount": 347,
       "Rows": [
@@ -11411,7 +11411,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:58.4933855+09:00",
+      "GeneratedAt": "2026-07-08T22:16:19.7312967+09:00",
       "RecordCount": 213,
       "PlayerSampleCount": 232,
       "Rows": [
@@ -11507,7 +11507,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:58.723287+09:00",
+      "GeneratedAt": "2026-07-08T22:16:19.9681925+09:00",
       "RecordCount": 938,
       "PlayerSampleCount": 1016,
       "Rows": [
@@ -11603,7 +11603,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:58.9425472+09:00",
+      "GeneratedAt": "2026-07-08T22:16:20.2031264+09:00",
       "RecordCount": 938,
       "PlayerSampleCount": 1016,
       "Rows": [
@@ -11699,7 +11699,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:59.073738+09:00",
+      "GeneratedAt": "2026-07-08T22:16:20.3494423+09:00",
       "RecordCount": 157,
       "PlayerSampleCount": 186,
       "Rows": [
@@ -11795,7 +11795,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:59.3111856+09:00",
+      "GeneratedAt": "2026-07-08T22:16:20.6106727+09:00",
       "RecordCount": 1222,
       "PlayerSampleCount": 1505,
       "Rows": [
@@ -11891,7 +11891,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:13:59.5333489+09:00",
+      "GeneratedAt": "2026-07-08T22:16:20.848838+09:00",
       "RecordCount": 1222,
       "PlayerSampleCount": 1505,
       "Rows": [
@@ -11987,7 +11987,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:13:59.6646181+09:00",
+      "GeneratedAt": "2026-07-08T22:16:20.9893795+09:00",
       "RecordCount": 549,
       "PlayerSampleCount": 1193,
       "Rows": [
@@ -12083,7 +12083,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:13:59.9171978+09:00",
+      "GeneratedAt": "2026-07-08T22:16:21.258743+09:00",
       "RecordCount": 4869,
       "PlayerSampleCount": 11062,
       "Rows": [
@@ -12179,7 +12179,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:00.1868073+09:00",
+      "GeneratedAt": "2026-07-08T22:16:21.513662+09:00",
       "RecordCount": 4869,
       "PlayerSampleCount": 11062,
       "Rows": [
@@ -12275,7 +12275,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:00.3214094+09:00",
+      "GeneratedAt": "2026-07-08T22:16:21.6599753+09:00",
       "RecordCount": 1277,
       "PlayerSampleCount": 3424,
       "Rows": [
@@ -12371,7 +12371,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:00.6278645+09:00",
+      "GeneratedAt": "2026-07-08T22:16:21.9778899+09:00",
       "RecordCount": 9729,
       "PlayerSampleCount": 26980,
       "Rows": [
@@ -12467,7 +12467,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:00.9180172+09:00",
+      "GeneratedAt": "2026-07-08T22:16:22.319877+09:00",
       "RecordCount": 9729,
       "PlayerSampleCount": 26980,
       "Rows": [
@@ -12563,7 +12563,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:01.0554839+09:00",
+      "GeneratedAt": "2026-07-08T22:16:22.4613059+09:00",
       "RecordCount": 1274,
       "PlayerSampleCount": 3325,
       "Rows": [
@@ -12650,7 +12650,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:01.3366073+09:00",
+      "GeneratedAt": "2026-07-08T22:16:22.7499593+09:00",
       "RecordCount": 7065,
       "PlayerSampleCount": 16809,
       "Rows": [
@@ -12737,7 +12737,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:01.6111512+09:00",
+      "GeneratedAt": "2026-07-08T22:16:23.0425713+09:00",
       "RecordCount": 7065,
       "PlayerSampleCount": 16809,
       "Rows": [
@@ -12824,7 +12824,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:01.73422+09:00",
+      "GeneratedAt": "2026-07-08T22:16:23.1827725+09:00",
       "RecordCount": 390,
       "PlayerSampleCount": 603,
       "Rows": [
@@ -12911,7 +12911,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:01.9524176+09:00",
+      "GeneratedAt": "2026-07-08T22:16:23.4561498+09:00",
       "RecordCount": 1395,
       "PlayerSampleCount": 1872,
       "Rows": [
@@ -12998,7 +12998,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:02.1711772+09:00",
+      "GeneratedAt": "2026-07-08T22:16:23.6862239+09:00",
       "RecordCount": 1395,
       "PlayerSampleCount": 1872,
       "Rows": [
@@ -13085,7 +13085,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:02.3148007+09:00",
+      "GeneratedAt": "2026-07-08T22:16:23.8850332+09:00",
       "RecordCount": 1827,
       "PlayerSampleCount": 9135,
       "Rows": [
@@ -13181,7 +13181,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:02.7724225+09:00",
+      "GeneratedAt": "2026-07-08T22:16:24.4825418+09:00",
       "RecordCount": 12456,
       "PlayerSampleCount": 62280,
       "Rows": [
@@ -13277,7 +13277,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:03.2057858+09:00",
+      "GeneratedAt": "2026-07-08T22:16:25.0960403+09:00",
       "RecordCount": 12456,
       "PlayerSampleCount": 62280,
       "Rows": [
@@ -13373,7 +13373,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:03.3263159+09:00",
+      "GeneratedAt": "2026-07-08T22:16:25.235134+09:00",
       "RecordCount": 94,
       "PlayerSampleCount": 95,
       "Rows": [
@@ -13460,7 +13460,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:03.537613+09:00",
+      "GeneratedAt": "2026-07-08T22:16:25.4928041+09:00",
       "RecordCount": 369,
       "PlayerSampleCount": 375,
       "Rows": [
@@ -13556,7 +13556,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:03.7552706+09:00",
+      "GeneratedAt": "2026-07-08T22:16:25.7613088+09:00",
       "RecordCount": 369,
       "PlayerSampleCount": 375,
       "Rows": [
@@ -13652,7 +13652,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:03.8838405+09:00",
+      "GeneratedAt": "2026-07-08T22:16:25.9057294+09:00",
       "RecordCount": 235,
       "PlayerSampleCount": 269,
       "Rows": [
@@ -13748,7 +13748,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:04.1118011+09:00",
+      "GeneratedAt": "2026-07-08T22:16:26.149685+09:00",
       "RecordCount": 1069,
       "PlayerSampleCount": 1211,
       "Rows": [
@@ -13844,7 +13844,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:04.3367052+09:00",
+      "GeneratedAt": "2026-07-08T22:16:26.3892577+09:00",
       "RecordCount": 1069,
       "PlayerSampleCount": 1211,
       "Rows": [
@@ -13940,7 +13940,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:04.4747536+09:00",
+      "GeneratedAt": "2026-07-08T22:16:26.5249044+09:00",
       "RecordCount": 173,
       "PlayerSampleCount": 201,
       "Rows": [
@@ -14036,7 +14036,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:04.6910764+09:00",
+      "GeneratedAt": "2026-07-08T22:16:26.8633048+09:00",
       "RecordCount": 1359,
       "PlayerSampleCount": 1663,
       "Rows": [
@@ -14132,7 +14132,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:04.9101386+09:00",
+      "GeneratedAt": "2026-07-08T22:16:27.2247308+09:00",
       "RecordCount": 1359,
       "PlayerSampleCount": 1663,
       "Rows": [
@@ -14228,7 +14228,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:05.0356587+09:00",
+      "GeneratedAt": "2026-07-08T22:16:27.436072+09:00",
       "RecordCount": 565,
       "PlayerSampleCount": 1248,
       "Rows": [
@@ -14324,7 +14324,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:05.3257735+09:00",
+      "GeneratedAt": "2026-07-08T22:16:27.8123691+09:00",
       "RecordCount": 5077,
       "PlayerSampleCount": 11961,
       "Rows": [
@@ -14420,7 +14420,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:05.6094928+09:00",
+      "GeneratedAt": "2026-07-08T22:16:28.132843+09:00",
       "RecordCount": 5077,
       "PlayerSampleCount": 11961,
       "Rows": [
@@ -14516,7 +14516,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:05.7577409+09:00",
+      "GeneratedAt": "2026-07-08T22:16:28.3022891+09:00",
       "RecordCount": 1273,
       "PlayerSampleCount": 3515,
       "Rows": [
@@ -14612,7 +14612,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:06.1044382+09:00",
+      "GeneratedAt": "2026-07-08T22:16:28.6121895+09:00",
       "RecordCount": 9739,
       "PlayerSampleCount": 28005,
       "Rows": [
@@ -14708,7 +14708,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:06.4283958+09:00",
+      "GeneratedAt": "2026-07-08T22:16:28.968533+09:00",
       "RecordCount": 9739,
       "PlayerSampleCount": 28005,
       "Rows": [
@@ -14804,7 +14804,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:06.5989332+09:00",
+      "GeneratedAt": "2026-07-08T22:16:29.1891838+09:00",
       "RecordCount": 1248,
       "PlayerSampleCount": 3221,
       "Rows": [
@@ -14891,7 +14891,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:06.8964456+09:00",
+      "GeneratedAt": "2026-07-08T22:16:29.6228373+09:00",
       "RecordCount": 7060,
       "PlayerSampleCount": 17144,
       "Rows": [
@@ -14978,7 +14978,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:07.1790356+09:00",
+      "GeneratedAt": "2026-07-08T22:16:29.9179869+09:00",
       "RecordCount": 7060,
       "PlayerSampleCount": 17144,
       "Rows": [
@@ -15065,7 +15065,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:07.3386802+09:00",
+      "GeneratedAt": "2026-07-08T22:16:30.027885+09:00",
       "RecordCount": 385,
       "PlayerSampleCount": 585,
       "Rows": [
@@ -15152,7 +15152,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:07.5977345+09:00",
+      "GeneratedAt": "2026-07-08T22:16:30.2284685+09:00",
       "RecordCount": 1431,
       "PlayerSampleCount": 1907,
       "Rows": [
@@ -15239,7 +15239,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:07.8043662+09:00",
+      "GeneratedAt": "2026-07-08T22:16:30.4781443+09:00",
       "RecordCount": 1431,
       "PlayerSampleCount": 1907,
       "Rows": [
@@ -15326,7 +15326,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:07.842441+09:00",
+      "GeneratedAt": "2026-07-08T22:16:30.5222075+09:00",
       "RecordCount": 740,
       "PlayerSampleCount": 3700,
       "Rows": [
@@ -15422,7 +15422,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:08.1354055+09:00",
+      "GeneratedAt": "2026-07-08T22:16:30.8204326+09:00",
       "RecordCount": 10077,
       "PlayerSampleCount": 50385,
       "Rows": [
@@ -15518,7 +15518,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:08.3950388+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.1342356+09:00",
       "RecordCount": 10077,
       "PlayerSampleCount": 50385,
       "Rows": [
@@ -15614,7 +15614,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:08.4231247+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.1651902+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -15628,7 +15628,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:08.5241186+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.2683385+09:00",
       "RecordCount": 1,
       "PlayerSampleCount": 1,
       "Rows": [
@@ -15652,7 +15652,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:08.6167634+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.3871297+09:00",
       "RecordCount": 1,
       "PlayerSampleCount": 1,
       "Rows": [
@@ -15676,7 +15676,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:08.6462092+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.4214072+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -15690,7 +15690,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:08.7483907+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.541512+09:00",
       "RecordCount": 14,
       "PlayerSampleCount": 14,
       "Rows": [
@@ -15723,7 +15723,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:08.8416483+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.6480797+09:00",
       "RecordCount": 14,
       "PlayerSampleCount": 14,
       "Rows": [
@@ -15756,7 +15756,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:08.8703216+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.6893864+09:00",
       "RecordCount": 6,
       "PlayerSampleCount": 6,
       "Rows": [
@@ -15798,7 +15798,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:08.9696216+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.8231021+09:00",
       "RecordCount": 272,
       "PlayerSampleCount": 276,
       "Rows": [
@@ -15894,7 +15894,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:09.0641122+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.9361939+09:00",
       "RecordCount": 272,
       "PlayerSampleCount": 276,
       "Rows": [
@@ -15990,7 +15990,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:09.0958318+09:00",
+      "GeneratedAt": "2026-07-08T22:16:31.9728667+09:00",
       "RecordCount": 237,
       "PlayerSampleCount": 338,
       "Rows": [
@@ -16086,7 +16086,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:09.2134285+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.1009504+09:00",
       "RecordCount": 3349,
       "PlayerSampleCount": 5855,
       "Rows": [
@@ -16182,7 +16182,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:09.3308008+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.213909+09:00",
       "RecordCount": 3349,
       "PlayerSampleCount": 5855,
       "Rows": [
@@ -16278,7 +16278,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:09.3627535+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.2528592+09:00",
       "RecordCount": 623,
       "PlayerSampleCount": 1979,
       "Rows": [
@@ -16374,7 +16374,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:09.5536352+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.5133044+09:00",
       "RecordCount": 8689,
       "PlayerSampleCount": 26792,
       "Rows": [
@@ -16470,7 +16470,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:09.7448201+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.7558622+09:00",
       "RecordCount": 8689,
       "PlayerSampleCount": 26792,
       "Rows": [
@@ -16566,7 +16566,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:09.7740331+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.7923279+09:00",
       "RecordCount": 471,
       "PlayerSampleCount": 1127,
       "Rows": [
@@ -16653,7 +16653,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:09.8953344+09:00",
+      "GeneratedAt": "2026-07-08T22:16:32.9335178+09:00",
       "RecordCount": 5353,
       "PlayerSampleCount": 12342,
       "Rows": [
@@ -16740,7 +16740,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:10.0384641+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.0707891+09:00",
       "RecordCount": 5353,
       "PlayerSampleCount": 12342,
       "Rows": [
@@ -16827,7 +16827,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:10.0678774+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.0986789+09:00",
       "RecordCount": 129,
       "PlayerSampleCount": 181,
       "Rows": [
@@ -16914,7 +16914,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:10.1649589+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.1909147+09:00",
       "RecordCount": 870,
       "PlayerSampleCount": 1048,
       "Rows": [
@@ -17001,7 +17001,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:10.2544961+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.2759029+09:00",
       "RecordCount": 870,
       "PlayerSampleCount": 1048,
       "Rows": [
@@ -17088,7 +17088,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:10.2859087+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.3080754+09:00",
       "RecordCount": 252,
       "PlayerSampleCount": 1260,
       "Rows": [
@@ -17184,7 +17184,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:10.3893791+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.433261+09:00",
       "RecordCount": 3410,
       "PlayerSampleCount": 17050,
       "Rows": [
@@ -17280,7 +17280,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:10.4928169+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.54236+09:00",
       "RecordCount": 3410,
       "PlayerSampleCount": 17050,
       "Rows": [
@@ -17376,7 +17376,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:10.5252012+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.5737573+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -17390,7 +17390,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:10.5853084+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.6280437+09:00",
       "RecordCount": 1,
       "PlayerSampleCount": 1,
       "Rows": [
@@ -17414,7 +17414,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:10.6352549+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.6785475+09:00",
       "RecordCount": 1,
       "PlayerSampleCount": 1,
       "Rows": [
@@ -17438,7 +17438,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:10.6647527+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.7063464+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -17452,7 +17452,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:10.7145224+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.7569785+09:00",
       "RecordCount": 5,
       "PlayerSampleCount": 5,
       "Rows": [
@@ -17485,7 +17485,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:10.7676531+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.8086608+09:00",
       "RecordCount": 5,
       "PlayerSampleCount": 5,
       "Rows": [
@@ -17518,7 +17518,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:10.7952435+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.8389745+09:00",
       "RecordCount": 3,
       "PlayerSampleCount": 3,
       "Rows": [
@@ -17551,7 +17551,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:10.8489892+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.8891436+09:00",
       "RecordCount": 83,
       "PlayerSampleCount": 84,
       "Rows": [
@@ -17647,7 +17647,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:10.9000468+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.9398597+09:00",
       "RecordCount": 83,
       "PlayerSampleCount": 84,
       "Rows": [
@@ -17743,7 +17743,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:10.9288229+09:00",
+      "GeneratedAt": "2026-07-08T22:16:33.9710587+09:00",
       "RecordCount": 73,
       "PlayerSampleCount": 106,
       "Rows": [
@@ -17839,7 +17839,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:10.9867878+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.0303798+09:00",
       "RecordCount": 1068,
       "PlayerSampleCount": 1856,
       "Rows": [
@@ -17935,7 +17935,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:11.0454502+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.0919412+09:00",
       "RecordCount": 1068,
       "PlayerSampleCount": 1856,
       "Rows": [
@@ -18031,7 +18031,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:11.0767882+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.1227403+09:00",
       "RecordCount": 207,
       "PlayerSampleCount": 653,
       "Rows": [
@@ -18127,7 +18127,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:11.1560928+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.2019182+09:00",
       "RecordCount": 2892,
       "PlayerSampleCount": 8411,
       "Rows": [
@@ -18223,7 +18223,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:11.232845+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.2770475+09:00",
       "RecordCount": 2892,
       "PlayerSampleCount": 8411,
       "Rows": [
@@ -18319,7 +18319,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:11.2626822+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.3121077+09:00",
       "RecordCount": 167,
       "PlayerSampleCount": 404,
       "Rows": [
@@ -18406,7 +18406,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:11.3287468+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.3846693+09:00",
       "RecordCount": 1764,
       "PlayerSampleCount": 3970,
       "Rows": [
@@ -18493,7 +18493,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:11.4029717+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.4524464+09:00",
       "RecordCount": 1764,
       "PlayerSampleCount": 3970,
       "Rows": [
@@ -18580,7 +18580,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:11.431728+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.4804589+09:00",
       "RecordCount": 44,
       "PlayerSampleCount": 62,
       "Rows": [
@@ -18667,7 +18667,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:11.4873477+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.5370824+09:00",
       "RecordCount": 297,
       "PlayerSampleCount": 364,
       "Rows": [
@@ -18754,7 +18754,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:11.5472131+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.596426+09:00",
       "RecordCount": 297,
       "PlayerSampleCount": 364,
       "Rows": [
@@ -18841,7 +18841,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:11.5777136+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.6265432+09:00",
       "RecordCount": 237,
       "PlayerSampleCount": 1185,
       "Rows": [
@@ -18937,7 +18937,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:11.676613+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.7193742+09:00",
       "RecordCount": 3257,
       "PlayerSampleCount": 16285,
       "Rows": [
@@ -19033,7 +19033,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:11.780112+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.8119567+09:00",
       "RecordCount": 3257,
       "PlayerSampleCount": 16285,
       "Rows": [
@@ -19129,7 +19129,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:11.8107709+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.8390999+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -19143,7 +19143,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:11.868579+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.8852182+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -19157,7 +19157,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:11.9202853+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.9330967+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -19171,7 +19171,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:11.9533607+09:00",
+      "GeneratedAt": "2026-07-08T22:16:34.9596883+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -19185,7 +19185,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:12.0091834+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.0113621+09:00",
       "RecordCount": 6,
       "PlayerSampleCount": 6,
       "Rows": [
@@ -19218,7 +19218,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:12.073554+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.0622565+09:00",
       "RecordCount": 6,
       "PlayerSampleCount": 6,
       "Rows": [
@@ -19251,7 +19251,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:12.1059189+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.0891652+09:00",
       "RecordCount": 2,
       "PlayerSampleCount": 2,
       "Rows": [
@@ -19284,7 +19284,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:12.1620844+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.1420709+09:00",
       "RecordCount": 89,
       "PlayerSampleCount": 91,
       "Rows": [
@@ -19380,7 +19380,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:12.2161654+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.1927802+09:00",
       "RecordCount": 89,
       "PlayerSampleCount": 91,
       "Rows": [
@@ -19476,7 +19476,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:12.2462073+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.2206194+09:00",
       "RecordCount": 82,
       "PlayerSampleCount": 119,
       "Rows": [
@@ -19572,7 +19572,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:12.3047665+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.2737023+09:00",
       "RecordCount": 1084,
       "PlayerSampleCount": 1886,
       "Rows": [
@@ -19668,7 +19668,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:12.3661611+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.3253496+09:00",
       "RecordCount": 1084,
       "PlayerSampleCount": 1886,
       "Rows": [
@@ -19764,7 +19764,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:12.3971128+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.3534017+09:00",
       "RecordCount": 198,
       "PlayerSampleCount": 638,
       "Rows": [
@@ -19860,7 +19860,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:12.478674+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.4267038+09:00",
       "RecordCount": 2799,
       "PlayerSampleCount": 8579,
       "Rows": [
@@ -19956,7 +19956,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:12.5730742+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.5003691+09:00",
       "RecordCount": 2799,
       "PlayerSampleCount": 8579,
       "Rows": [
@@ -20052,7 +20052,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:12.6052643+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.5310967+09:00",
       "RecordCount": 144,
       "PlayerSampleCount": 344,
       "Rows": [
@@ -20139,7 +20139,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:12.673553+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.6027772+09:00",
       "RecordCount": 1707,
       "PlayerSampleCount": 3909,
       "Rows": [
@@ -20226,7 +20226,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:12.7427188+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.6617697+09:00",
       "RecordCount": 1707,
       "PlayerSampleCount": 3909,
       "Rows": [
@@ -20313,7 +20313,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:12.7783358+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.688718+09:00",
       "RecordCount": 41,
       "PlayerSampleCount": 60,
       "Rows": [
@@ -20400,7 +20400,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:12.8382124+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.7363624+09:00",
       "RecordCount": 278,
       "PlayerSampleCount": 334,
       "Rows": [
@@ -20487,7 +20487,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:12.8938611+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.7855937+09:00",
       "RecordCount": 278,
       "PlayerSampleCount": 334,
       "Rows": [
@@ -20574,7 +20574,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:12.9302508+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.8181676+09:00",
       "RecordCount": 251,
       "PlayerSampleCount": 1255,
       "Rows": [
@@ -20670,7 +20670,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:13.0519346+09:00",
+      "GeneratedAt": "2026-07-08T22:16:35.9162611+09:00",
       "RecordCount": 3410,
       "PlayerSampleCount": 17050,
       "Rows": [
@@ -20766,7 +20766,7 @@
       "CpTierLabel": "\uC804\uCCB4 CP",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:13.1677602+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.0178086+09:00",
       "RecordCount": 3410,
       "PlayerSampleCount": 17050,
       "Rows": [
@@ -20862,7 +20862,7 @@
       "CpTierLabel": "~399K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:13.1993345+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.0467904+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -20876,7 +20876,7 @@
       "CpTierLabel": "~399K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:13.2546701+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.0970917+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -20890,7 +20890,7 @@
       "CpTierLabel": "~399K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:13.311408+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.1477275+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -20904,7 +20904,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:13.3429806+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.1748762+09:00",
       "RecordCount": 0,
       "PlayerSampleCount": 0,
       "Rows": []
@@ -20918,7 +20918,7 @@
       "CpTierLabel": "400~499K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:13.4018073+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.2263019+09:00",
       "RecordCount": 3,
       "PlayerSampleCount": 3,
       "Rows": [
@@ -20951,7 +20951,7 @@
       "CpTierLabel": "400~499K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:13.4530046+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.273175+09:00",
       "RecordCount": 3,
       "PlayerSampleCount": 3,
       "Rows": [
@@ -20984,7 +20984,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:13.4805261+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.3007425+09:00",
       "RecordCount": 1,
       "PlayerSampleCount": 1,
       "Rows": [
@@ -21008,7 +21008,7 @@
       "CpTierLabel": "500~599K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:13.5323679+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.3509166+09:00",
       "RecordCount": 100,
       "PlayerSampleCount": 101,
       "Rows": [
@@ -21104,7 +21104,7 @@
       "CpTierLabel": "500~599K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:13.588171+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.3999947+09:00",
       "RecordCount": 100,
       "PlayerSampleCount": 101,
       "Rows": [
@@ -21200,7 +21200,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:13.6204221+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.4292225+09:00",
       "RecordCount": 82,
       "PlayerSampleCount": 113,
       "Rows": [
@@ -21296,7 +21296,7 @@
       "CpTierLabel": "600~699K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:13.6809539+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.4829723+09:00",
       "RecordCount": 1197,
       "PlayerSampleCount": 2113,
       "Rows": [
@@ -21392,7 +21392,7 @@
       "CpTierLabel": "600~699K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:13.7447254+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.5366849+09:00",
       "RecordCount": 1197,
       "PlayerSampleCount": 2113,
       "Rows": [
@@ -21488,7 +21488,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:13.7794791+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.5682309+09:00",
       "RecordCount": 218,
       "PlayerSampleCount": 688,
       "Rows": [
@@ -21584,7 +21584,7 @@
       "CpTierLabel": "700~799K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:13.8615247+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.6475887+09:00",
       "RecordCount": 2998,
       "PlayerSampleCount": 9802,
       "Rows": [
@@ -21680,7 +21680,7 @@
       "CpTierLabel": "700~799K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:13.9438384+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.7229167+09:00",
       "RecordCount": 2998,
       "PlayerSampleCount": 9802,
       "Rows": [
@@ -21776,7 +21776,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:13.974757+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.7517018+09:00",
       "RecordCount": 160,
       "PlayerSampleCount": 379,
       "Rows": [
@@ -21863,7 +21863,7 @@
       "CpTierLabel": "800~899K",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:14.040446+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.8205902+09:00",
       "RecordCount": 1882,
       "PlayerSampleCount": 4463,
       "Rows": [
@@ -21950,7 +21950,7 @@
       "CpTierLabel": "800~899K",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:14.1027643+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.8830975+09:00",
       "RecordCount": 1882,
       "PlayerSampleCount": 4463,
       "Rows": [
@@ -22037,7 +22037,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Today",
       "PeriodLabel": "\uC624\uB298",
-      "GeneratedAt": "2026-07-08T22:14:14.1311681+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.9116093+09:00",
       "RecordCount": 44,
       "PlayerSampleCount": 59,
       "Rows": [
@@ -22124,7 +22124,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "Recent14Days",
       "PeriodLabel": "\uCD5C\uADFC 14\uC77C",
-      "GeneratedAt": "2026-07-08T22:14:14.1850068+09:00",
+      "GeneratedAt": "2026-07-08T22:16:36.9634193+09:00",
       "RecordCount": 295,
       "PlayerSampleCount": 350,
       "Rows": [
@@ -22211,7 +22211,7 @@
       "CpTierLabel": "900K\u002B",
       "Period": "All",
       "PeriodLabel": "\uC804\uCCB4 \uAE30\uAC04",
-      "GeneratedAt": "2026-07-08T22:14:14.2366991+09:00",
+      "GeneratedAt": "2026-07-08T22:16:37.0194803+09:00",
       "RecordCount": 295,
       "PlayerSampleCount": 350,
       "Rows": [
@@ -22293,6 +22293,6 @@
   "Signature": {
     "Algorithm": "RSA-SHA256-PKCS1-v1",
     "KeyId": "notmeter-ranking-2026-07",
-    "Value": "G1VZLUKTWaTUt6Asb2TB7wmXJzL81IL5wFAn\u002BFQXSR7bQQ35WxGVaPzqmjwSoz/0uvzOzBSX\u002BxAoKaWOySvuLp6ddR\u002BqY1mvuOQTPI8fM7L4DBmUsj0dQg32asTbXNlrZqij/KM4KKBncZaqt5agt5tDQrXfng/lK0jVAVur7jwvkpHLK8x1dK8IUS3lgL1\u002BN7Q\u002B6lsZU\u002BsodzMJVEnBpqmUKO3Ko\u002B7odZQ4uImGnmR4O0wWKQnL/dVLwQEn33bwoDsOsGgKoK7gPomgWdrP28BKtIIvXfrKZ/mjtFgLPt84Osp8h9n06OsT4kKilZZ8oBcE/SDq7Ajg1sNA8GyPbH2qpg0uWh5yVKg5r9Zv3iXgN3yXyc/zp2J9FWQk2lPWIfOf7fPq/N1tkBgK/eyCbrxnd7BL5AVDHnJGtx4osYN54Flk8/uVbEIIb/MV2BOCg6LZPYDlcLN\u002Bm979QbPbAWFUnEfEPdFkrWN1YfQhqJvEkG520OdgYVkEIj9dCj9J"
+    "Value": "nHzFg0SlsdyaKxYrViyTGtM01NtlzJRIvBkalVfeew4orRKjYEiQu2x/eFuYPBMRybcP3Ccu7E\u002B3wkwkyv6TazqsX052rU2EjaxLGQ3mxvFm2EAVXQn8x51fJS\u002B3KEBewsEO5yOvnB1M5pHxBb\u002BhnJ\u002BoBTfEDTg1YlgXhoVh3y5ZlS71IDKWHrlfIPsPX4tGswOrSRLxGGdXBpiLSo4YJ9tUMpLgJELUBh\u002BkLg281SFXPrC5H1RQomHdBufBgBPoNC/cBv5mParH3lRxTRwxoTD7Pn2tBlyPBJ\u002B3dlGlIqf7n/4iQEN9FAaMtNScxsENh60UdJddI0YZfgHlyvHIkwYPpEbmaXZmSmtt5wiR9/rpszhswq7sTfMwU/Wq7EwrEj5e7Z\u002B3WpTxFTnzlaPevLNdlY96kF\u002Byp2wKBrMsQCQCJBXPapfqTvTZ6bt0x2tQU1WJWTY4KaW4sI5BLe0kaGu3ve1az3UWFARxoP\u002B0A/N0DpfJ0oqDjTm0wqDhIUMu"
   }
 }
