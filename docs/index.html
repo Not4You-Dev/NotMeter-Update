@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111a">
+  <meta name="description" content="NotMeter 던전 통계와 직업별 DPS 랭킹을 웹에서 확인하세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="NotMeter 던전 통계">
+  <meta property="og:description" content="직업별 상위 25% DPS와 TOP 20 랭킹을 동일한 통계 캐시로 확인하세요.">
+  <meta property="og:url" content="https://not4you-dev.github.io/NotMeter-Update/">
+  <meta property="og:image" content="https://not4you-dev.github.io/NotMeter-Update/assets/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NotMeter 던전 통계">
+  <meta name="twitter:description" content="직업별 상위 25% DPS와 TOP 20 랭킹">
+  <meta name="twitter:image" content="https://not4you-dev.github.io/NotMeter-Update/assets/og.png">
+  <title>NotMeter 던전 통계</title>
+  <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
+  <link rel="stylesheet" href="./assets/app.css">
+  <script src="./assets/app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-icon" src="./assets/notmeter-icon.png" width="44" height="44" alt="">
+        <div>
+          <h1 data-i18n="title">NotMeter 던전 통계</h1>
+          <p data-i18n="subtitle">직업별 상위 25% DPS 기준으로 정렬합니다</p>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="live-pill" title="최근 집계된 일일 사용자 수">
+          <span class="live-dot" aria-hidden="true"></span>
+          <span data-i18n="dailyUsers">일일 사용자</span>
+          <strong id="daily-user-count">—</strong>
+        </div>
+        <button class="ghost-button" id="language-button" type="button" aria-label="Switch language">EN</button>
+      </div>
+    </header>
+
+    <section class="filter-panel" aria-label="통계 필터">
+      <label class="filter-field">
+        <span data-i18n="dungeon">던전</span>
+        <select id="dungeon-filter"></select>
+      </label>
+      <label class="filter-field">
+        <span data-i18n="boss">보스</span>
+        <select id="boss-filter"></select>
+      </label>
+      <label class="filter-field">
+        <span>CP</span>
+        <select id="cp-filter"></select>
+      </label>
+      <label class="filter-field">
+        <span data-i18n="period">기간</span>
+        <select id="period-filter"></select>
+      </label>
+      <button class="refresh-button" id="refresh-button" type="button">
+        <span class="refresh-glyph" aria-hidden="true">↻</span>
+        <span data-i18n="refresh">새로고침</span>
+      </button>
+    </section>
+
+    <section class="snapshot-bar" aria-live="polite">
+      <div>
+        <strong id="snapshot-title">통계를 불러오는 중입니다</strong>
+        <span id="snapshot-caption"></span>
+      </div>
+      <div class="snapshot-meta">
+        <span id="sample-meta">—</span>
+        <span class="meta-divider" aria-hidden="true"></span>
+        <span id="generated-meta">—</span>
+      </div>
+    </section>
+
+    <section class="ranking-panel">
+      <div class="view-heading" id="class-heading" hidden>
+        <button class="back-button" id="back-button" type="button" aria-label="Back">‹</button>
+        <div>
+          <div class="heading-line">
+            <h2 id="class-title"></h2>
+            <span class="top-badge">TOP 20</span>
+          </div>
+          <p id="class-caption"></p>
+        </div>
+      </div>
+
+      <div class="loading-state" id="loading-state">
+        <div class="spinner" aria-hidden="true"></div>
+        <p data-i18n="loading">동일한 통계 캐시를 불러오는 중입니다</p>
+      </div>
+
+      <div class="error-state" id="error-state" hidden>
+        <div class="error-mark" aria-hidden="true">!</div>
+        <h2 data-i18n="loadError">통계 캐시를 불러오지 못했습니다</h2>
+        <p id="error-message"></p>
+        <button class="refresh-button compact" id="retry-button" type="button" data-i18n="retry">다시 시도</button>
+      </div>
+
+      <div class="empty-state" id="empty-state" hidden>
+        <p data-i18n="empty">선택한 조건에 해당하는 통계가 아직 없습니다</p>
+      </div>
+
+      <div class="table-scroll" id="summary-view" hidden>
+        <table class="ranking-table summary-table">
+          <thead>
+            <tr>
+              <th class="rank-column" data-i18n="rank">순위</th>
+              <th data-i18n="job">직업</th>
+              <th class="number-column" data-i18n="sample">표본</th>
+              <th class="number-column" data-i18n="top25">상위 25%</th>
+              <th class="number-column" data-i18n="median">중앙값</th>
+              <th class="number-column" data-i18n="max">최고</th>
+              <th class="distribution-column" data-i18n="distribution">분포</th>
+              <th class="chevron-column"><span class="sr-only" data-i18n="details">상세</span></th>
+            </tr>
+          </thead>
+          <tbody id="summary-rows"></tbody>
+        </table>
+      </div>
+
+      <div class="table-scroll" id="class-view" hidden>
+        <table class="ranking-table class-table">
+          <thead>
+            <tr>
+              <th class="rank-column" data-i18n="rank">순위</th>
+              <th data-i18n="character">캐릭터</th>
+              <th data-i18n="boss">보스</th>
+              <th class="number-column" data-i18n="duration">전투 시간</th>
+              <th class="number-column">DPS</th>
+            </tr>
+          </thead>
+          <tbody id="class-rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span data-i18n="cacheNotice">클라이언트와 동일한 통계 생성본을 사용합니다.</span>
+      <span id="cache-age"></span>
+    </footer>
+  </main>
+
+  <template id="job-icon-template">
+    <span class="job-icon-frame"><img alt=""></span>
+  </template>
+</body>
+</html>
