@@ -113,6 +113,7 @@
       weeklyTooltip: "직전 주 동일 조건 비교",
       classDps: "{job} DPS 1~20위",
       top20: "TOP 20",
+      backToJobs: "직업 목록으로",
       party: "파티",
       viewDetails: "보기",
       combatDetails: "전투 상세 정보",
@@ -190,6 +191,7 @@
       weeklyTooltip: "Previous week, same filters",
       classDps: "{job} DPS — Top 20",
       top20: "TOP 20",
+      backToJobs: "Back to classes",
       party: "PARTY",
       viewDetails: "View",
       combatDetails: "Combat Details",
@@ -324,7 +326,21 @@
     elements["refresh-button"].addEventListener("click", () => void loadCache(true));
     elements["retry-button"].addEventListener("click", () => void loadCache(true));
     elements["back-button"].addEventListener("click", () => {
+      if (history.state?.notMeterStatsView === "class") {
+        history.back();
+        return;
+      }
       leaveClassView();
+      render();
+    });
+    window.addEventListener("popstate", event => {
+      const job = event.state?.notMeterStatsJob;
+      if (event.state?.notMeterStatsView === "class" && job) {
+        state.selectedJob = job;
+        state.mode = "class";
+      } else {
+        leaveClassView();
+      }
       render();
     });
     elements["detail-close"].addEventListener("click", closeCombatDetail);
@@ -518,6 +534,10 @@
     const open = () => {
       state.selectedJob = row.jobName;
       state.mode = "class";
+      history.pushState({
+        notMeterStatsView: "class",
+        notMeterStatsJob: row.jobName,
+      }, "");
       render();
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
@@ -653,7 +673,7 @@
     }
     characterStack.append(main);
 
-    const party = decodeParty(player);
+    const party = state.dungeonKey === "training-dummy-60s" ? [] : decodeParty(player);
     if (party.length > 1) {
       const partyLine = document.createElement("div");
       partyLine.className = "party-icons";
