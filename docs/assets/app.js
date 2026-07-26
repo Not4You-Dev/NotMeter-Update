@@ -6,6 +6,10 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking.json.gz",
   ];
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
+  const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
+  const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
+  const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
+  const DETAIL_MEMORY_LIMIT = 48;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
   const WEEKLY_LABEL_PREFIX = "weekly-wed05|";
@@ -117,6 +121,9 @@
       party: "파티",
       viewDetails: "보기",
       combatDetails: "전투 상세 정보",
+      detailLoading: "전투 상세 정보를 불러오는 중입니다",
+      detailUnavailable: "전투 상세 정보를 불러오지 못했습니다 다시 시도해 주세요",
+      partyMembers: "파티원",
       totalDamage: "총 데미지",
       contribution: "기여도",
       combatPower: "전투력 CP",
@@ -195,6 +202,9 @@
       party: "PARTY",
       viewDetails: "View",
       combatDetails: "Combat Details",
+      detailLoading: "Loading combat details",
+      detailUnavailable: "Combat details are temporarily unavailable. Please try again.",
+      partyMembers: "Party members",
       totalDamage: "Total damage",
       contribution: "Contribution",
       combatPower: "Combat Power",
@@ -245,6 +255,8 @@
     period: "Weekly",
     selectedJob: "",
     selectedDetail: null,
+    detailMemory: new Map(),
+    detailLoads: new Map(),
     mode: "summary",
     loading: false,
     iconAtlases: {
@@ -280,6 +292,7 @@
       "detail-perfect-rate", "detail-double-rate", "detail-evade-rate", "detail-cp-row",
       "detail-visible-count", "detail-settings-toggle", "detail-settings-options",
       "detail-skill-rows", "detail-buffs-section", "detail-buffs", "detail-buff-count",
+      "detail-party-tabs",
     ]) {
       elements[id] = document.getElementById(id);
     }
@@ -376,6 +389,8 @@
       const previousDungeon = state.dungeonKey;
       closeCombatDetail();
       state.data = cache;
+      state.detailMemory.clear();
+      void pruneDetailCache(cache.generatedAt);
       state.dungeonKey = cache.dungeons.some(item => item.key === previousDungeon)
         ? previousDungeon
         : cache.dungeons[0]?.key || "";
@@ -622,21 +637,46 @@
   function buildClassRow(player) {
     const tr = document.createElement("tr");
     const detail = resolveCombatDetail(player);
-    if (detail) {
+    const publishedLookupKey = String(player.Q ?? player.detailLookupKey ?? "")
+      .trim()
+      .toLowerCase();
+    const canBuildLookupKey =
+      /^[0-9a-f]{64}$/.test(publishedLookupKey) ||
+      Boolean(globalThis.crypto?.subtle);
+    let detailLookupPromise = null;
+    const getDetailLookupKey = () => {
+      detailLookupPromise ||= resolveDetailLookupKey(player);
+      return detailLookupPromise;
+    };
+    if (detail || canBuildLookupKey) {
       tr.className = "class-detail-row";
       tr.tabIndex = 0;
       tr.setAttribute("role", "button");
       tr.setAttribute(
         "aria-label",
         `${formatCharacterName(player.name, player.serverId)} ${t("combatDetails")}`);
-      const open = () => openCombatDetail(player, detail);
-      tr.addEventListener("click", open);
+      const open = async () => detail
+        ? openLegacyCombatDetail(player, detail)
+        : openRemoteCombatDetail(player, await getDetailLookupKey(), tr);
+      tr.addEventListener("click", () => void open());
       tr.addEventListener("keydown", event => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          open();
+          void open();
         }
       });
+      if (!detail && canBuildLookupKey) {
+        let hoverTimer = 0;
+        tr.addEventListener("mouseenter", () => {
+          window.clearTimeout(hoverTimer);
+          hoverTimer = window.setTimeout(() => {
+            void getDetailLookupKey()
+              .then(loadRankingCombatDetail)
+              .catch(() => {});
+          }, 220);
+        });
+        tr.addEventListener("mouseleave", () => window.clearTimeout(hoverTimer));
+      }
     }
     tr.append(cellWithRank(player.rank));
 
@@ -654,7 +694,7 @@
     if (isTaiwanName(player.name)) {
       const badge = document.createElement("span");
       badge.className = "tw-badge";
-      badge.title = state.language === "en" ? "Taiwan server" : "대만 서버";
+      badge.title = state.locale === "en" ? "Taiwan server" : "대만 서버";
       badge.setAttribute("role", "img");
       badge.setAttribute("aria-label", badge.title);
       main.append(badge);
@@ -700,7 +740,7 @@
     tr.append(numericCell(formatInteger(Math.round(Number(player.dps) || 0)), "accent"));
     const detailCell = document.createElement("td");
     detailCell.className = "detail-column";
-    if (detail) {
+    if (detail || canBuildLookupKey) {
       const detailLink = document.createElement("span");
       detailLink.className = "detail-link";
       detailLink.textContent = `${t("viewDetails")} ›`;
@@ -718,12 +758,230 @@
     return state.data?.classRankings?.[state.dungeonKey]?.details?.[detailId] || null;
   }
 
-  function openCombatDetail(player, detail) {
-    state.selectedDetail = { player, detail };
+  async function resolveDetailLookupKey(player) {
+    const value = String(player.Q ?? player.detailLookupKey ?? "").trim().toLowerCase();
+    if (/^[0-9a-f]{64}$/.test(value)) {
+      return value;
+    }
+    if (!globalThis.crypto?.subtle) {
+      return "";
+    }
+
+    const dungeonKey = String(state.dungeonKey || "").trim().toLowerCase();
+    const bossIndex = Math.max(
+      0,
+      Math.trunc(Number(player.B ?? player.bossIndex ?? state.bossIndex) || 0));
+    const job = String(state.selectedJob || "").trim().normalize("NFC");
+    const name = String(player.name || "").trim().normalize("NFC");
+    const serverId = Math.max(0, Math.trunc(Number(player.serverId) || 0));
+    const combatPower = Math.max(0, Math.trunc(Number(player.combatPower) || 0));
+    const rawDuration = Number(player.durationSeconds);
+    const roundedDuration = Math.round(
+      (Number.isFinite(rawDuration) ? Math.max(0, rawDuration) : 0) * 1000) / 1000;
+    const duration = roundedDuration.toFixed(3).replace(/\.?0+$/, "");
+    const rawDps = Number(player.dps);
+    const dps = Math.round(Number.isFinite(rawDps) ? Math.max(0, rawDps) : 0);
+    const canonical = [
+      dungeonKey,
+      bossIndex,
+      job,
+      name,
+      serverId,
+      combatPower,
+      duration || "0",
+      dps,
+    ].join("\n");
+    const hash = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(canonical));
+    return Array.from(new Uint8Array(hash))
+      .map(byte => byte.toString(16).padStart(2, "0"))
+      .join("");
+  }
+
+  function openLegacyCombatDetail(player, detail) {
+    const dungeon = currentDungeon();
+    const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
+    const bossName = bossIndex > 0
+      ? dungeon?.bossNames?.[bossIndex - 1]
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon);
+    state.selectedDetail = {
+      player,
+      actorId: Number(detail.actorId) || 0,
+      record: {
+        bossName,
+        durationSeconds: Math.max(0, Number(player.durationSeconds) || 60),
+        players: [detail],
+      },
+    };
     renderCombatDetail();
     elements["combat-detail-modal"].hidden = false;
     document.body.classList.add("detail-open");
     elements["detail-close"].focus({ preventScroll: true });
+  }
+
+  async function openRemoteCombatDetail(player, lookupKey, row) {
+    if (!lookupKey || row.classList.contains("detail-loading")) {
+      return;
+    }
+    row.classList.add("detail-loading");
+    row.setAttribute("aria-busy", "true");
+    const detailLink = row.querySelector(".detail-link");
+    const previousLabel = detailLink?.textContent || "";
+    if (detailLink) {
+      detailLink.textContent = t("detailLoading");
+    }
+    try {
+      const document = await loadRankingCombatDetail(lookupKey);
+      const actorId = Number(document.selectors?.[lookupKey]) || 0;
+      state.selectedDetail = {
+        player,
+        actorId,
+        record: document.record,
+      };
+      renderCombatDetail();
+      elements["combat-detail-modal"].hidden = false;
+      document.body.classList.add("detail-open");
+      elements["detail-close"].focus({ preventScroll: true });
+    } catch (error) {
+      console.error(error);
+      row.title = t("detailUnavailable");
+      if (detailLink) {
+        detailLink.textContent = t("detailUnavailable");
+      }
+      return;
+    } finally {
+      row.classList.remove("detail-loading");
+      row.removeAttribute("aria-busy");
+    }
+    if (detailLink) {
+      detailLink.textContent = previousLabel;
+    }
+  }
+
+  async function loadRankingCombatDetail(lookupKey) {
+    if (state.detailMemory.has(lookupKey)) {
+      const cached = state.detailMemory.get(lookupKey);
+      state.detailMemory.delete(lookupKey);
+      state.detailMemory.set(lookupKey, cached);
+      return cached;
+    }
+    if (state.detailLoads.has(lookupKey)) {
+      return state.detailLoads.get(lookupKey);
+    }
+
+    const load = loadRankingCombatDetailCore(lookupKey)
+      .then(document => {
+        rememberDetail(lookupKey, document);
+        return document;
+      })
+      .finally(() => state.detailLoads.delete(lookupKey));
+    state.detailLoads.set(lookupKey, load);
+    return load;
+  }
+
+  async function loadRankingCombatDetailCore(lookupKey) {
+    const generation = String(state.data?.generatedAt || "");
+    const request = new Request(
+      `${DETAIL_ENDPOINT}${lookupKey}?g=${encodeURIComponent(generation)}`,
+      { mode: "cors", credentials: "omit" });
+    let cache = null;
+    if ("caches" in window) {
+      try {
+        cache = await caches.open(DETAIL_CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+        if (cachedResponse) {
+          try {
+            return await parseRankingCombatDetail(cachedResponse, lookupKey);
+          } catch {
+            await cache.delete(request);
+          }
+        }
+      } catch {
+        cache = null;
+      }
+    }
+
+    const response = await fetch(request, {
+      cache: "no-cache",
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      throw new Error(`${t("detailUnavailable")} (${response.status})`);
+    }
+    const cacheCopy = response.clone();
+    const document = await parseRankingCombatDetail(response, lookupKey);
+    if (cache) {
+      try {
+        await cache.put(request, cacheCopy);
+      } catch {
+      }
+    }
+    return document;
+  }
+
+  async function parseRankingCombatDetail(response, lookupKey) {
+    const payload = await response.arrayBuffer();
+    if (payload.byteLength <= 0 || payload.byteLength > 8 * 1024 * 1024) {
+      throw new Error(t("detailUnavailable"));
+    }
+    const etag = String(response.headers.get("etag") || "")
+      .replace(/^W\//, "")
+      .replaceAll("\"", "")
+      .trim()
+      .toLowerCase();
+    if (/^[0-9a-f]{64}$/.test(etag) && globalThis.crypto?.subtle) {
+      const hash = await crypto.subtle.digest("SHA-256", payload);
+      const actual = Array.from(new Uint8Array(hash))
+        .map(value => value.toString(16).padStart(2, "0"))
+        .join("");
+      if (actual !== etag) {
+        throw new Error(t("detailUnavailable"));
+      }
+    }
+
+    const document = JSON.parse(new TextDecoder().decode(payload));
+    const players = document.record?.players;
+    const actorId = Number(document.selectors?.[lookupKey]) || 0;
+    if (document.schema !== DETAIL_SCHEMA ||
+        Number(document.version) !== 1 ||
+        document.dungeonKey !== state.dungeonKey ||
+        !Array.isArray(players) ||
+        players.length < 1 ||
+        players.length > 10 ||
+        actorId <= 0 ||
+        !players.some(player => Number(player.actorId) === actorId) ||
+        players.some(player =>
+          !Array.isArray(player.skills) ||
+          player.skills.length > 192 ||
+          !Array.isArray(player.buffs) ||
+          player.buffs.length > 80)) {
+      throw new Error(t("detailUnavailable"));
+    }
+    return document;
+  }
+
+  function rememberDetail(lookupKey, document) {
+    state.detailMemory.delete(lookupKey);
+    state.detailMemory.set(lookupKey, document);
+    while (state.detailMemory.size > DETAIL_MEMORY_LIMIT) {
+      state.detailMemory.delete(state.detailMemory.keys().next().value);
+    }
+  }
+
+  async function pruneDetailCache(generatedAt) {
+    if (!("caches" in window)) {
+      return;
+    }
+    try {
+      const cache = await caches.open(DETAIL_CACHE_NAME);
+      const expected = `g=${encodeURIComponent(String(generatedAt || ""))}`;
+      const requests = await cache.keys();
+      await Promise.all(requests
+        .filter(request => !request.url.includes(expected))
+        .map(request => cache.delete(request)));
+    } catch {
+    }
   }
 
   function closeCombatDetail() {
@@ -741,14 +999,23 @@
     if (!state.selectedDetail) {
       return;
     }
-    const { player, detail } = state.selectedDetail;
+    const { player, record } = state.selectedDetail;
+    const players = Array.isArray(record?.players) ? record.players : [];
+    const detail = players.find(candidate =>
+      Number(candidate.actorId) === Number(state.selectedDetail.actorId)) || players[0];
+    if (!detail) {
+      closeCombatDetail();
+      return;
+    }
     const detailJob = detail.jobName || state.selectedJob;
-    const durationSeconds = Math.max(0, Number(player.durationSeconds) || 60);
+    const durationSeconds = Math.max(
+      0,
+      Number(record.durationSeconds) || Number(player.durationSeconds) || 60);
     const dungeon = currentDungeon();
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
-    const bossName = bossIndex > 0
+    const bossName = String(record.bossName || "") || (bossIndex > 0
       ? dungeon?.bossNames?.[bossIndex - 1]
-      : dungeon?.bossNames?.[0] || dungeonName(dungeon);
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon));
 
     elements["detail-job-icon"].replaceChildren(createJobIcon(detailJob));
     elements["detail-title"].textContent = bossName || t("combatDetails");
@@ -756,6 +1023,7 @@
       detail.name || player.name,
       Number(detail.serverId || player.serverId));
     elements["detail-duration"].textContent = formatDuration(durationSeconds);
+    renderDetailPartyTabs(players);
 
     const combatPower = Number(detail.combatPower || player.combatPower) || 0;
     elements["detail-cp-row"].hidden = combatPower <= 0;
@@ -805,6 +1073,45 @@
     elements["detail-buffs"].replaceChildren(buffItems);
     elements["detail-buff-count"].textContent = ` (${formatInteger(buffs.length)})`;
     elements["detail-buffs-section"].hidden = false;
+  }
+
+  function renderDetailPartyTabs(players) {
+    const host = elements["detail-party-tabs"];
+    if (!host) {
+      return;
+    }
+    if (players.length <= 1) {
+      host.hidden = true;
+      host.replaceChildren();
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    for (const player of players) {
+      const actorId = Number(player.actorId) || 0;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "detail-party-tab";
+      button.classList.toggle(
+        "active",
+        actorId === Number(state.selectedDetail?.actorId));
+      button.append(createJobIcon(player.jobName || ""));
+      const identity = document.createElement("span");
+      const name = document.createElement("strong");
+      name.textContent = formatCharacterName(player.name, Number(player.serverId));
+      const dps = document.createElement("small");
+      dps.textContent = `DPS ${formatCompact(Number(player.dps) || 0)}`;
+      identity.append(name, dps);
+      button.append(identity);
+      button.title = `${t("partyMembers")} · ${name.textContent}`;
+      button.addEventListener("click", () => {
+        state.selectedDetail.actorId = actorId;
+        renderCombatDetail();
+      });
+      fragment.append(button);
+    }
+    host.replaceChildren(fragment);
+    host.hidden = false;
   }
 
   function buildDetailSkillRow(skill) {
