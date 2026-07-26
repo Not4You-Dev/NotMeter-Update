@@ -634,7 +634,9 @@
     if (isTaiwanName(player.name)) {
       const badge = document.createElement("span");
       badge.className = "tw-badge";
-      badge.textContent = "🇹🇼 TW";
+      badge.title = state.language === "en" ? "Taiwan server" : "대만 서버";
+      badge.setAttribute("role", "img");
+      badge.setAttribute("aria-label", badge.title);
       main.append(badge);
     }
     if (Number(player.combatPower) > 0) {
