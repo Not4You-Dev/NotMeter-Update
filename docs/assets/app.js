@@ -93,6 +93,20 @@
       classDps: "{job} DPS 1~20위",
       top20: "TOP 20",
       party: "파티",
+      viewDetails: "보기",
+      combatDetails: "전투 상세 정보",
+      totalDamage: "총 피해량",
+      hits: "타수",
+      hitRate: "적중률",
+      criticalRate: "치명타율",
+      skillCount: "스킬 수",
+      skillBreakdown: "스킬 피해 내역",
+      skill: "스킬",
+      damage: "피해량",
+      share: "비중",
+      average: "평균",
+      averageInterval: "평균 간격",
+      buffUptime: "버프 업타임",
       agoNow: "방금 갱신",
       agoMinutes: "{value}분 전 갱신",
       agoHours: "{value}시간 전 갱신",
@@ -133,6 +147,20 @@
       classDps: "{job} DPS — Top 20",
       top20: "TOP 20",
       party: "PARTY",
+      viewDetails: "View",
+      combatDetails: "Combat Details",
+      totalDamage: "Total damage",
+      hits: "Hits",
+      hitRate: "Hit rate",
+      criticalRate: "Critical rate",
+      skillCount: "Skills",
+      skillBreakdown: "Skill Damage",
+      skill: "Skill",
+      damage: "Damage",
+      share: "Share",
+      average: "Average",
+      averageInterval: "Avg. interval",
+      buffUptime: "Buff uptime",
       agoNow: "Updated just now",
       agoMinutes: "Updated {value}m ago",
       agoHours: "Updated {value}h ago",
@@ -150,6 +178,7 @@
     cpTierIndex: 0,
     period: "Recent14Days",
     selectedJob: "",
+    selectedDetail: null,
     mode: "summary",
     loading: false,
   };
@@ -171,6 +200,10 @@
       "sample-meta", "generated-meta", "class-heading", "class-title", "class-caption",
       "back-button", "loading-state", "error-state", "error-message", "empty-state",
       "summary-view", "summary-rows", "class-view", "class-rows", "cache-age",
+      "combat-detail-modal", "detail-close", "detail-job-icon", "detail-title",
+      "detail-character", "detail-duration", "detail-cp", "detail-total-damage",
+      "detail-dps", "detail-hits", "detail-hit-rate", "detail-critical-rate",
+      "detail-skill-count", "detail-skill-rows", "detail-buffs-section", "detail-buffs",
     ]) {
       elements[id] = document.getElementById(id);
     }
@@ -183,8 +216,12 @@
       applyLocale();
       populateFilters();
       render();
+      if (state.selectedDetail) {
+        renderCombatDetail();
+      }
     });
     elements["dungeon-filter"].addEventListener("change", event => {
+      closeCombatDetail();
       state.dungeonKey = event.target.value;
       state.bossIndex = 0;
       state.cpTierIndex = 0;
@@ -214,6 +251,17 @@
       leaveClassView();
       render();
     });
+    elements["detail-close"].addEventListener("click", closeCombatDetail);
+    elements["combat-detail-modal"].addEventListener("click", event => {
+      if (event.target === elements["combat-detail-modal"]) {
+        closeCombatDetail();
+      }
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && state.selectedDetail) {
+        closeCombatDetail();
+      }
+    });
   }
 
   async function loadCache(force = false) {
@@ -228,6 +276,7 @@
       const cache = await fetchRankingCache(force);
       validateCache(cache);
       const previousDungeon = state.dungeonKey;
+      closeCombatDetail();
       state.data = cache;
       state.dungeonKey = cache.dungeons.some(item => item.key === previousDungeon)
         ? previousDungeon
@@ -466,10 +515,29 @@
 
   function buildClassRow(player) {
     const tr = document.createElement("tr");
+    const detail = resolveCombatDetail(player);
+    if (detail) {
+      tr.className = "class-detail-row";
+      tr.tabIndex = 0;
+      tr.setAttribute("role", "button");
+      tr.setAttribute(
+        "aria-label",
+        `${formatCharacterName(player.name, player.serverId)} ${t("combatDetails")}`);
+      const open = () => openCombatDetail(player, detail);
+      tr.addEventListener("click", open);
+      tr.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          open();
+        }
+      });
+    }
     tr.append(cellWithRank(player.rank));
 
     const characterCell = document.createElement("td");
     characterCell.className = "character-cell";
+    const characterStack = document.createElement("div");
+    characterStack.className = "character-stack";
     const main = document.createElement("div");
     main.className = "character-main";
     main.append(createJobIcon(state.selectedJob));
@@ -490,14 +558,15 @@
       cpIcon.src = "./assets/combat-power.png";
       cpIcon.alt = "";
       const value = document.createElement("span");
-      value.textContent = formatDps(player.combatPower);
+      value.textContent = formatCombatPower(player.combatPower);
+      cp.title = `${formatInteger(player.combatPower)} CP`;
       cp.append(cpIcon, value);
       main.append(cp);
     }
-    characterCell.append(main);
+    characterStack.append(main);
 
     const party = decodeParty(player);
-    if (party.length > 0) {
+    if (party.length > 1) {
       const partyLine = document.createElement("div");
       partyLine.className = "party-icons";
       const label = document.createElement("span");
@@ -505,8 +574,9 @@
       label.textContent = t("party");
       partyLine.append(label);
       party.forEach(job => partyLine.append(createJobIcon(job)));
-      characterCell.append(partyLine);
+      characterStack.append(partyLine);
     }
+    characterCell.append(characterStack);
     tr.append(characterCell);
 
     const dungeon = currentDungeon();
@@ -520,7 +590,124 @@
 
     tr.append(numericCell(formatDuration(player.durationSeconds)));
     tr.append(numericCell(formatInteger(Math.round(Number(player.dps) || 0)), "accent"));
+    const detailCell = document.createElement("td");
+    detailCell.className = "detail-column";
+    if (detail) {
+      const detailLink = document.createElement("span");
+      detailLink.className = "detail-link";
+      detailLink.textContent = `${t("viewDetails")} ›`;
+      detailCell.append(detailLink);
+    }
+    tr.append(detailCell);
     return tr;
+  }
+
+  function resolveCombatDetail(player) {
+    const detailId = String(player.D ?? player.detailId ?? "").trim();
+    if (!detailId) {
+      return null;
+    }
+    return state.data?.classRankings?.[state.dungeonKey]?.details?.[detailId] || null;
+  }
+
+  function openCombatDetail(player, detail) {
+    state.selectedDetail = { player, detail };
+    renderCombatDetail();
+    elements["combat-detail-modal"].hidden = false;
+    document.body.classList.add("detail-open");
+    elements["detail-close"].focus({ preventScroll: true });
+  }
+
+  function closeCombatDetail() {
+    if (!state.selectedDetail && elements["combat-detail-modal"]?.hidden) {
+      return;
+    }
+    state.selectedDetail = null;
+    if (elements["combat-detail-modal"]) {
+      elements["combat-detail-modal"].hidden = true;
+    }
+    document.body.classList.remove("detail-open");
+  }
+
+  function renderCombatDetail() {
+    if (!state.selectedDetail) {
+      return;
+    }
+    const { player, detail } = state.selectedDetail;
+    const detailJob = detail.jobName || state.selectedJob;
+    const durationSeconds = Math.max(0, Number(player.durationSeconds) || 60);
+
+    elements["detail-job-icon"].replaceChildren(createJobIcon(detailJob));
+    elements["detail-title"].textContent = `${dungeonName(currentDungeon())} · ${t("combatDetails")}`;
+    elements["detail-character"].textContent = formatCharacterName(
+      detail.name || player.name,
+      Number(detail.serverId || player.serverId));
+    elements["detail-duration"].textContent = formatDuration(durationSeconds);
+
+    const combatPower = Number(detail.combatPower || player.combatPower) || 0;
+    elements["detail-cp"].replaceChildren();
+    elements["detail-cp"].hidden = combatPower <= 0;
+    if (combatPower > 0) {
+      const cpIcon = document.createElement("img");
+      cpIcon.src = "./assets/combat-power.png";
+      cpIcon.alt = "";
+      const cpValue = document.createElement("span");
+      cpValue.textContent = formatCombatPower(combatPower);
+      elements["detail-cp"].title = `${formatInteger(combatPower)} CP`;
+      elements["detail-cp"].append(cpIcon, cpValue);
+    }
+
+    elements["detail-total-damage"].textContent = formatInteger(detail.totalDamage);
+    elements["detail-dps"].textContent = formatInteger(Math.round(Number(detail.dps) || 0));
+    elements["detail-hits"].textContent = formatInteger(detail.hitCount);
+    elements["detail-hit-rate"].textContent = formatPercent(detail.hitRate);
+    elements["detail-critical-rate"].textContent = formatPercent(detail.criticalRate);
+
+    const skills = Array.isArray(detail.skills)
+      ? [...detail.skills]
+          .filter(skill => Number(skill.totalDamage) > 0)
+          .sort((left, right) => Number(right.totalDamage) - Number(left.totalDamage))
+      : [];
+    elements["detail-skill-count"].textContent = formatInteger(
+      Number(detail.skillCount) || skills.length);
+    const skillRows = document.createDocumentFragment();
+    for (const skill of skills) {
+      const row = document.createElement("tr");
+      const skillCell = document.createElement("td");
+      const skillName = document.createElement("strong");
+      skillName.textContent = String(skill.skillName || "—");
+      skillCell.append(skillName);
+      row.append(skillCell);
+      row.append(numericCell(formatInteger(skill.totalDamage), "accent"));
+      row.append(numericCell(formatPercent(skill.damagePercentage, 1)));
+      row.append(numericCell(formatInteger(skill.hitCount)));
+      row.append(numericCell(formatPercent(skill.criticalRate)));
+      row.append(numericCell(formatInteger(Math.round(Number(skill.averageDamage) || 0))));
+      row.append(numericCell(formatInterval(skill.averageUseIntervalMilliseconds)));
+      skillRows.append(row);
+    }
+    elements["detail-skill-rows"].replaceChildren(skillRows);
+
+    const buffs = Array.isArray(detail.buffs)
+      ? [...detail.buffs]
+          .filter(buff => String(buff.name || "").trim())
+          .sort((left, right) => Number(right.uptimeSeconds) - Number(left.uptimeSeconds))
+      : [];
+    const buffItems = document.createDocumentFragment();
+    for (const buff of buffs) {
+      const item = document.createElement("div");
+      item.className = "detail-buff";
+      const name = document.createElement("strong");
+      name.textContent = buff.name;
+      const uptime = document.createElement("span");
+      const seconds = Math.max(0, Number(buff.uptimeSeconds) || 0);
+      const ratio = durationSeconds > 0 ? Math.min(100, seconds / durationSeconds * 100) : 0;
+      uptime.textContent = `${formatSeconds(seconds)} · ${formatPercent(ratio)}`;
+      item.append(name, uptime);
+      buffItems.append(item);
+    }
+    elements["detail-buffs"].replaceChildren(buffItems);
+    elements["detail-buffs-section"].hidden = buffs.length === 0;
   }
 
   function findSummaryView() {
@@ -601,6 +788,7 @@
   }
 
   function leaveClassView() {
+    closeCombatDetail();
     state.mode = "summary";
     state.selectedJob = "";
   }
@@ -703,10 +891,47 @@
     for (const [size, suffix] of units) {
       if (Math.abs(number) >= size) {
         const digits = Math.abs(number) >= size * 100 ? 0 : Math.abs(number) >= size * 10 ? 1 : 2;
-        return `${(number / size).toFixed(digits).replace(/\.?0+$/, "")}${suffix}`;
+        return `${trimFixed(number / size, digits)}${suffix}`;
       }
     }
     return formatInteger(Math.round(number));
+  }
+
+  function formatCombatPower(value) {
+    const number = Math.max(0, Number(value) || 0);
+    if (number >= 1_000_000) {
+      return `${trimFixed(number / 1_000_000, 2)}M`;
+    }
+    if (number >= 1_000) {
+      return `${trimFixed(number / 1_000, 1)}K`;
+    }
+    return formatInteger(Math.round(number));
+  }
+
+  function trimFixed(value, digits) {
+    const fixed = Number(value).toFixed(digits);
+    return digits > 0 ? fixed.replace(/\.?0+$/, "") : fixed;
+  }
+
+  function formatPercent(value, digits = 0) {
+    return `${trimFixed(Math.max(0, Number(value) || 0), digits)}%`;
+  }
+
+  function formatInterval(value) {
+    const milliseconds = Number(value);
+    if (!Number.isFinite(milliseconds) || milliseconds <= 0) {
+      return "—";
+    }
+    return milliseconds >= 1_000
+      ? `${trimFixed(milliseconds / 1_000, 2)}s`
+      : `${formatInteger(Math.round(milliseconds))}ms`;
+  }
+
+  function formatSeconds(value) {
+    const seconds = Math.max(0, Number(value) || 0);
+    return state.locale === "ko"
+      ? `${trimFixed(seconds, seconds < 10 ? 1 : 0)}초`
+      : `${trimFixed(seconds, seconds < 10 ? 1 : 0)}s`;
   }
 
   function formatInteger(value) {
