@@ -356,7 +356,7 @@ button:focus-visible,
   min-width: 0;
 }
 
-.back-button {
+.ranking-back-button {
   display: inline-flex;
   min-width: 118px;
   height: 38px;
@@ -378,7 +378,7 @@ button:focus-visible,
   transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
 }
 
-.back-button-icon {
+.ranking-back-button-icon {
   display: inline-flex;
   width: 24px;
   height: 24px;
@@ -392,13 +392,13 @@ button:focus-visible,
   line-height: 1;
 }
 
-.back-button:hover {
+.ranking-back-button:hover {
   border-color: #55e5da;
   background: linear-gradient(180deg, #174b54, #0d333c);
   box-shadow: 0 0 0 2px rgba(62, 224, 210, 0.1);
 }
 
-.back-button:focus-visible {
+.ranking-back-button:focus-visible {
   outline: 2px solid #70f5e9;
   outline-offset: 2px;
 }
@@ -1578,7 +1578,7 @@ tr:nth-child(3) .rank-badge {
     gap: 9px;
   }
 
-  .back-button {
+  .ranking-back-button {
     min-width: 106px;
     height: 36px;
     padding-right: 9px;
