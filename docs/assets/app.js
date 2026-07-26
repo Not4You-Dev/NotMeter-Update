@@ -8,7 +8,8 @@
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
-  const PERIODS = ["Today", "Recent14Days", "All"];
+  const WEEKLY_LABEL_PREFIX = "weekly-wed05|";
+  const PERIODS = ["Weekly", "Today", "Recent14Days", "All"];
   const JOB_ORDER = ["검성", "수호성", "살성", "궁성", "마도성", "정령성", "치유성", "호법성", "권성"];
   const JOB_CODES = {
     "0": "검성",
@@ -101,12 +102,15 @@
       cacheNotice: "클라이언트와 동일한 통계 생성본을 사용합니다.",
       allBosses: "전체 보스",
       allCp: "전체 CP",
+      thisWeek: "이번 주",
       today: "오늘",
       recent14: "최근 14일",
       allPeriod: "전체 기간",
       records: "기록",
       samples: "표본",
       updated: "갱신",
+      weeklyCompare: "직업 옆 ▲▼는 직전 주 동일 조건 상위 25% DPS 대비",
+      weeklyTooltip: "직전 주 동일 조건 비교",
       classDps: "{job} DPS 1~20위",
       top20: "TOP 20",
       party: "파티",
@@ -175,12 +179,15 @@
       cacheNotice: "Uses the same generated statistics snapshot as the client.",
       allBosses: "All bosses",
       allCp: "All CP",
+      thisWeek: "This week",
       today: "Today",
       recent14: "Last 14 days",
       allPeriod: "All time",
       records: "records",
       samples: "samples",
       updated: "updated",
+      weeklyCompare: "▲▼ compares top-25% DPS with the previous week under the same filters",
+      weeklyTooltip: "Previous week, same filters",
       classDps: "{job} DPS — Top 20",
       top20: "TOP 20",
       party: "PARTY",
@@ -233,7 +240,7 @@
     dungeonKey: "",
     bossIndex: 0,
     cpTierIndex: 0,
-    period: "Recent14Days",
+    period: "Weekly",
     selectedJob: "",
     selectedDetail: null,
     mode: "summary",
@@ -532,6 +539,10 @@
     name.className = "job-name";
     name.textContent = jobName(row.jobName);
     jobWrap.append(name);
+    const comparison = buildWeeklyComparisonBadge(row);
+    if (comparison) {
+      jobWrap.append(comparison);
+    }
     jobCell.append(jobWrap);
     tr.append(jobCell);
 
@@ -1116,23 +1127,40 @@
   }
 
   function findSummaryView() {
-    return state.data.views.find(view =>
+    const views = state.data.views.filter(view =>
       view.dungeonKey === state.dungeonKey &&
       Number(view.bossIndex) === state.bossIndex &&
-      Number(view.cpTierIndex) === state.cpTierIndex &&
-      normalizePeriod(view.period) === state.period);
+      Number(view.cpTierIndex) === state.cpTierIndex);
+    if (state.period === "Weekly") {
+      return views.find(view =>
+        normalizePeriod(view.period) === "All" &&
+        parseWeeklyRange(view.periodLabel));
+    }
+    return views.find(view =>
+      normalizePeriod(view.period) === state.period &&
+      (state.period !== "All" || !parseWeeklyRange(view.periodLabel)));
   }
 
   function findClassView() {
     const classRanking = state.data.classRankings[state.dungeonKey];
-    return classRanking?.views?.find(view =>
+    const views = classRanking?.views?.filter(view =>
       Number(view.bossIndex) === state.bossIndex &&
-      Number(view.cpTierIndex) === state.cpTierIndex &&
-      normalizePeriod(view.period) === state.period);
+      Number(view.cpTierIndex) === state.cpTierIndex) || [];
+    if (state.period === "Weekly") {
+      return [...views].reverse().find(view => normalizePeriod(view.period) === "All");
+    }
+    return views.find(view => normalizePeriod(view.period) === state.period);
   }
 
   function updateSnapshot(view) {
     elements["snapshot-title"].textContent = filterDescription();
+    const weeklyRange = state.period === "Weekly"
+      ? parseWeeklyRange(view?.periodLabel)
+      : null;
+    elements["snapshot-caption"].textContent = weeklyRange
+      ? `${formatWeeklyRange(weeklyRange)} · ${t("weeklyCompare")}`
+      : "";
+    elements["snapshot-caption"].hidden = !weeklyRange;
     elements["sample-meta"].textContent = view
       ? `${t("records")} ${formatInteger(view.recordCount)} · ${t("samples")} ${formatInteger(view.playerSampleCount)}`
       : "—";
@@ -1218,7 +1246,9 @@
 
   function periodName(period) {
     const normalized = normalizePeriod(period);
-    return normalized === "Today"
+    return normalized === "Weekly"
+      ? t("thisWeek")
+      : normalized === "Today"
       ? t("today")
       : normalized === "All"
         ? t("allPeriod")
@@ -1230,6 +1260,62 @@
       return ["Today", "Recent14Days", "All"][value] || "Recent14Days";
     }
     return String(value || "Recent14Days");
+  }
+
+  function parseWeeklyRange(label) {
+    const text = String(label || "");
+    if (!text.startsWith(WEEKLY_LABEL_PREFIX)) {
+      return null;
+    }
+    const [startText, endText] = text.slice(WEEKLY_LABEL_PREFIX.length).split("|");
+    const start = new Date(startText);
+    const end = new Date(endText);
+    return Number.isFinite(start.getTime()) && Number.isFinite(end.getTime()) && end > start
+      ? { start, end }
+      : null;
+  }
+
+  function formatWeeklyRange(range) {
+    const separator = state.locale === "ko" ? "~" : "–";
+    const suffix = state.locale === "ko" ? "한국시간" : "KST";
+    return `${formatKoreaShort(range.start)}${separator}${formatKoreaShort(range.end)} ${suffix}`;
+  }
+
+  function formatKoreaShort(value) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Seoul",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(value);
+    const get = type => parts.find(part => part.type === type)?.value || "";
+    return `${get("month")}.${get("day")} ${get("hour")}:${get("minute")}`;
+  }
+
+  function buildWeeklyComparisonBadge(row) {
+    if (state.period !== "Weekly" ||
+        !Array.isArray(row.dpsPercentiles) ||
+        row.dpsPercentiles.length < 3) {
+      return null;
+    }
+    const previousP75 = Number(row.dpsPercentiles[0]);
+    const previousSamples = Math.max(0, Math.round(Number(row.dpsPercentiles[2]) || 0));
+    const currentP75 = Number(row.p75Dps);
+    if (!(previousP75 > 0) || !(previousSamples > 0) || !Number.isFinite(currentP75)) {
+      return null;
+    }
+    const change = (currentP75 - previousP75) / previousP75 * 100;
+    const direction = change > 0.05 ? "up" : change < -0.05 ? "down" : "flat";
+    const badge = document.createElement("span");
+    badge.className = `weekly-change ${direction}`;
+    badge.textContent = `${direction === "up" ? "▲" : direction === "down" ? "▼" : "–"} ${Math.abs(change).toFixed(1)}%`;
+    badge.title =
+      `${t("weeklyTooltip")}\n` +
+      `${t("top25")} ${formatDps(previousP75)} → ${formatDps(currentP75)}\n` +
+      `${t("samples")} ${formatInteger(previousSamples)} → ${formatInteger(row.sampleCount)}`;
+    return badge;
   }
 
   function cellWithRank(rank) {
