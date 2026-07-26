@@ -701,9 +701,37 @@ tr:nth-child(3) .rank-badge {
 }
 
 .tw-badge {
-  border-color: #5c6475;
-  background: #242b37;
-  color: #dce6f1;
+  position: relative;
+  width: 20px;
+  height: 14px;
+  overflow: hidden;
+  padding: 0;
+  border-color: #7f8995;
+  border-radius: 2px;
+  background: #fe0000;
+  color: transparent;
+}
+
+.tw-badge::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 50%;
+  background: #000095;
+  content: "";
+}
+
+.tw-badge::after {
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #fff;
+  content: "";
+  transform: translate(-50%, -50%);
 }
 
 .party-icons {
