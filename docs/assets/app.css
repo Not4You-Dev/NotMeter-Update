@@ -307,10 +307,14 @@ button:focus-visible,
 }
 
 #snapshot-caption {
-  display: none;
+  display: block;
   margin-top: 3px;
   color: var(--muted);
   font-size: 11px;
+}
+
+#snapshot-caption[hidden] {
+  display: none;
 }
 
 .snapshot-meta {
@@ -558,6 +562,30 @@ tr:nth-child(3) .rank-badge {
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.weekly-change {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border: 1px solid #587082;
+  border-radius: 6px;
+  background: rgba(151, 169, 184, 0.12);
+  color: #aebdca;
+  font-size: 10.5px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.weekly-change.up {
+  border-color: rgba(67, 219, 162, 0.55);
+  background: rgba(67, 219, 162, 0.12);
+  color: #5ee3ae;
+}
+
+.weekly-change.down {
+  border-color: rgba(255, 112, 125, 0.55);
+  background: rgba(255, 112, 125, 0.12);
+  color: #ff8792;
 }
 
 .numeric {
