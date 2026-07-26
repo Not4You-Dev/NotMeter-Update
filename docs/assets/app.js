@@ -57,6 +57,23 @@
     "나즈문", "겔코스", "파톤", "펠레이르", "엘비다", "케투", "파이디온", "노툰", "무르트",
     "로탄", "쿠하푸", "두안카", "브로크", "왈터", "푸라킨", "이그누스",
   ];
+  const DETAIL_METRICS = [
+    ["specialization", "specialization"],
+    ["hits", "hits"],
+    ["parry", "parry"],
+    ["avoidance", "avoidance"],
+    ["multiHit", "multiHit"],
+    ["critical", "critical"],
+    ["front", "front"],
+    ["back", "back"],
+    ["perfect", "perfect"],
+    ["double", "doubleDamage"],
+    ["periodic", "periodicDamage"],
+    ["healing", "healing"],
+    ["drainHealing", "drainHealing"],
+    ["averageDamage", "averageDamage"],
+  ];
+  const POTION_CODES = new Set([2011101, 2011102, 2010102, 2020101, 2020102, 2010106, 2010103]);
 
   const COPY = {
     ko: {
@@ -95,18 +112,38 @@
       party: "파티",
       viewDetails: "보기",
       combatDetails: "전투 상세 정보",
-      totalDamage: "총 피해량",
+      totalDamage: "총 데미지",
+      contribution: "기여도",
+      combatPower: "전투력 CP",
       hits: "타수",
       hitRate: "적중률",
       criticalRate: "치명타율",
       skillCount: "스킬 수",
       skillBreakdown: "스킬 피해 내역",
       skill: "스킬",
-      damage: "피해량",
+      damage: "데미지",
       share: "비중",
       average: "평균",
       averageInterval: "평균 간격",
       buffUptime: "버프 업타임",
+      buffUptimeCaption: " / 전투 시간 대비 유지율",
+      visibleItems: "표시 항목",
+      openSettings: "설정 열기",
+      closeSettings: "설정 닫기",
+      specialization: "특성",
+      parry: "페리",
+      avoidance: "회피",
+      multiHit: "다단 히트",
+      critical: "크리",
+      front: "전방",
+      back: "후방",
+      perfect: "완벽",
+      doubleDamage: "강타",
+      periodicDamage: "지속피해",
+      healing: "치유",
+      drainHealing: "흡혈",
+      averageDamage: "평균 데미지",
+      recordedBuffsNone: "기록된 버프 없음",
       agoNow: "방금 갱신",
       agoMinutes: "{value}분 전 갱신",
       agoHours: "{value}시간 전 갱신",
@@ -150,6 +187,8 @@
       viewDetails: "View",
       combatDetails: "Combat Details",
       totalDamage: "Total damage",
+      contribution: "Contribution",
+      combatPower: "Combat Power",
       hits: "Hits",
       hitRate: "Hit rate",
       criticalRate: "Critical rate",
@@ -161,6 +200,24 @@
       average: "Average",
       averageInterval: "Avg. interval",
       buffUptime: "Buff uptime",
+      buffUptimeCaption: " / share of combat duration",
+      visibleItems: "Visible items",
+      openSettings: "Open settings",
+      closeSettings: "Close settings",
+      specialization: "Specialization",
+      parry: "Parry",
+      avoidance: "Evade",
+      multiHit: "Multi-hit",
+      critical: "Critical",
+      front: "Front",
+      back: "Back",
+      perfect: "Perfect",
+      doubleDamage: "Power hit",
+      periodicDamage: "Periodic",
+      healing: "Healing",
+      drainHealing: "Drain",
+      averageDamage: "Average damage",
+      recordedBuffsNone: "No recorded buffs",
       agoNow: "Updated just now",
       agoMinutes: "Updated {value}m ago",
       agoHours: "Updated {value}h ago",
@@ -181,6 +238,11 @@
     selectedDetail: null,
     mode: "summary",
     loading: false,
+    iconAtlases: {
+      skill: null,
+      buff: null,
+    },
+    visibleMetrics: loadVisibleMetrics(),
   };
 
   const elements = {};
@@ -189,6 +251,8 @@
     bindElements();
     bindEvents();
     applyLocale();
+    renderDetailSettings();
+    void loadIconAtlases();
     void loadCache();
     window.setInterval(updateCacheAge, 60_000);
   });
@@ -202,8 +266,11 @@
       "summary-view", "summary-rows", "class-view", "class-rows", "cache-age",
       "combat-detail-modal", "detail-close", "detail-job-icon", "detail-title",
       "detail-character", "detail-duration", "detail-cp", "detail-total-damage",
-      "detail-dps", "detail-hits", "detail-hit-rate", "detail-critical-rate",
-      "detail-skill-count", "detail-skill-rows", "detail-buffs-section", "detail-buffs",
+      "detail-dps", "detail-share", "detail-summary-duration", "detail-hits",
+      "detail-parry-rate", "detail-critical-rate", "detail-front-rate", "detail-back-rate",
+      "detail-perfect-rate", "detail-double-rate", "detail-evade-rate", "detail-cp-row",
+      "detail-visible-count", "detail-settings-toggle", "detail-settings-options",
+      "detail-skill-rows", "detail-buffs-section", "detail-buffs", "detail-buff-count",
     ]) {
       elements[id] = document.getElementById(id);
     }
@@ -211,12 +278,14 @@
 
   function bindEvents() {
     elements["language-button"].addEventListener("click", () => {
+      const openDetail = state.selectedDetail;
       state.locale = state.locale === "ko" ? "en" : "ko";
       localStorage.setItem("notmeter-stats-locale", state.locale);
       applyLocale();
       populateFilters();
       render();
-      if (state.selectedDetail) {
+      if (openDetail) {
+        state.selectedDetail = openDetail;
         renderCombatDetail();
       }
     });
@@ -252,6 +321,12 @@
       render();
     });
     elements["detail-close"].addEventListener("click", closeCombatDetail);
+    elements["detail-settings-toggle"].addEventListener("click", () => {
+      const options = elements["detail-settings-options"];
+      options.hidden = !options.hidden;
+      elements["detail-settings-toggle"].textContent =
+        t(options.hidden ? "openSettings" : "closeSettings");
+    });
     elements["combat-detail-modal"].addEventListener("click", event => {
       if (event.target === elements["combat-detail-modal"]) {
         closeCombatDetail();
@@ -636,78 +711,400 @@
     const { player, detail } = state.selectedDetail;
     const detailJob = detail.jobName || state.selectedJob;
     const durationSeconds = Math.max(0, Number(player.durationSeconds) || 60);
+    const dungeon = currentDungeon();
+    const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
+    const bossName = bossIndex > 0
+      ? dungeon?.bossNames?.[bossIndex - 1]
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon);
 
     elements["detail-job-icon"].replaceChildren(createJobIcon(detailJob));
-    elements["detail-title"].textContent = `${dungeonName(currentDungeon())} · ${t("combatDetails")}`;
+    elements["detail-title"].textContent = bossName || t("combatDetails");
     elements["detail-character"].textContent = formatCharacterName(
       detail.name || player.name,
       Number(detail.serverId || player.serverId));
     elements["detail-duration"].textContent = formatDuration(durationSeconds);
 
     const combatPower = Number(detail.combatPower || player.combatPower) || 0;
-    elements["detail-cp"].replaceChildren();
-    elements["detail-cp"].hidden = combatPower <= 0;
-    if (combatPower > 0) {
-      const cpIcon = document.createElement("img");
-      cpIcon.src = "./assets/combat-power.png";
-      cpIcon.alt = "";
-      const cpValue = document.createElement("span");
-      cpValue.textContent = formatCombatPower(combatPower);
-      elements["detail-cp"].title = `${formatInteger(combatPower)} CP`;
-      elements["detail-cp"].append(cpIcon, cpValue);
-    }
-
+    elements["detail-cp-row"].hidden = combatPower <= 0;
+    elements["detail-cp"].textContent = formatInteger(combatPower);
     elements["detail-total-damage"].textContent = formatInteger(detail.totalDamage);
-    elements["detail-dps"].textContent = formatInteger(Math.round(Number(detail.dps) || 0));
+    elements["detail-dps"].textContent = formatCompact(Number(detail.dps) || 0);
+    elements["detail-share"].textContent = formatPercent(detail.sharePercent);
+    elements["detail-summary-duration"].textContent = formatDuration(durationSeconds);
     elements["detail-hits"].textContent = formatInteger(detail.hitCount);
-    elements["detail-hit-rate"].textContent = formatPercent(detail.hitRate);
+    elements["detail-parry-rate"].textContent = formatPercent(detail.parryRate);
     elements["detail-critical-rate"].textContent = formatPercent(detail.criticalRate);
+    elements["detail-front-rate"].textContent = formatPositionPercent(detail.frontAttackRate);
+    elements["detail-back-rate"].textContent = formatPositionPercent(detail.backAttackRate);
+    elements["detail-perfect-rate"].textContent = formatPercent(detail.perfectRate);
+    elements["detail-double-rate"].textContent = formatPercent(detail.doubleDamageRate);
+    elements["detail-evade-rate"].textContent = formatPercent(detail.evadeRate);
+    applyDetailMetricVisibility();
 
     const skills = Array.isArray(detail.skills)
       ? [...detail.skills]
           .filter(skill => Number(skill.totalDamage) > 0)
           .sort((left, right) => Number(right.totalDamage) - Number(left.totalDamage))
       : [];
-    elements["detail-skill-count"].textContent = formatInteger(
-      Number(detail.skillCount) || skills.length);
     const skillRows = document.createDocumentFragment();
     for (const skill of skills) {
-      const row = document.createElement("tr");
-      const skillCell = document.createElement("td");
-      const skillName = document.createElement("strong");
-      skillName.textContent = String(skill.skillName || "—");
-      skillCell.append(skillName);
-      row.append(skillCell);
-      row.append(numericCell(formatInteger(skill.totalDamage), "accent"));
-      row.append(numericCell(formatPercent(skill.damagePercentage, 1)));
-      row.append(numericCell(formatInteger(skill.hitCount)));
-      row.append(numericCell(formatPercent(skill.criticalRate)));
-      row.append(numericCell(formatInteger(Math.round(Number(skill.averageDamage) || 0))));
-      row.append(numericCell(formatInterval(skill.averageUseIntervalMilliseconds)));
-      skillRows.append(row);
+      skillRows.append(buildDetailSkillRow(skill));
     }
     elements["detail-skill-rows"].replaceChildren(skillRows);
 
     const buffs = Array.isArray(detail.buffs)
       ? [...detail.buffs]
-          .filter(buff => String(buff.name || "").trim())
-          .sort((left, right) => Number(right.uptimeSeconds) - Number(left.uptimeSeconds))
+          .sort((left, right) =>
+            Number(right.uptimeSeconds) - Number(left.uptimeSeconds) ||
+            Number(right.count) - Number(left.count) ||
+            Number(left.code) - Number(right.code))
       : [];
     const buffItems = document.createDocumentFragment();
     for (const buff of buffs) {
-      const item = document.createElement("div");
-      item.className = "detail-buff";
-      const name = document.createElement("strong");
-      name.textContent = buff.name;
-      const uptime = document.createElement("span");
-      const seconds = Math.max(0, Number(buff.uptimeSeconds) || 0);
-      const ratio = durationSeconds > 0 ? Math.min(100, seconds / durationSeconds * 100) : 0;
-      uptime.textContent = `${formatSeconds(seconds)} · ${formatPercent(ratio)}`;
-      item.append(name, uptime);
-      buffItems.append(item);
+      buffItems.append(buildDetailBuff(buff, durationSeconds));
+    }
+    if (buffs.length === 0) {
+      const empty = document.createElement("span");
+      empty.className = "detail-buff-empty";
+      empty.textContent = t("recordedBuffsNone");
+      buffItems.append(empty);
     }
     elements["detail-buffs"].replaceChildren(buffItems);
-    elements["detail-buffs-section"].hidden = buffs.length === 0;
+    elements["detail-buff-count"].textContent = ` (${formatInteger(buffs.length)})`;
+    elements["detail-buffs-section"].hidden = false;
+  }
+
+  function buildDetailSkillRow(skill) {
+    const row = document.createElement("article");
+    row.className = "detail-skill-row";
+    row.title = `${String(skill.skillName || "—")}\n${formatInteger(skill.minHit)} ~ ${formatInteger(skill.maxHit)}`;
+
+    const bar = document.createElement("span");
+    bar.className = "detail-skill-bar";
+    bar.style.width = `${Math.max(0, Math.min(100, Number(skill.damagePercentage) || 0))}%`;
+
+    const icon = document.createElement("span");
+    icon.className = "detail-skill-icon";
+    applySkillIcon(icon, skill.skillCode, skill.rawSkillCode, 28);
+
+    const name = document.createElement("strong");
+    name.className = "detail-skill-name";
+    name.textContent = String(skill.skillName || "—");
+
+    const damage = document.createElement("strong");
+    damage.className = "detail-skill-damage";
+    damage.append(document.createTextNode(formatInteger(skill.totalDamage)));
+    const share = document.createElement("span");
+    share.textContent = ` (${formatPercent(skill.damagePercentage, 1)})`;
+    damage.append(share);
+
+    const chips = document.createElement("div");
+    chips.className = "detail-skill-chips";
+    const interval = Number(skill.averageUseIntervalMilliseconds);
+    if (Number.isFinite(interval) && interval > 0) {
+      chips.append(buildDetailChip(t("averageInterval"), `${interval.toFixed(2)}ms`, "accent"));
+    }
+    if (isDetailMetricVisible("specialization")) {
+      chips.append(buildSpecializationChip(skill.specializationFlags));
+    }
+    if (isDetailMetricVisible("hits")) {
+      chips.append(buildDetailChip(t("hits"), formatInteger(skill.hitCount)));
+    }
+    if (isDetailMetricVisible("parry")) {
+      chips.append(buildDetailChip(t("parry"), formatPercent(skill.parryRate), "accent"));
+    }
+    if (isDetailMetricVisible("avoidance") && Number(skill.evadeCount) > 0) {
+      chips.append(buildDetailChip(
+        t("avoidance"),
+        `${formatInteger(skill.evadeCount)} / ${formatPercent(skill.evadeRate)}`));
+    }
+    if (isDetailMetricVisible("multiHit")) {
+      const hits = Math.max(0, Number(skill.hitCount) || 0);
+      const ratio = hits > 0 ? (Number(skill.multiHitCount) || 0) / hits * 100 : 0;
+      chips.append(buildDetailChip(t("multiHit"), formatPercent(ratio), "double"));
+    }
+    if (isDetailMetricVisible("critical")) {
+      chips.append(buildDetailChip(t("critical"), formatPercent(skill.criticalRate), "critical"));
+    }
+    if (isDetailMetricVisible("front")) {
+      chips.append(buildDetailChip(t("front"), formatPositionPercent(skill.frontAttackRate), "position"));
+    }
+    if (isDetailMetricVisible("back")) {
+      chips.append(buildDetailChip(t("back"), formatPositionPercent(skill.backAttackRate), "position"));
+    }
+    if (isDetailMetricVisible("perfect")) {
+      chips.append(buildDetailChip(t("perfect"), formatPercent(skill.perfectRate), "perfect"));
+    }
+    if (isDetailMetricVisible("double")) {
+      chips.append(buildDetailChip(t("doubleDamage"), formatPercent(skill.doubleDamageRate), "double"));
+    }
+    if (isDetailMetricVisible("periodic") &&
+        (Number(skill.periodicDamage) > 0 || Number(skill.periodicHitCount) > 0)) {
+      const periodic = Number(skill.periodicHitCount) > 0
+        ? `${formatCompact(skill.periodicDamage)} / ${formatInteger(skill.periodicHitCount)}${state.locale === "ko" ? "회" : "x"}`
+        : formatCompact(skill.periodicDamage);
+      chips.append(buildDetailChip(t("periodicDamage"), periodic, "perfect"));
+    }
+    if (isDetailMetricVisible("healing") && Number(skill.healingAmount) > 0) {
+      chips.append(buildDetailChip(t("healing"), formatCompact(skill.healingAmount), "healing"));
+    }
+    if (isDetailMetricVisible("drainHealing") && Number(skill.drainHealingAmount) > 0) {
+      chips.append(buildDetailChip(t("drainHealing"), formatCompact(skill.drainHealingAmount), "healing"));
+    }
+    if (isDetailMetricVisible("averageDamage")) {
+      chips.append(buildDetailChip(t("averageDamage"), formatCompact(skill.averageDamage)));
+    }
+
+    row.append(bar, icon, name, damage, chips);
+    return row;
+  }
+
+  function buildDetailChip(label, value, modifier = "") {
+    const chip = document.createElement("span");
+    chip.className = `detail-chip ${modifier}`.trim();
+    chip.append(document.createTextNode(`${label} `));
+    const strong = document.createElement("b");
+    strong.textContent = value;
+    chip.append(strong);
+    chip.title = `${label} ${value}`;
+    return chip;
+  }
+
+  function buildSpecializationChip(flags) {
+    const chip = document.createElement("span");
+    chip.className = "detail-chip";
+    chip.append(document.createTextNode(t("specialization")));
+    const dots = document.createElement("span");
+    dots.className = "detail-spec-dots";
+    for (let index = 0; index < 5; index++) {
+      const dot = document.createElement("i");
+      if (Array.isArray(flags) && flags[index]) {
+        dot.className = "active";
+      }
+      dots.append(dot);
+    }
+    chip.append(dots);
+    return chip;
+  }
+
+  function buildDetailBuff(buff, durationSeconds) {
+    const item = document.createElement("article");
+    item.className = "detail-buff";
+    const seconds = Math.max(0, Number(buff.uptimeSeconds) || 0);
+    const ratio = durationSeconds > 0 ? Math.min(100, seconds / durationSeconds * 100) : 0;
+
+    const icon = document.createElement("span");
+    icon.className = "detail-buff-icon";
+    applyBuffIcon(icon, buff.code, buff.rawCode, 30);
+
+    const text = document.createElement("div");
+    text.className = "detail-buff-text";
+    const name = document.createElement("strong");
+    name.textContent = buffDisplayName(buff);
+    const uptime = document.createElement("span");
+    uptime.textContent =
+      `${formatPercent(ratio)} · ${formatDuration(seconds)} · x${Math.max(1, Number(buff.count) || 0)}`;
+    text.append(name, uptime);
+
+    const gauge = document.createElement("span");
+    gauge.className = "detail-buff-gauge";
+    const fill = document.createElement("i");
+    fill.style.width = `${ratio}%`;
+    gauge.append(fill);
+
+    item.title = `${name.textContent}\n${formatDuration(seconds)} / ${formatDuration(durationSeconds)} (${formatPercent(ratio)})`;
+    item.append(icon, text, gauge);
+    return item;
+  }
+
+  function buffDisplayName(buff) {
+    const manifest = state.iconAtlases.buff;
+    const names = state.locale === "en" ? manifest?.namesEn : manifest?.namesKo;
+    for (const candidate of [buff.rawCode, buff.code]) {
+      const name = names?.[String(Math.abs(Number(candidate) || 0))];
+      if (name) {
+        return name;
+      }
+    }
+    return String(buff.name || "—");
+  }
+
+  function loadVisibleMetrics() {
+    try {
+      const saved = JSON.parse(localStorage.getItem("notmeter-detail-metrics") || "null");
+      if (Array.isArray(saved)) {
+        const allowed = new Set(DETAIL_METRICS.map(([key]) => key));
+        return new Set(saved.filter(key => allowed.has(key)));
+      }
+    } catch {
+    }
+    return new Set(DETAIL_METRICS.map(([key]) => key));
+  }
+
+  function renderDetailSettings() {
+    if (!elements["detail-settings-options"]) {
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    for (const [key, labelKey] of DETAIL_METRICS) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = t(labelKey);
+      button.classList.toggle("active", isDetailMetricVisible(key));
+      button.addEventListener("click", () => {
+        if (state.visibleMetrics.has(key)) {
+          state.visibleMetrics.delete(key);
+        } else {
+          state.visibleMetrics.add(key);
+        }
+        localStorage.setItem(
+          "notmeter-detail-metrics",
+          JSON.stringify([...state.visibleMetrics]));
+        renderDetailSettings();
+        if (state.selectedDetail) {
+          renderCombatDetail();
+        }
+      });
+      fragment.append(button);
+    }
+    elements["detail-settings-options"].replaceChildren(fragment);
+    elements["detail-visible-count"].textContent =
+      `${state.visibleMetrics.size}/${DETAIL_METRICS.length}`;
+    elements["detail-settings-toggle"].textContent =
+      t(elements["detail-settings-options"].hidden ? "openSettings" : "closeSettings");
+  }
+
+  function isDetailMetricVisible(key) {
+    return state.visibleMetrics.has(key);
+  }
+
+  function applyDetailMetricVisibility() {
+    document.querySelectorAll("#combat-detail-modal [data-detail-metric]").forEach(element => {
+      element.hidden = !isDetailMetricVisible(element.dataset.detailMetric);
+    });
+  }
+
+  async function loadIconAtlases() {
+    try {
+      const [skill, buff] = await Promise.all([
+        fetch("./assets/icons/skill-icons.json?v=20260726-5", { cache: "force-cache" })
+          .then(response => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))),
+        fetch("./assets/icons/buff-icons.json?v=20260726-5", { cache: "force-cache" })
+          .then(response => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`))),
+      ]);
+      state.iconAtlases.skill = skill;
+      state.iconAtlases.buff = buff;
+      if (state.selectedDetail) {
+        renderCombatDetail();
+      }
+    } catch (error) {
+      console.warn("NotMeter icon atlas unavailable", error);
+    }
+  }
+
+  function applySkillIcon(element, rawCode, fallbackCode, size) {
+    const key = findSkillIconKey(rawCode, fallbackCode);
+    if (key) {
+      applyAtlasIcon(element, "skill", key, size);
+    }
+  }
+
+  function applyBuffIcon(element, code, rawCode, size) {
+    const manifest = state.iconAtlases.buff;
+    if (manifest) {
+      for (const candidate of [rawCode, code]) {
+        const iconKey = manifest.codes?.[String(Math.abs(Number(candidate) || 0))];
+        if (iconKey && Object.hasOwn(manifest.icons, iconKey)) {
+          applyAtlasIcon(element, "buff", iconKey, size);
+          return;
+        }
+      }
+    }
+    applySkillIcon(element, rawCode, code, size);
+  }
+
+  function applyAtlasIcon(element, type, key, size) {
+    const manifest = state.iconAtlases[type];
+    const index = manifest?.icons?.[key];
+    if (!Number.isInteger(index)) {
+      return;
+    }
+    const column = index % Number(manifest.columns);
+    const row = Math.floor(index / Number(manifest.columns));
+    element.style.backgroundImage = `url("./assets/icons/${type}-atlas.png?v=20260726-5")`;
+    element.style.backgroundSize =
+      `${Number(manifest.columns) * size}px ${Number(manifest.rows) * size}px`;
+    element.style.backgroundPosition = `${-column * size}px ${-row * size}px`;
+  }
+
+  function findSkillIconKey(rawCode, fallbackCode) {
+    const manifest = state.iconAtlases.skill;
+    if (!manifest) {
+      return "";
+    }
+
+    for (const candidate of [rawCode, fallbackCode]) {
+      const godstone = godstoneIconKey(candidate);
+      if (godstone && Object.hasOwn(manifest.icons, godstone)) {
+        return godstone;
+      }
+    }
+
+    // rawCode에는 특성 단계가 붙으므로 클라이언트 기준 코드로 접어서 찾는다
+    for (const candidate of [rawCode, fallbackCode]) {
+      let normalized = normalizeSkillIconCode(candidate);
+      if (normalized === 11250000) {
+        normalized = 11400000;
+      } else if (normalized === 11400000) {
+        normalized = 11250000;
+      }
+      const key = String(normalized || "");
+      if (key && Object.hasOwn(manifest.icons, key)) {
+        return key;
+      }
+    }
+    return "";
+  }
+
+  function normalizeSkillIconCode(value) {
+    let code = Math.abs(Number(value) || 0);
+    if (code >= 100011 && code <= 100018) return 16100000;
+    if ((code >= 100021 && code <= 100028) || code === 16990002) return 16110000;
+    if ((code >= 100031 && code <= 100038) || code === 16990003) return 16120000;
+    if (code >= 100041 && code <= 100048) return 16130000;
+    if (code === 100051 || code === 100055) return 16250000;
+    if ((code >= 16001101 && code <= 16001104) || (code >= 16001301 && code <= 16001304)) return 16100000;
+    if ((code >= 16001105 && code <= 16001108) || (code >= 16001305 && code <= 16001308)) return 16110000;
+    if ((code >= 16001109 && code <= 16001112) || (code >= 16001309 && code <= 16001312)) return 16120000;
+    if ((code >= 16001113 && code <= 16001116) || (code >= 16001313 && code <= 16001316)) return 16130000;
+    if (code === 16001117 || code === 16001317) return 16250000;
+    if (POTION_CODES.has(code)) return code;
+    if (code >= 10000000 && code % 10 === 0 && POTION_CODES.has(code / 10)) return code / 10;
+    if (code >= 110000000 && code <= 190999999) {
+      return Math.floor(code / 100000) * 10000;
+    }
+    if (code >= 100000000) {
+      code = Math.floor(code / 10);
+    }
+    if (POTION_CODES.has(code)) return code;
+    return code >= 11000000 && code <= 19999999
+      ? Math.floor(code / 10000) * 10000
+      : 0;
+  }
+
+  function godstoneIconKey(value) {
+    let code = Math.abs(Number(value) || 0);
+    if (code >= 3000000 && code <= 3099999) {
+      code = code * 10 + 1;
+    }
+    if (code < 30000000 || code > 30999999) {
+      return "";
+    }
+    const digits = String(Math.trunc(code)).padStart(8, "0");
+    const suffix = Number(digits.slice(5, 7)) - 6;
+    return suffix >= 1 && suffix <= 18
+      ? `godstone-${String(suffix).padStart(3, "0")}`
+      : "";
   }
 
   function findSummaryView() {
@@ -777,6 +1174,7 @@
         element.textContent = t(key);
       }
     });
+    renderDetailSettings();
   }
 
   function showState(name) {
@@ -897,6 +1295,20 @@
     return formatInteger(Math.round(number));
   }
 
+  function formatCompact(value) {
+    const number = Math.max(0, Number(value) || 0);
+    if (number >= 1_000_000_000) {
+      return `${(number / 1_000_000_000).toFixed(2)}B`;
+    }
+    if (number >= 1_000_000) {
+      return `${(number / 1_000_000).toFixed(2)}M`;
+    }
+    if (number >= 1_000) {
+      return `${(number / 1_000).toFixed(2)}K`;
+    }
+    return formatInteger(Math.round(number));
+  }
+
   function formatCombatPower(value) {
     const number = Math.max(0, Number(value) || 0);
     if (number >= 1_000_000) {
@@ -915,6 +1327,12 @@
 
   function formatPercent(value, digits = 0) {
     return `${trimFixed(Math.max(0, Number(value) || 0), digits)}%`;
+  }
+
+  function formatPositionPercent(value) {
+    return value === null || value === undefined || Number.isNaN(Number(value))
+      ? "-%"
+      : formatPercent(value);
   }
 
   function formatInterval(value) {
