@@ -640,9 +640,11 @@
     const publishedLookupKey = String(player.Q ?? player.detailLookupKey ?? "")
       .trim()
       .toLowerCase();
+    const hasPublishedDetail =
+      player.H === true || player.hasDetail === true;
     const canBuildLookupKey =
       /^[0-9a-f]{64}$/.test(publishedLookupKey) ||
-      Boolean(globalThis.crypto?.subtle);
+      (hasPublishedDetail && Boolean(globalThis.crypto?.subtle));
     let detailLookupPromise = null;
     const getDetailLookupKey = () => {
       detailLookupPromise ||= resolveDetailLookupKey(player);
