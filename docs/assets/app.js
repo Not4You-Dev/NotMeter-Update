@@ -892,10 +892,20 @@
     item.className = "detail-buff";
     const seconds = Math.max(0, Number(buff.uptimeSeconds) || 0);
     const ratio = durationSeconds > 0 ? Math.min(100, seconds / durationSeconds * 100) : 0;
+    const enhanced = globalThis.NotMeterCombatDetailBuffs.isEnhanced(buff);
 
+    const iconSlot = document.createElement("span");
+    iconSlot.className = "detail-buff-icon-slot";
     const icon = document.createElement("span");
     icon.className = "detail-buff-icon";
     applyBuffIcon(icon, buff.code, buff.rawCode, 30);
+    iconSlot.append(icon);
+    if (enhanced) {
+      const upBadge = document.createElement("span");
+      upBadge.className = "detail-buff-up";
+      upBadge.textContent = "UP";
+      iconSlot.append(upBadge);
+    }
 
     const text = document.createElement("div");
     text.className = "detail-buff-text";
@@ -912,21 +922,19 @@
     fill.style.width = `${ratio}%`;
     gauge.append(fill);
 
-    item.title = `${name.textContent}\n${formatDuration(seconds)} / ${formatDuration(durationSeconds)} (${formatPercent(ratio)})`;
-    item.append(icon, text, gauge);
+    const enhancedDescription = enhanced
+      ? state.locale === "en" ? "\nEnhanced buff" : "\n상위 버프"
+      : "";
+    item.title = `${name.textContent}\n${formatDuration(seconds)} / ${formatDuration(durationSeconds)} (${formatPercent(ratio)})${enhancedDescription}`;
+    item.append(iconSlot, text, gauge);
     return item;
   }
 
   function buffDisplayName(buff) {
-    const manifest = state.iconAtlases.buff;
-    const names = state.locale === "en" ? manifest?.namesEn : manifest?.namesKo;
-    for (const candidate of [buff.rawCode, buff.code]) {
-      const name = names?.[String(Math.abs(Number(candidate) || 0))];
-      if (name) {
-        return name;
-      }
-    }
-    return String(buff.name || "—");
+    return globalThis.NotMeterCombatDetailBuffs.displayName(
+      buff,
+      state.locale,
+      state.iconAtlases.buff);
   }
 
   function loadVisibleMetrics() {
