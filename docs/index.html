@@ -132,6 +132,7 @@
               <th data-i18n="boss">보스</th>
               <th class="number-column" data-i18n="duration">전투 시간</th>
               <th class="number-column">DPS</th>
+              <th class="detail-column" data-i18n="details">상세</th>
             </tr>
           </thead>
           <tbody id="class-rows"></tbody>
@@ -145,8 +146,61 @@
     </footer>
   </main>
 
-  <template id="job-icon-template">
-    <span class="job-icon-frame"><img alt=""></span>
-  </template>
+  <div class="detail-modal" id="combat-detail-modal" hidden>
+    <section class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <header class="detail-header">
+        <div class="detail-identity">
+          <span id="detail-job-icon"></span>
+          <div>
+            <div class="detail-title-line">
+              <h2 id="detail-title" data-i18n="combatDetails">전투 상세 정보</h2>
+              <span class="detail-duration" id="detail-duration">01:00</span>
+            </div>
+            <div class="detail-character-line">
+              <strong id="detail-character"></strong>
+              <span class="cp-badge" id="detail-cp"></span>
+            </div>
+          </div>
+        </div>
+        <button class="detail-close" id="detail-close" type="button" aria-label="Close">×</button>
+      </header>
+
+      <div class="detail-metrics">
+        <div><span data-i18n="totalDamage">총 피해량</span><strong id="detail-total-damage">—</strong></div>
+        <div><span>DPS</span><strong id="detail-dps">—</strong></div>
+        <div><span data-i18n="hits">타수</span><strong id="detail-hits">—</strong></div>
+        <div><span data-i18n="hitRate">적중률</span><strong id="detail-hit-rate">—</strong></div>
+        <div><span data-i18n="criticalRate">치명타율</span><strong id="detail-critical-rate">—</strong></div>
+        <div><span data-i18n="skillCount">스킬 수</span><strong id="detail-skill-count">—</strong></div>
+      </div>
+
+      <div class="detail-content">
+        <section class="detail-section">
+          <h3 data-i18n="skillBreakdown">스킬 피해 내역</h3>
+          <div class="detail-table-scroll">
+            <table class="detail-table">
+              <thead>
+                <tr>
+                  <th data-i18n="skill">스킬</th>
+                  <th data-i18n="damage">피해량</th>
+                  <th data-i18n="share">비중</th>
+                  <th data-i18n="hits">타수</th>
+                  <th data-i18n="criticalRate">치명타율</th>
+                  <th data-i18n="average">평균</th>
+                  <th data-i18n="averageInterval">평균 간격</th>
+                </tr>
+              </thead>
+              <tbody id="detail-skill-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="detail-section" id="detail-buffs-section">
+          <h3 data-i18n="buffUptime">버프 업타임</h3>
+          <div class="detail-buffs" id="detail-buffs"></div>
+        </section>
+      </div>
+    </section>
+  </div>
 </body>
 </html>
