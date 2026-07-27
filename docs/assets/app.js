@@ -571,6 +571,7 @@
     tr.append(cellWithRank(rank));
 
     const jobCell = document.createElement("td");
+    jobCell.className = "summary-job-cell";
     const jobWrap = document.createElement("div");
     jobWrap.className = "job-cell";
     jobWrap.append(createJobIcon(row.jobName));
@@ -585,12 +586,13 @@
     jobCell.append(jobWrap);
     tr.append(jobCell);
 
-    tr.append(numericCell(formatInteger(row.sampleCount)));
-    tr.append(numericCell(formatDps(row.p75Dps), "accent"));
-    tr.append(numericCell(formatDps(row.medianDps), "median"));
-    tr.append(numericCell(formatDps(row.maxDps), "max"));
+    tr.append(numericCell(formatInteger(row.sampleCount), "summary-sample", t("sample")));
+    tr.append(numericCell(formatDps(row.p75Dps), "accent summary-p75", t("top25")));
+    tr.append(numericCell(formatDps(row.medianDps), "median summary-median", t("median")));
+    tr.append(numericCell(formatDps(row.maxDps), "max summary-max", t("max")));
 
     const distributionCell = document.createElement("td");
+    distributionCell.className = "summary-distribution";
     const distribution = document.createElement("div");
     distribution.className = "distribution";
     const track = document.createElement("div");
@@ -690,6 +692,13 @@
     }
     tr.append(cellWithRank(player.rank));
 
+    const dungeon = currentDungeon();
+    const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
+    const boss = bossIndex > 0 ? dungeon?.bossNames?.[bossIndex - 1] : "";
+    const bossName = boss || (state.bossIndex > 0
+      ? dungeon?.bossNames?.[state.bossIndex - 1]
+      : t("allBosses"));
+
     const characterCell = document.createElement("td");
     characterCell.className = "character-cell";
     const characterStack = document.createElement("div");
@@ -734,20 +743,23 @@
       party.forEach(job => partyLine.append(createJobIcon(job)));
       characterStack.append(partyLine);
     }
+    const mobileMeta = document.createElement("span");
+    mobileMeta.className = "mobile-class-meta";
+    mobileMeta.textContent = `${bossName} · ${formatDuration(player.durationSeconds)}`;
+    characterStack.append(mobileMeta);
     characterCell.append(characterStack);
     tr.append(characterCell);
 
-    const dungeon = currentDungeon();
-    const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
-    const boss = bossIndex > 0 ? dungeon?.bossNames?.[bossIndex - 1] : "";
     const bossCell = document.createElement("td");
-    bossCell.textContent = boss || (state.bossIndex > 0
-      ? dungeon?.bossNames?.[state.bossIndex - 1]
-      : t("allBosses"));
+    bossCell.className = "class-boss";
+    bossCell.textContent = bossName;
     tr.append(bossCell);
 
-    tr.append(numericCell(formatDuration(player.durationSeconds)));
-    tr.append(numericCell(formatInteger(Math.round(Number(player.dps) || 0)), "accent"));
+    tr.append(numericCell(formatDuration(player.durationSeconds), "class-duration", t("duration")));
+    tr.append(numericCell(
+      formatInteger(Math.round(Number(player.dps) || 0)),
+      "accent class-dps",
+      "DPS"));
     const detailCell = document.createElement("td");
     detailCell.className = "detail-column";
     const detailLink = document.createElement("span");
@@ -1724,10 +1736,13 @@
     return td;
   }
 
-  function numericCell(value, modifier = "") {
+  function numericCell(value, modifier = "", label = "") {
     const td = document.createElement("td");
     td.className = `numeric ${modifier}`.trim();
     td.textContent = value;
+    if (label) {
+      td.dataset.label = label;
+    }
     return td;
   }
 
