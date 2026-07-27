@@ -10,6 +10,8 @@
   const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
   const DETAIL_MEMORY_LIMIT = 48;
+  const CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+  const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
   const WEEKLY_LABEL_PREFIX = "weekly-wed05|";
@@ -291,6 +293,7 @@
     detailLoads: new Map(),
     mode: "summary",
     loading: false,
+    lastCacheSyncAt: 0,
     iconAtlases: {
       skill: null,
       buff: null,
@@ -308,6 +311,16 @@
     void loadIconAtlases();
     void loadCache();
     window.setInterval(updateCacheAge, 60_000);
+    window.setInterval(() => {
+      if (!document.hidden) {
+        void syncLatestCache();
+      }
+    }, CACHE_SYNC_INTERVAL_MS);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        void syncLatestCache();
+      }
+    });
   });
 
   function bindElements() {
@@ -407,17 +420,25 @@
     });
   }
 
-  async function loadCache(force = false) {
+  async function loadCache(force = false, preserveView = false) {
     if (state.loading) {
       return;
     }
     state.loading = true;
     elements["refresh-button"].disabled = true;
-    showState("loading");
+    if (!preserveView) {
+      showState("loading");
+    }
 
     try {
       const cache = await fetchRankingCache(force);
       validateCache(cache);
+      state.lastCacheSyncAt = Date.now();
+      if (preserveView &&
+        state.data &&
+        String(cache.generatedAt) === String(state.data.generatedAt)) {
+        return;
+      }
       const previousDungeon = state.dungeonKey;
       closeCombatDetail();
       state.data = cache;
@@ -426,13 +447,18 @@
       state.dungeonKey = cache.dungeons.some(item => item.key === previousDungeon)
         ? previousDungeon
         : cache.dungeons[0]?.key || "";
-      state.mode = "summary";
-      state.selectedJob = "";
+      if (!preserveView || state.dungeonKey !== previousDungeon) {
+        state.mode = "summary";
+        state.selectedJob = "";
+      }
       updateDailyUsers();
       populateFilters();
       render();
     } catch (error) {
       console.error(error);
+      if (preserveView) {
+        return;
+      }
       elements["error-message"].textContent =
         error instanceof Error && error.message ? error.message : t("cacheUnavailable");
       showState("error");
@@ -440,6 +466,15 @@
       state.loading = false;
       elements["refresh-button"].disabled = false;
     }
+  }
+
+  async function syncLatestCache() {
+    if (state.loading ||
+      !state.data ||
+      Date.now() - state.lastCacheSyncAt < CACHE_SYNC_THROTTLE_MS) {
+      return;
+    }
+    await loadCache(false, true);
   }
 
   async function fetchRankingCache(force) {
@@ -724,7 +759,14 @@
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
     const boss = bossIndex > 0 ? dungeon?.bossNames?.[bossIndex - 1] : "";
     const targetName = String(player.T ?? player.targetName ?? "").trim();
-    const bossName = targetName || boss || (state.bossIndex > 0
+    const targetMobCode = Number(player.M ?? player.targetMobCode ?? 0);
+    const exactTarget = state.dungeonKey === "training-dummy-60s" &&
+      targetName &&
+      Number.isInteger(targetMobCode) &&
+      targetMobCode > 0
+      ? `${targetName} (${targetMobCode})`
+      : targetName;
+    const bossName = exactTarget || boss || (state.bossIndex > 0
       ? dungeon?.bossNames?.[state.bossIndex - 1]
       : t("allBosses"));
 
