@@ -759,14 +759,7 @@
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
     const boss = bossIndex > 0 ? dungeon?.bossNames?.[bossIndex - 1] : "";
     const targetName = String(player.T ?? player.targetName ?? "").trim();
-    const targetMobCode = Number(player.M ?? player.targetMobCode ?? 0);
-    const exactTarget = state.dungeonKey === "training-dummy-60s" &&
-      targetName &&
-      Number.isInteger(targetMobCode) &&
-      targetMobCode > 0
-      ? `${targetName} (${targetMobCode})`
-      : targetName;
-    const bossName = exactTarget || boss || (state.bossIndex > 0
+    const bossName = targetName || boss || (state.bossIndex > 0
       ? dungeon?.bossNames?.[state.bossIndex - 1]
       : t("allBosses"));
 
