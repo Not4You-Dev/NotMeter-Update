@@ -16,9 +16,9 @@
   <meta name="twitter:image" content="https://not4you-dev.github.io/NotMeter-Update/assets/og.png">
   <title>NotMeter 던전 통계</title>
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260727-12">
-  <script src="./assets/combat-detail-buffs.js?v=20260727-12" defer></script>
-  <script src="./assets/app.js?v=20260727-12" defer></script>
+  <link rel="stylesheet" href="./assets/app.css?v=20260727-14">
+  <script src="./assets/combat-detail-buffs.js?v=20260727-14" defer></script>
+  <script src="./assets/app.js?v=20260727-14" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -76,6 +76,45 @@
         <span class="meta-divider" aria-hidden="true"></span>
         <span id="generated-meta">—</span>
       </div>
+    </section>
+
+    <section class="weekly-guide" id="weekly-guide" hidden>
+      <details>
+        <summary>
+          <span class="weekly-guide-icon" aria-hidden="true">i</span>
+          <span class="weekly-guide-heading">
+            <strong data-i18n="weeklyGuideTitle">▲▼ 이번 주 변화 표시 안내</strong>
+            <span data-i18n="weeklyGuideSubtitle">직전 주 동일 조건의 직업별 상위 25% DPS와 비교합니다</span>
+          </span>
+          <span class="weekly-guide-toggle" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="weekly-guide-body">
+          <div class="weekly-guide-legend" aria-label="주간 변화 기호">
+            <span class="up"><b>▲</b><span data-i18n="weeklyUp">상승</span></span>
+            <span class="down"><b>▼</b><span data-i18n="weeklyDown">하락</span></span>
+            <span class="flat"><b>–</b><span data-i18n="weeklyFlat">변화 없음</span></span>
+          </div>
+          <div class="weekly-guide-copy">
+            <div>
+              <strong data-i18n="weeklyGuidePurposeTitle">표시 목적</strong>
+              <p data-i18n="weeklyGuidePurpose">밸런스 패치 이후 직업별 실전 성능 흐름을 빠르게 비교하기 위한 참고 지표입니다.</p>
+            </div>
+            <div>
+              <strong data-i18n="weeklyGuideBasisTitle">비교 기준</strong>
+              <p data-i18n="weeklyGuideBasis">상위 25% DPS는 직업별 전체 표본에서 상위 25%가 시작되는 경계값(P75)입니다. 현재 선택한 던전·보스·CP 구간을 동일하게 맞춰 이번 주와 직전 주의 P75를 비교하며, 한 주는 매주 수요일 오전 5시부터 다음 수요일 오전 5시까지입니다.</p>
+            </div>
+            <div>
+              <strong data-i18n="weeklyGuideMeaningTitle">퍼센트 의미</strong>
+              <p data-i18n="weeklyGuideMeaning">변화율은 (이번 주 P75−직전 주 P75)÷직전 주 P75×100으로 계산합니다. ▲2.4%는 이번 주 값이 2.4% 높고, ▼2.4%는 2.4% 낮다는 뜻입니다.</p>
+            </div>
+            <div>
+              <strong data-i18n="weeklyGuideRankingTitle">랭킹 반영 방식</strong>
+              <p data-i18n="weeklyGuideRanking">직업 순서는 이번 주 상위 25% DPS로 정렬됩니다. 화살표는 변화 추세만 보여주며 개인 순위, TOP 20 순위, 상위 % 계산에는 영향을 주지 않습니다.</p>
+            </div>
+          </div>
+          <p class="weekly-guide-note" data-i18n="weeklyGuideNote">직전 주에 같은 조건의 기록이 없으면 화살표가 표시되지 않습니다. 화살표에 마우스를 올리면 이전·현재 DPS와 표본 수를 확인할 수 있습니다.</p>
+        </div>
+      </details>
     </section>
 
     <section class="ranking-panel">
