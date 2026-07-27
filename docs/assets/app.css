@@ -1230,6 +1230,33 @@ tr:nth-child(3) .rank-badge {
   scrollbar-width: thin;
 }
 
+.detail-unavailable {
+  display: flex;
+  min-height: 210px;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 9px;
+  padding: 28px;
+  border: 1px dashed #365066;
+  border-radius: 9px;
+  background: rgba(11, 20, 29, 0.88);
+  color: #88a3b5;
+  text-align: center;
+}
+
+.detail-unavailable strong {
+  color: #d8e7ef;
+  font-size: 15px;
+}
+
+.detail-unavailable span {
+  max-width: 560px;
+  font-size: 12px;
+  line-height: 1.65;
+}
+
 .detail-skill-row {
   position: relative;
   display: grid;
