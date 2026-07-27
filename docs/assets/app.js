@@ -123,6 +123,8 @@
       combatDetails: "전투 상세 정보",
       detailLoading: "전투 상세 정보를 불러오는 중입니다",
       detailUnavailable: "전투 상세 정보를 불러오지 못했습니다 다시 시도해 주세요",
+      detailUnavailableTitle: "상세 기록 없음",
+      detailUnavailableOld: "오래된 기록은 당시 스킬별 상세 데이터를 수집하지 않아 전투 상세 정보를 제공할 수 없습니다",
       partyMembers: "파티원",
       totalDamage: "총 데미지",
       contribution: "기여도",
@@ -204,6 +206,8 @@
       combatDetails: "Combat Details",
       detailLoading: "Loading combat details",
       detailUnavailable: "Combat details are temporarily unavailable. Please try again.",
+      detailUnavailableTitle: "Details unavailable",
+      detailUnavailableOld: "This older record was saved before skill-level combat details were collected, so its detailed breakdown cannot be provided.",
       partyMembers: "Party members",
       totalDamage: "Total damage",
       contribution: "Contribution",
@@ -650,35 +654,39 @@
       detailLookupPromise ||= resolveDetailLookupKey(player);
       return detailLookupPromise;
     };
-    if (detail || canBuildLookupKey) {
-      tr.className = "class-detail-row";
-      tr.tabIndex = 0;
-      tr.setAttribute("role", "button");
-      tr.setAttribute(
-        "aria-label",
-        `${formatCharacterName(player.name, player.serverId)} ${t("combatDetails")}`);
-      const open = async () => detail
-        ? openLegacyCombatDetail(player, detail)
-        : openRemoteCombatDetail(player, await getDetailLookupKey(), tr);
-      tr.addEventListener("click", () => void open());
-      tr.addEventListener("keydown", event => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          void open();
-        }
-      });
-      if (!detail && canBuildLookupKey) {
-        let hoverTimer = 0;
-        tr.addEventListener("mouseenter", () => {
-          window.clearTimeout(hoverTimer);
-          hoverTimer = window.setTimeout(() => {
-            void getDetailLookupKey()
-              .then(loadRankingCombatDetail)
-              .catch(() => {});
-          }, 220);
-        });
-        tr.addEventListener("mouseleave", () => window.clearTimeout(hoverTimer));
+    tr.className = "class-detail-row";
+    tr.tabIndex = 0;
+    tr.setAttribute("role", "button");
+    tr.setAttribute(
+      "aria-label",
+      `${formatCharacterName(player.name, player.serverId)} ${t("combatDetails")}`);
+    const open = async () => {
+      if (detail) {
+        openLegacyCombatDetail(player, detail);
+      } else if (canBuildLookupKey) {
+        await openRemoteCombatDetail(player, await getDetailLookupKey(), tr);
+      } else {
+        openUnavailableCombatDetail(player, t("detailUnavailableOld"));
       }
+    };
+    tr.addEventListener("click", () => void open());
+    tr.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        void open();
+      }
+    });
+    if (!detail && canBuildLookupKey) {
+      let hoverTimer = 0;
+      tr.addEventListener("mouseenter", () => {
+        window.clearTimeout(hoverTimer);
+        hoverTimer = window.setTimeout(() => {
+          void getDetailLookupKey()
+            .then(loadRankingCombatDetail)
+            .catch(() => {});
+        }, 220);
+      });
+      tr.addEventListener("mouseleave", () => window.clearTimeout(hoverTimer));
     }
     tr.append(cellWithRank(player.rank));
 
@@ -742,12 +750,10 @@
     tr.append(numericCell(formatInteger(Math.round(Number(player.dps) || 0)), "accent"));
     const detailCell = document.createElement("td");
     detailCell.className = "detail-column";
-    if (detail || canBuildLookupKey) {
-      const detailLink = document.createElement("span");
-      detailLink.className = "detail-link";
-      detailLink.textContent = `${t("viewDetails")} ›`;
-      detailCell.append(detailLink);
-    }
+    const detailLink = document.createElement("span");
+    detailLink.className = "detail-link";
+    detailLink.textContent = `${t("viewDetails")} ›`;
+    detailCell.append(detailLink);
     tr.append(detailCell);
     return tr;
   }
@@ -822,6 +828,38 @@
     elements["detail-close"].focus({ preventScroll: true });
   }
 
+  function openUnavailableCombatDetail(player, reason) {
+    const dungeon = currentDungeon();
+    const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
+    const bossName = bossIndex > 0
+      ? dungeon?.bossNames?.[bossIndex - 1]
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon);
+    const actorId = 1;
+    state.selectedDetail = {
+      player,
+      actorId,
+      unavailableReason: String(reason || t("detailUnavailable")),
+      record: {
+        bossName,
+        durationSeconds: Math.max(0, Number(player.durationSeconds) || 0),
+        players: [{
+          actorId,
+          name: player.name,
+          serverId: Number(player.serverId) || 0,
+          jobName: state.selectedJob,
+          combatPower: Number(player.combatPower) || 0,
+          dps: Number(player.dps) || 0,
+          skills: [],
+          buffs: [],
+        }],
+      },
+    };
+    renderCombatDetail();
+    elements["combat-detail-modal"].hidden = false;
+    document.body.classList.add("detail-open");
+    elements["detail-close"].focus({ preventScroll: true });
+  }
+
   async function openRemoteCombatDetail(player, lookupKey, row) {
     if (!lookupKey || row.classList.contains("detail-loading")) {
       return;
@@ -841,23 +879,24 @@
         actorId,
         record: document.record,
       };
+      row.removeAttribute("title");
       renderCombatDetail();
       elements["combat-detail-modal"].hidden = false;
       document.body.classList.add("detail-open");
       elements["detail-close"].focus({ preventScroll: true });
     } catch (error) {
       console.error(error);
-      row.title = t("detailUnavailable");
-      if (detailLink) {
-        detailLink.textContent = t("detailUnavailable");
-      }
-      return;
+      const reason = Number(error?.status) === 404
+        ? t("detailUnavailableOld")
+        : t("detailUnavailable");
+      row.title = reason;
+      openUnavailableCombatDetail(player, reason);
     } finally {
       row.classList.remove("detail-loading");
       row.removeAttribute("aria-busy");
-    }
-    if (detailLink) {
-      detailLink.textContent = previousLabel;
+      if (detailLink) {
+        detailLink.textContent = previousLabel;
+      }
     }
   }
 
@@ -909,7 +948,9 @@
       headers: { Accept: "application/json" },
     });
     if (!response.ok) {
-      throw new Error(`${t("detailUnavailable")} (${response.status})`);
+      const error = new Error(`${t("detailUnavailable")} (${response.status})`);
+      error.status = response.status;
+      throw error;
     }
     const cacheCopy = response.clone();
     const document = await parseRankingCombatDetail(response, lookupKey);
@@ -1002,6 +1043,7 @@
       return;
     }
     const { player, record } = state.selectedDetail;
+    const unavailableReason = String(state.selectedDetail.unavailableReason || "");
     const players = Array.isArray(record?.players) ? record.players : [];
     const detail = players.find(candidate =>
       Number(candidate.actorId) === Number(state.selectedDetail.actorId)) || players[0];
@@ -1030,18 +1072,23 @@
     const combatPower = Number(detail.combatPower || player.combatPower) || 0;
     elements["detail-cp-row"].hidden = combatPower <= 0;
     elements["detail-cp"].textContent = formatInteger(combatPower);
-    elements["detail-total-damage"].textContent = formatInteger(detail.totalDamage);
-    elements["detail-dps"].textContent = formatCompact(Number(detail.dps) || 0);
-    elements["detail-share"].textContent = formatPercent(detail.sharePercent);
+    elements["detail-total-damage"].textContent = unavailableReason
+      ? "—"
+      : formatInteger(detail.totalDamage);
+    elements["detail-dps"].textContent = formatCompact(
+      Number(detail.dps || player.dps) || 0);
+    elements["detail-share"].textContent = unavailableReason
+      ? "—"
+      : formatPercent(detail.sharePercent);
     elements["detail-summary-duration"].textContent = formatDuration(durationSeconds);
-    elements["detail-hits"].textContent = formatInteger(detail.hitCount);
-    elements["detail-parry-rate"].textContent = formatPercent(detail.parryRate);
-    elements["detail-critical-rate"].textContent = formatPercent(detail.criticalRate);
-    elements["detail-front-rate"].textContent = formatPositionPercent(detail.frontAttackRate);
-    elements["detail-back-rate"].textContent = formatPositionPercent(detail.backAttackRate);
-    elements["detail-perfect-rate"].textContent = formatPercent(detail.perfectRate);
-    elements["detail-double-rate"].textContent = formatPercent(detail.doubleDamageRate);
-    elements["detail-evade-rate"].textContent = formatPercent(detail.evadeRate);
+    elements["detail-hits"].textContent = unavailableReason ? "—" : formatInteger(detail.hitCount);
+    elements["detail-parry-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.parryRate);
+    elements["detail-critical-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.criticalRate);
+    elements["detail-front-rate"].textContent = unavailableReason ? "—" : formatPositionPercent(detail.frontAttackRate);
+    elements["detail-back-rate"].textContent = unavailableReason ? "—" : formatPositionPercent(detail.backAttackRate);
+    elements["detail-perfect-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.perfectRate);
+    elements["detail-double-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.doubleDamageRate);
+    elements["detail-evade-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.evadeRate);
     applyDetailMetricVisibility();
 
     const skills = Array.isArray(detail.skills)
@@ -1050,10 +1097,28 @@
           .sort((left, right) => Number(right.totalDamage) - Number(left.totalDamage))
       : [];
     const skillRows = document.createDocumentFragment();
-    for (const skill of skills) {
-      skillRows.append(buildDetailSkillRow(skill));
+    if (unavailableReason) {
+      const unavailable = document.createElement("article");
+      unavailable.className = "detail-unavailable";
+      const title = document.createElement("strong");
+      title.textContent = t("detailUnavailableTitle");
+      const description = document.createElement("span");
+      description.textContent = unavailableReason;
+      unavailable.append(title, description);
+      skillRows.append(unavailable);
+    } else {
+      for (const skill of skills) {
+        skillRows.append(buildDetailSkillRow(skill));
+      }
     }
     elements["detail-skill-rows"].replaceChildren(skillRows);
+
+    if (unavailableReason) {
+      elements["detail-buffs"].replaceChildren();
+      elements["detail-buff-count"].textContent = "";
+      elements["detail-buffs-section"].hidden = true;
+      return;
+    }
 
     const buffs = Array.isArray(detail.buffs)
       ? [...detail.buffs]
