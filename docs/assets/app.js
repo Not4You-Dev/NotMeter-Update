@@ -723,7 +723,8 @@
     const dungeon = currentDungeon();
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
     const boss = bossIndex > 0 ? dungeon?.bossNames?.[bossIndex - 1] : "";
-    const bossName = boss || (state.bossIndex > 0
+    const targetName = String(player.T ?? player.targetName ?? "").trim();
+    const bossName = targetName || boss || (state.bossIndex > 0
       ? dungeon?.bossNames?.[state.bossIndex - 1]
       : t("allBosses"));
 
