@@ -16,9 +16,9 @@
   <meta name="twitter:image" content="https://not4you-dev.github.io/NotMeter-Update/assets/og.png">
   <title>NotMeter 던전 통계</title>
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260727-14">
-  <script src="./assets/combat-detail-buffs.js?v=20260727-14" defer></script>
-  <script src="./assets/app.js?v=20260727-14" defer></script>
+  <link rel="stylesheet" href="./assets/app.css?v=20260727-15">
+  <script src="./assets/combat-detail-buffs.js?v=20260727-15" defer></script>
+  <script src="./assets/app.js?v=20260727-15" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -76,6 +76,36 @@
         <span class="meta-divider" aria-hidden="true"></span>
         <span id="generated-meta">—</span>
       </div>
+    </section>
+
+    <section class="weekly-guide ranking-entry-guide" id="ranking-entry-guide">
+      <details>
+        <summary>
+          <span class="weekly-guide-icon" aria-hidden="true">!</span>
+          <span class="weekly-guide-heading">
+            <strong data-i18n="rankingEntryGuideTitle">랭킹 등록 기준 안내</strong>
+            <span data-i18n="rankingEntryGuideSubtitle">기록이 보이지 않을 때 먼저 확인해 주세요</span>
+          </span>
+          <span class="weekly-guide-toggle" aria-hidden="true">⌄</span>
+        </summary>
+        <div class="weekly-guide-body">
+          <div class="weekly-guide-copy">
+            <div>
+              <strong data-i18n="rankingEntrySpreadTitle">파티 전투력 차이</strong>
+              <p data-i18n="rankingEntrySpread">전투 기록에서 CP가 확인된 파티원 중 최고 전투력과 최저 전투력의 차이가 200K(200,000) 이상이면 해당 전투 전체가 통계와 TOP 20 랭킹에서 제외됩니다.</p>
+            </div>
+            <div>
+              <strong data-i18n="rankingEntryCalculationTitle">계산 방법</strong>
+              <p data-i18n="rankingEntryCalculation">최고 CP − 최저 CP로 계산하며 정확히 200K인 경우도 제외됩니다. 예를 들어 900K와 700K가 함께 기록되면 차이가 200K이므로 등록되지 않습니다.</p>
+            </div>
+            <div>
+              <strong data-i18n="rankingEntryPurposeTitle">적용 목적</strong>
+              <p data-i18n="rankingEntryPurpose">버스 또는 전투력 격차가 큰 파티의 기록으로 인해 직업별 DPS 통계가 왜곡되는 것을 방지하기 위한 기준입니다.</p>
+            </div>
+          </div>
+          <p class="weekly-guide-note" data-i18n="rankingEntryNote">CP를 알 수 없는 파티원은 차이 계산에서 제외됩니다. 일반 던전 기록은 이 기준 외에도 확정 처치와 파티원 5인 이상 등의 집계 조건을 모두 충족해야 하며, 훈련용 허수아비는 별도 기준을 사용합니다.</p>
+        </div>
+      </details>
     </section>
 
     <section class="weekly-guide" id="weekly-guide" hidden>
