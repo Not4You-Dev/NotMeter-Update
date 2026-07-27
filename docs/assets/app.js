@@ -872,12 +872,12 @@
       detailLink.textContent = t("detailLoading");
     }
     try {
-      const document = await loadRankingCombatDetail(lookupKey);
-      const actorId = Number(document.selectors?.[lookupKey]) || 0;
+      const detailDocument = await loadRankingCombatDetail(lookupKey);
+      const actorId = Number(detailDocument.selectors?.[lookupKey]) || 0;
       state.selectedDetail = {
         player,
         actorId,
-        record: document.record,
+        record: detailDocument.record,
       };
       row.removeAttribute("title");
       renderCombatDetail();
