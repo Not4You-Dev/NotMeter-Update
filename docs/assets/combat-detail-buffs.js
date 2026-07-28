@@ -37,12 +37,23 @@
   }
 
   function iconSource(buff) {
-    if (skillFamilyCode(buff?.code) === AMPLIFICATION_PRAYER_CODE ||
+    const name = String(buff?.name || "").trim().toLocaleLowerCase();
+    const isAmplificationPrayer =
+      name === "증폭의 기도" ||
+      name === "prayer of amplification";
+    const isEarthBlessing =
+      name === "대지의 축복" ||
+      name === "earth's blessing" ||
+      name === "earth’s blessing";
+
+    if (isAmplificationPrayer ||
+        skillFamilyCode(buff?.code) === AMPLIFICATION_PRAYER_CODE ||
         skillFamilyCode(buff?.rawCode) === AMPLIFICATION_PRAYER_CODE) {
       return { type: "skill", key: String(AMPLIFICATION_PRAYER_CODE) };
     }
 
-    if (EARTH_BLESSING_CODES.has(compactCode(buff?.code)) ||
+    if (isEarthBlessing ||
+        EARTH_BLESSING_CODES.has(compactCode(buff?.code)) ||
         EARTH_BLESSING_CODES.has(compactCode(buff?.rawCode))) {
       return { type: "buff", key: "ICON_CL_SKILL_030" };
     }

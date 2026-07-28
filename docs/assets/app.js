@@ -1683,7 +1683,7 @@
     iconSlot.className = "detail-buff-icon-slot";
     const icon = document.createElement("span");
     icon.className = "detail-buff-icon";
-    applyBuffIcon(icon, buff.code, buff.rawCode, 30);
+    applyBuffIcon(icon, buff, 30);
     iconSlot.append(icon);
     if (enhanced) {
       const upBadge = document.createElement("span");
@@ -1802,8 +1802,10 @@
     }
   }
 
-  function applyBuffIcon(element, code, rawCode, size) {
-    const preferred = globalThis.NotMeterCombatDetailBuffs.iconSource({ code, rawCode });
+  function applyBuffIcon(element, buff, size) {
+    const code = buff?.code;
+    const rawCode = buff?.rawCode;
+    const preferred = globalThis.NotMeterCombatDetailBuffs.iconSource(buff);
     const preferredManifest = preferred ? state.iconAtlases[preferred.type] : null;
     if (preferred && Object.hasOwn(preferredManifest?.icons || {}, preferred.key)) {
       applyAtlasIcon(element, preferred.type, preferred.key, size);
