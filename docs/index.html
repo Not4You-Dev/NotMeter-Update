@@ -16,9 +16,9 @@
   <meta name="twitter:image" content="https://not4you-dev.github.io/NotMeter-Update/assets/og.png">
   <title>NotMeter 던전 통계</title>
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260727-15">
-  <script src="./assets/combat-detail-buffs.js?v=20260727-15" defer></script>
-  <script src="./assets/app.js?v=20260727-15" defer></script>
+  <link rel="stylesheet" href="./assets/app.css?v=20260728-16">
+  <script src="./assets/combat-detail-buffs.js?v=20260728-16" defer></script>
+  <script src="./assets/app.js?v=20260728-16" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -64,6 +64,29 @@
         <span class="refresh-glyph" aria-hidden="true">↻</span>
         <span data-i18n="refresh">새로고침</span>
       </button>
+    </section>
+
+    <section class="custom-cp-panel" id="custom-cp-panel" hidden>
+      <div class="custom-cp-heading">
+        <strong data-i18n="customCpTitle">직접 CP 지정</strong>
+        <span data-i18n="customCpDescription">400은 40만 CP이며, 최소값과 최대값 사이 기록만 조회합니다</span>
+      </div>
+      <label class="custom-cp-input">
+        <span data-i18n="customCpMinimum">최소 CP</span>
+        <span class="custom-cp-control">
+          <input id="custom-cp-min" type="number" min="400" max="1998" step="1" inputmode="numeric" value="400">
+          <b>K</b>
+        </span>
+      </label>
+      <label class="custom-cp-input">
+        <span data-i18n="customCpMaximum">최대 CP</span>
+        <span class="custom-cp-control">
+          <input id="custom-cp-max" type="number" min="401" max="1999" step="1" inputmode="numeric" value="420">
+          <b>K</b>
+        </span>
+      </label>
+      <button class="custom-cp-apply" id="custom-cp-apply" type="button" data-i18n="customCpApply">적용</button>
+      <span class="custom-cp-result" id="custom-cp-result"></span>
     </section>
 
     <section class="snapshot-bar" aria-live="polite">
