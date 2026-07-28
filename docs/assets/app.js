@@ -2018,7 +2018,7 @@
             ? String(item.player.R || "")
             : null,
           Q: null,
-          H: null,
+          H: item.player.H === true ? true : null,
           T: item.player.T || null,
         }));
       return { jobName, players };
