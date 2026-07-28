@@ -16,9 +16,9 @@
   <meta name="twitter:image" content="https://not4you-dev.github.io/NotMeter-Update/assets/og.png">
   <title>NotMeter 던전 통계</title>
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260728-19">
+  <link rel="stylesheet" href="./assets/app.css?v=20260728-20">
   <script src="./assets/combat-detail-buffs.js?v=20260728-16" defer></script>
-  <script src="./assets/app.js?v=20260728-19" defer></script>
+  <script src="./assets/app.js?v=20260728-20" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -179,7 +179,7 @@
         <div>
           <div class="heading-line">
             <h2 id="class-title"></h2>
-            <span class="top-badge">TOP 20</span>
+            <span class="top-badge" id="class-badge">TOP 20</span>
           </div>
           <p id="class-caption"></p>
         </div>
@@ -207,7 +207,7 @@
             <tr>
               <th class="rank-column" data-i18n="rank">순위</th>
               <th data-i18n="job">직업</th>
-              <th class="number-column" data-i18n="sample">표본</th>
+              <th class="number-column" id="sample-column-heading" data-i18n="sample">표본</th>
               <th class="number-column" data-i18n="top25">상위 25%</th>
               <th class="number-column" data-i18n="median">중앙값</th>
               <th class="number-column" data-i18n="max">최고</th>
