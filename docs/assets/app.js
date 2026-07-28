@@ -5,7 +5,12 @@
     "./data/notmeter-ranking.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking.json.gz",
   ];
+  const CUSTOM_CP_CACHE_URLS = [
+    "./data/notmeter-ranking-custom-cp.json.gz",
+    "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
+  ];
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
+  const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
@@ -14,6 +19,7 @@
   const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
+  const INTERNAL_REPLAY_PERIOD_LABEL = "__notmeter_replay_top20_v1__";
   const WEEKLY_LABEL_PREFIX = "weekly-wed05|";
   const PERIODS = ["Weekly", "Today", "Recent14Days", "All"];
   const JOB_ORDER = ["검성", "수호성", "살성", "궁성", "마도성", "정령성", "치유성", "호법성", "권성"];
@@ -108,6 +114,14 @@
       cacheNotice: "클라이언트와 동일한 통계 생성본을 사용합니다.",
       allBosses: "전체 보스",
       allCp: "전체 CP",
+      customCp: "직접 CP 지정",
+      customCpTitle: "직접 CP 지정",
+      customCpDescription: "400은 40만 CP이며, 최소값과 최대값 사이 기록만 조회합니다",
+      customCpMinimum: "최소 CP",
+      customCpMaximum: "최대 CP",
+      customCpApply: "적용",
+      customCpResolved: "집계 범위 {minimum}K~{maximum}K",
+      customCpInvalid: "400K~1,999K 안에서 최소 CP보다 큰 최대 CP를 입력해 주세요",
       thisWeek: "이번 주",
       today: "오늘",
       recent14: "최근 14일",
@@ -214,6 +228,14 @@
       cacheNotice: "Uses the same generated statistics snapshot as the client.",
       allBosses: "All bosses",
       allCp: "All CP",
+      customCp: "Custom CP",
+      customCpTitle: "Custom CP",
+      customCpDescription: "Values are in K; only records within the selected range are shown",
+      customCpMinimum: "Minimum CP",
+      customCpMaximum: "Maximum CP",
+      customCpApply: "Apply",
+      customCpResolved: "Active range: {minimum}K–{maximum}K",
+      customCpInvalid: "Use 400K–1,999K and enter a maximum greater than the minimum",
       thisWeek: "This week",
       today: "Today",
       recent14: "Last 14 days",
@@ -299,11 +321,16 @@
 
   const state = {
     data: null,
+    customCpData: null,
+    customCpLoad: null,
     locale: localStorage.getItem("notmeter-stats-locale") ||
       (navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en"),
     dungeonKey: "",
     bossIndex: 0,
     cpTierIndex: 0,
+    cpFilterMode: "standard",
+    customCpMinK: Math.min(1998, Math.max(400, Number(localStorage.getItem("notmeter-stats-custom-cp-min-k")) || 400)),
+    customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
     selectedJob: "",
     selectedDetail: null,
@@ -344,6 +371,7 @@
   function bindElements() {
     for (const id of [
       "daily-user-count", "language-button", "dungeon-filter", "boss-filter", "cp-filter",
+      "custom-cp-panel", "custom-cp-min", "custom-cp-max", "custom-cp-apply", "custom-cp-result",
       "period-filter", "refresh-button", "retry-button", "snapshot-title", "snapshot-caption",
       "sample-meta", "generated-meta", "weekly-guide", "class-heading", "class-title", "class-caption",
       "back-button", "loading-state", "error-state", "error-message", "empty-state",
@@ -390,10 +418,26 @@
       render();
     });
     elements["cp-filter"].addEventListener("change", event => {
+      if (event.target.value === "custom") {
+        state.cpFilterMode = "custom";
+        void applyCustomCpValue();
+        return;
+      }
+      state.cpFilterMode = "standard";
       state.cpTierIndex = Number(event.target.value);
+      syncCustomCpControls();
       leaveClassView();
       render();
     });
+    elements["custom-cp-apply"].addEventListener("click", () => void applyCustomCpValue());
+    for (const input of [elements["custom-cp-min"], elements["custom-cp-max"]]) {
+      input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          void applyCustomCpValue();
+        }
+      });
+    }
     elements["period-filter"].addEventListener("change", event => {
       state.period = event.target.value;
       leaveClassView();
@@ -459,6 +503,11 @@
       }
       const previousDungeon = state.dungeonKey;
       closeCombatDetail();
+      if (!state.data ||
+          String(cache.generatedAt) !== String(state.data.generatedAt)) {
+        state.customCpData = null;
+        state.customCpLoad = null;
+      }
       state.data = cache;
       state.detailMemory.clear();
       void pruneDetailCache(cache.generatedAt);
@@ -471,6 +520,9 @@
       }
       updateDailyUsers();
       populateFilters();
+      if (state.cpFilterMode === "custom") {
+        await ensureCustomCpCache(force);
+      }
       render();
     } catch (error) {
       console.error(error);
@@ -496,8 +548,12 @@
   }
 
   async function fetchRankingCache(force) {
+    return fetchCompressedJson(CACHE_URLS, force);
+  }
+
+  async function fetchCompressedJson(urls, force) {
     const errors = [];
-    for (const baseUrl of CACHE_URLS) {
+    for (const baseUrl of urls) {
       const separator = baseUrl.includes("?") ? "&" : "?";
       const url = force ? `${baseUrl}${separator}v=${Date.now()}` : baseUrl;
       try {
@@ -538,6 +594,41 @@
     }
   }
 
+  function validateCustomCpCache(cache) {
+    if (!cache ||
+        cache.schema !== EXPECTED_CUSTOM_CP_SCHEMA ||
+        Number(cache.version) !== 1 ||
+        !Array.isArray(cache.cpTiers) ||
+        !Array.isArray(cache.views) ||
+        !cache.classRankings ||
+        !cache.generatedAt ||
+        String(cache.generatedAt) !== String(state.data?.generatedAt)) {
+      throw new Error(t("cacheInvalid"));
+    }
+  }
+
+  async function ensureCustomCpCache(force = false) {
+    if (state.customCpData &&
+        String(state.customCpData.generatedAt) === String(state.data?.generatedAt) &&
+        !force) {
+      return state.customCpData;
+    }
+    if (state.customCpLoad && !force) {
+      return state.customCpLoad;
+    }
+    const load = fetchCompressedJson(CUSTOM_CP_CACHE_URLS, force)
+      .then(cache => {
+        validateCustomCpCache(cache);
+        state.customCpData = cache;
+        return cache;
+      })
+      .finally(() => {
+        state.customCpLoad = null;
+      });
+    state.customCpLoad = load;
+    return load;
+  }
+
   function populateFilters() {
     if (!state.data) {
       return;
@@ -565,7 +656,8 @@
     const cpTiers = state.data.cpTiers
       .filter(item => Number(item.index) < STANDARD_CP_TIER_LIMIT)
       .sort((left, right) => Number(left.index) - Number(right.index));
-    if (!cpTiers.some(item => Number(item.index) === state.cpTierIndex)) {
+    if (state.cpFilterMode !== "custom" &&
+        !cpTiers.some(item => Number(item.index) === state.cpTierIndex)) {
       state.cpTierIndex = 0;
     }
     replaceOptions(
@@ -574,6 +666,15 @@
       item => item.index,
       item => Number(item.index) === 0 ? t("allCp") : item.label,
       state.cpTierIndex);
+    const customOption = document.createElement("option");
+    customOption.value = "custom";
+    customOption.textContent = t("customCp");
+    elements["cp-filter"].append(customOption);
+    if (state.cpFilterMode === "custom") {
+      state.cpTierIndex = -1;
+      elements["cp-filter"].value = "custom";
+    }
+    syncCustomCpControls();
 
     replaceOptions(
       elements["period-filter"],
@@ -593,6 +694,83 @@
       fragment.append(option);
     }
     select.replaceChildren(fragment);
+  }
+
+  async function applyCustomCpValue() {
+    const minimum = Math.trunc(Number(elements["custom-cp-min"].value));
+    const maximum = Math.trunc(Number(elements["custom-cp-max"].value));
+    if (!Number.isFinite(minimum) || !Number.isFinite(maximum) ||
+        minimum < 400 || maximum > 1999 || maximum <= minimum) {
+      elements["custom-cp-result"].textContent = t("customCpInvalid");
+      elements["custom-cp-result"].classList.add("error");
+      (minimum < 400 ? elements["custom-cp-min"] : elements["custom-cp-max"]).focus();
+      return;
+    }
+
+    state.customCpMinK = minimum;
+    state.customCpMaxK = maximum;
+    state.cpFilterMode = "custom";
+    localStorage.setItem("notmeter-stats-custom-cp-min-k", String(minimum));
+    localStorage.setItem("notmeter-stats-custom-cp-max-k", String(maximum));
+    elements["custom-cp-apply"].disabled = true;
+    showState("loading");
+    try {
+      await ensureCustomCpCache();
+    } catch (error) {
+      console.error(error);
+      elements["error-message"].textContent =
+        error instanceof Error && error.message ? error.message : t("cacheUnavailable");
+      showState("error");
+      return;
+    } finally {
+      elements["custom-cp-apply"].disabled = false;
+    }
+    if (matchingCustomCpTiers().length === 0) {
+      elements["custom-cp-result"].textContent = t("customCpInvalid");
+      elements["custom-cp-result"].classList.add("error");
+      return;
+    }
+
+    state.cpTierIndex = -1;
+    elements["cp-filter"].value = "custom";
+    syncCustomCpControls();
+    leaveClassView();
+    render();
+  }
+
+  function matchingCustomCpTiers() {
+    if (!state.customCpData) {
+      return [];
+    }
+    const minimum = state.customCpMinK * 1000;
+    const maximum = state.customCpMaxK * 1000;
+    return state.customCpData.cpTiers
+      .filter(item => Number(item.index) >= STANDARD_CP_TIER_LIMIT)
+      .filter(item => {
+        const tierMinimum = Number(item.minCombatPower) || 0;
+        const tierMaximum = item.maxCombatPowerExclusive == null
+          ? Number.POSITIVE_INFINITY
+          : Number(item.maxCombatPowerExclusive);
+        return tierMaximum > minimum && tierMinimum <= maximum;
+      });
+  }
+
+  function syncCustomCpControls() {
+    const custom = state.cpFilterMode === "custom";
+    elements["custom-cp-panel"].hidden = !custom;
+    elements["custom-cp-min"].value = String(state.customCpMinK);
+    elements["custom-cp-max"].value = String(state.customCpMaxK);
+    elements["custom-cp-result"].classList.remove("error");
+    if (!custom || !state.data) {
+      elements["custom-cp-result"].textContent = "";
+      return;
+    }
+    elements["custom-cp-result"].textContent = matchingCustomCpTiers().length > 0
+      ? t("customCpResolved", {
+          minimum: formatInteger(state.customCpMinK),
+          maximum: formatInteger(state.customCpMaxK),
+        })
+      : t("customCpInvalid");
   }
 
   function render() {
@@ -857,7 +1035,10 @@
     if (!detailId) {
       return null;
     }
-    return state.data?.classRankings?.[state.dungeonKey]?.details?.[detailId] || null;
+    const source = state.cpFilterMode === "custom"
+      ? state.customCpData
+      : state.data;
+    return source?.classRankings?.[state.dungeonKey]?.details?.[detailId] || null;
   }
 
   async function resolveDetailLookupKey(player) {
@@ -1617,29 +1798,192 @@
   }
 
   function findSummaryView() {
-    const views = state.data.views.filter(view =>
+    const customTierIndexes = state.cpFilterMode === "custom"
+      ? new Set(matchingCustomCpTiers().map(tier => Number(tier.index)))
+      : null;
+    const source = customTierIndexes ? state.customCpData : state.data;
+    const views = (source?.views || []).filter(view =>
       view.dungeonKey === state.dungeonKey &&
       Number(view.bossIndex) === state.bossIndex &&
-      Number(view.cpTierIndex) === state.cpTierIndex);
+      (customTierIndexes
+        ? customTierIndexes.has(Number(view.cpTierIndex))
+        : Number(view.cpTierIndex) === state.cpTierIndex));
+    if (state.cpFilterMode === "custom") {
+      const selected = selectPeriodViews(views);
+      return mergeCustomSummaryViews(selected);
+    }
+    return selectPeriodViews(views)[0];
+  }
+
+  function selectPeriodViews(views) {
     if (state.period === "Weekly") {
-      return views.find(view =>
+      return views.filter(view =>
         normalizePeriod(view.period) === "All" &&
         parseWeeklyRange(view.periodLabel));
     }
-    return views.find(view =>
+    return views.filter(view =>
       normalizePeriod(view.period) === state.period &&
-      (state.period !== "All" || !parseWeeklyRange(view.periodLabel)));
+      (state.period !== "All" || !parseWeeklyRange(view.periodLabel)) &&
+      view.periodLabel !== INTERNAL_REPLAY_PERIOD_LABEL);
   }
 
   function findClassView() {
-    const classRanking = state.data.classRankings[state.dungeonKey];
+    const customTierIndexes = state.cpFilterMode === "custom"
+      ? new Set(matchingCustomCpTiers().map(tier => Number(tier.index)))
+      : null;
+    const source = customTierIndexes ? state.customCpData : state.data;
+    const classRanking = source?.classRankings?.[state.dungeonKey];
     const views = classRanking?.views?.filter(view =>
       Number(view.bossIndex) === state.bossIndex &&
-      Number(view.cpTierIndex) === state.cpTierIndex) || [];
+      (customTierIndexes
+        ? customTierIndexes.has(Number(view.cpTierIndex))
+        : Number(view.cpTierIndex) === state.cpTierIndex)) || [];
+    if (state.cpFilterMode === "custom") {
+      const selected = [];
+      const viewsByTier = new Map();
+      for (const view of views) {
+        const tierIndex = Number(view.cpTierIndex);
+        const tierViews = viewsByTier.get(tierIndex) || [];
+        tierViews.push(view);
+        viewsByTier.set(tierIndex, tierViews);
+      }
+      for (const tierViews of viewsByTier.values()) {
+        const matching = tierViews.filter(view =>
+          normalizePeriod(view.period) ===
+            (state.period === "Weekly" ? "All" : state.period));
+        const view = state.period === "Weekly"
+          ? matching[matching.length - 1]
+          : matching[0];
+        if (view) {
+          selected.push(view);
+        }
+      }
+      return mergeCustomClassViews(selected);
+    }
     if (state.period === "Weekly") {
       return [...views].reverse().find(view => normalizePeriod(view.period) === "All");
     }
     return views.find(view => normalizePeriod(view.period) === state.period);
+  }
+
+  function mergeCustomSummaryViews(views) {
+    if (views.length === 0) {
+      return null;
+    }
+    const rowsByJob = new Map();
+    for (const view of views) {
+      for (const row of view.rows || []) {
+        const rows = rowsByJob.get(row.jobName) || [];
+        rows.push(row);
+        rowsByJob.set(row.jobName, rows);
+      }
+    }
+    return {
+      ...views[0],
+      cpTierIndex: -1,
+      cpTierLabel: customCpRangeLabel(),
+      recordCount: views.reduce((sum, view) => sum + (Number(view.recordCount) || 0), 0),
+      playerSampleCount: views.reduce((sum, view) => sum + (Number(view.playerSampleCount) || 0), 0),
+      rows: [...rowsByJob.entries()].map(([jobName, rows]) =>
+        mergeCustomSummaryRows(jobName, rows)),
+    };
+  }
+
+  function mergeCustomSummaryRows(jobName, rows) {
+    const samples = [];
+    for (const row of rows) {
+      const values = Array.isArray(row.dpsPercentiles) && row.dpsPercentiles.length >= 10
+        ? row.dpsPercentiles
+        : [row.minDps, row.p25Dps, row.medianDps, row.p75Dps, row.maxDps];
+      const weight = Math.max(1, Number(row.sampleCount) || 1) / Math.max(1, values.length);
+      for (const value of values) {
+        if (Number(value) > 0) {
+          samples.push([Number(value), weight]);
+        }
+      }
+    }
+    samples.sort((left, right) => left[0] - right[0]);
+    const sampleCount = rows.reduce((sum, row) => sum + (Number(row.sampleCount) || 0), 0);
+    const weeklyComparison = state.period === "Weekly"
+      ? mergeWeeklyComparison(rows)
+      : null;
+    return {
+      jobName,
+      sampleCount,
+      minDps: weightedQuantile(samples, 0),
+      p25Dps: weightedQuantile(samples, 0.25),
+      medianDps: weightedQuantile(samples, 0.5),
+      p75Dps: weightedQuantile(samples, 0.75),
+      maxDps: weightedQuantile(samples, 1),
+      dpsPercentiles: weeklyComparison,
+    };
+  }
+
+  function weightedQuantile(samples, quantile) {
+    if (samples.length === 0) {
+      return 0;
+    }
+    const total = samples.reduce((sum, item) => sum + item[1], 0);
+    const target = Math.max(0, Math.min(1, quantile)) * total;
+    let current = 0;
+    for (const item of samples) {
+      current += item[1];
+      if (current >= target) {
+        return item[0];
+      }
+    }
+    return samples[samples.length - 1][0];
+  }
+
+  function mergeWeeklyComparison(rows) {
+    const available = rows
+      .map(row => row.dpsPercentiles)
+      .filter(value => Array.isArray(value) && value.length === 3 && Number(value[2]) > 0);
+    if (available.length === 0) {
+      return null;
+    }
+    const count = available.reduce((sum, value) => sum + Number(value[2]), 0);
+    return [
+      available.reduce((sum, value) => sum + Number(value[0]) * Number(value[2]), 0) / count,
+      available.reduce((sum, value) => sum + Number(value[1]) * Number(value[2]), 0) / count,
+      count,
+    ];
+  }
+
+  function mergeCustomClassViews(views) {
+    const minimum = state.customCpMinK * 1000;
+    const maximum = state.customCpMaxK * 1000;
+    const bestByCharacter = new Map();
+    for (const view of views) {
+      for (const row of view.rows || []) {
+        for (const player of row.players || []) {
+          const combatPower = Number(player.combatPower) || 0;
+          if (combatPower < minimum || combatPower > maximum) {
+            continue;
+          }
+          const key = `${row.jobName}\u0000${Number(player.serverId) || 0}\u0000${player.name}`;
+          const current = bestByCharacter.get(key);
+          if (!current || Number(player.dps) > Number(current.player.dps)) {
+            bestByCharacter.set(key, { jobName: row.jobName, player });
+          }
+        }
+      }
+    }
+    const rows = JOB_ORDER.map(jobName => {
+      const players = [...bestByCharacter.values()]
+        .filter(item => item.jobName === jobName)
+        .map(item => item.player)
+        .sort((left, right) => Number(right.dps) - Number(left.dps))
+        .slice(0, 20)
+        .map((player, index) => ({ ...player, rank: index + 1 }));
+      return { jobName, players };
+    }).filter(row => row.players.length > 0);
+    return {
+      bossIndex: state.bossIndex,
+      cpTierIndex: -1,
+      period: state.period === "Weekly" ? "All" : state.period,
+      rows,
+    };
   }
 
   function updateSnapshot(view) {
@@ -1653,7 +1997,9 @@
     elements["snapshot-caption"].hidden = !weeklyRange;
     elements["weekly-guide"].hidden = state.period !== "Weekly";
     elements["sample-meta"].textContent = view
-      ? `${t("records")} ${formatInteger(view.recordCount)} · ${t("samples")} ${formatInteger(view.playerSampleCount)}`
+      ? state.cpFilterMode === "custom"
+        ? `${t("samples")} ${formatInteger(view.playerSampleCount)}`
+        : `${t("records")} ${formatInteger(view.recordCount)} · ${t("samples")} ${formatInteger(view.playerSampleCount)}`
       : "—";
     elements["generated-meta"].textContent = state.data
       ? `${t("updated")} ${formatDateTime(state.data.generatedAt)}`
@@ -1665,10 +2011,16 @@
     const boss = state.bossIndex === 0
       ? t("allBosses")
       : dungeon?.bossNames?.[state.bossIndex - 1] || t("allBosses");
-    const cp = state.cpTierIndex === 0
-      ? t("allCp")
-      : state.data.cpTiers.find(item => Number(item.index) === state.cpTierIndex)?.label || t("allCp");
+    const cp = state.cpFilterMode === "custom"
+      ? customCpRangeLabel()
+      : state.cpTierIndex === 0
+        ? t("allCp")
+        : state.data.cpTiers.find(item => Number(item.index) === state.cpTierIndex)?.label || t("allCp");
     return `${dungeonName(dungeon)} · ${boss} · ${cp} · ${periodName(state.period)}`;
+  }
+
+  function customCpRangeLabel() {
+    return `${formatInteger(state.customCpMinK)}K~${formatInteger(state.customCpMaxK)}K`;
   }
 
   function updateDailyUsers() {
@@ -1701,6 +2053,7 @@
         element.textContent = t(key);
       }
     });
+    syncCustomCpControls();
     renderDetailSettings();
   }
 
