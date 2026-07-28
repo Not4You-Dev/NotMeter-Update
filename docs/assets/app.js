@@ -1570,7 +1570,7 @@
 
     const icon = document.createElement("span");
     icon.className = "detail-skill-icon";
-    applySkillIcon(icon, skill.skillCode, skill.rawSkillCode, 28);
+    applyDetailSkillIcon(icon, skill, 28);
 
     const name = document.createElement("strong");
     name.className = "detail-skill-name";
@@ -1800,6 +1800,16 @@
     if (key) {
       applyAtlasIcon(element, "skill", key, size);
     }
+  }
+
+  function applyDetailSkillIcon(element, skill, size) {
+    const preferred = globalThis.NotMeterCombatDetailBuffs.skillIconSource(skill);
+    const preferredManifest = preferred ? state.iconAtlases[preferred.type] : null;
+    if (preferred && Object.hasOwn(preferredManifest?.icons || {}, preferred.key)) {
+      applyAtlasIcon(element, preferred.type, preferred.key, size);
+      return;
+    }
+    applySkillIcon(element, skill?.skillCode, skill?.rawSkillCode, size);
   }
 
   function applyBuffIcon(element, buff, size) {

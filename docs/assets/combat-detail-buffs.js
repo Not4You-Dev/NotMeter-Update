@@ -61,6 +61,22 @@
     return null;
   }
 
+  function skillIconSource(skill) {
+    const name = String(skill?.skillName || "").trim().toLocaleLowerCase();
+    const isEarthBlessing =
+      name === "대지의 축복" ||
+      name === "earth's blessing" ||
+      name === "earth’s blessing";
+
+    if (isEarthBlessing ||
+        EARTH_BLESSING_CODES.has(compactCode(skill?.skillCode)) ||
+        EARTH_BLESSING_CODES.has(compactCode(skill?.rawSkillCode))) {
+      return { type: "buff", key: "ICON_CL_SKILL_030" };
+    }
+
+    return null;
+  }
+
   function displayName(buff, locale, manifest) {
     const recordedName = String(buff?.name || "").trim();
     if (locale !== "en" && recordedName) {
@@ -82,5 +98,6 @@
     displayName,
     iconSource,
     isEnhanced,
+    skillIconSource,
   });
 })();
