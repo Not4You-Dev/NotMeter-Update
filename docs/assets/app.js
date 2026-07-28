@@ -120,7 +120,7 @@
       allCp: "전체 CP",
       customCp: "직접 CP 지정",
       customCpTitle: "직접 CP 지정",
-      customCpDescription: "400~420은 40만 이상 42만 미만 기록을 조회합니다",
+      customCpDescription: "400~420은 40만 CP부터 42만 CP 구간까지 조회합니다",
       customCpMinimum: "최소 CP",
       customCpMaximum: "최대 CP",
       customCpApply: "적용",
@@ -240,7 +240,7 @@
       allCp: "All CP",
       customCp: "Custom CP",
       customCpTitle: "Custom CP",
-      customCpDescription: "400–420 means at least 400K and below 420K",
+      customCpDescription: "400–420 includes every CP bucket from 400K through 420K",
       customCpMinimum: "Minimum CP",
       customCpMaximum: "Maximum CP",
       customCpApply: "Apply",
@@ -2039,7 +2039,7 @@
     const periodMask = customCpPeriodMask(period);
     return buckets.filter(bucket =>
       Number(bucket.K) >= state.customCpMinK &&
-      Number(bucket.K) < state.customCpMaxK &&
+      Number(bucket.K) <= state.customCpMaxK &&
       (state.bossIndex === 0 || Number(bucket.B) === state.bossIndex) &&
       (Number(bucket.M) & periodMask) !== 0);
   }
@@ -2052,7 +2052,7 @@
     const periodMask = customCpPeriodMask(period);
     return buckets.filter(bucket =>
       Number(bucket.K) >= state.customCpMinK &&
-      Number(bucket.K) < state.customCpMaxK &&
+      Number(bucket.K) <= state.customCpMaxK &&
       (state.bossIndex === 0 || Number(bucket.B) === state.bossIndex) &&
       Number(bucket.M) === periodMask);
   }
