@@ -10,7 +10,8 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
   ];
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
-  const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v1";
+  const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v4";
+  const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
@@ -323,6 +324,8 @@
     data: null,
     customCpData: null,
     customCpLoad: null,
+    customCpRankData: new Map(),
+    customCpRankLoads: new Map(),
     locale: localStorage.getItem("notmeter-stats-locale") ||
       (navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en"),
     dungeonKey: "",
@@ -507,6 +510,8 @@
           String(cache.generatedAt) !== String(state.data.generatedAt)) {
         state.customCpData = null;
         state.customCpLoad = null;
+        state.customCpRankData.clear();
+        state.customCpRankLoads.clear();
       }
       state.data = cache;
       state.detailMemory.clear();
@@ -597,10 +602,34 @@
   function validateCustomCpCache(cache) {
     if (!cache ||
         cache.schema !== EXPECTED_CUSTOM_CP_SCHEMA ||
-        Number(cache.version) !== 1 ||
+        Number(cache.version) !== 4 ||
         !Array.isArray(cache.cpTiers) ||
         !Array.isArray(cache.views) ||
         !cache.classRankings ||
+        !parseWeeklyRange(cache.currentWeekPeriodLabel) ||
+        !cache.summaryBucketsByDungeon ||
+        typeof cache.summaryBucketsByDungeon !== "object" ||
+        !cache.generatedAt ||
+        String(cache.generatedAt) !== String(state.data?.generatedAt)) {
+      throw new Error(t("cacheInvalid"));
+    }
+  }
+
+  function customCpRankCacheUrls(dungeonKey) {
+    const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+    const fileName = `notmeter-ranking-custom-cp-${safeKey}.json.gz`;
+    return [
+      `./data/${fileName}`,
+      `https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/${fileName}`,
+    ];
+  }
+
+  function validateCustomCpRankCache(cache, dungeonKey) {
+    if (!cache ||
+        cache.schema !== EXPECTED_CUSTOM_CP_RANK_SCHEMA ||
+        Number(cache.version) !== 1 ||
+        cache.dungeonKey !== dungeonKey ||
+        !Array.isArray(cache.rankBuckets) ||
         !cache.generatedAt ||
         String(cache.generatedAt) !== String(state.data?.generatedAt)) {
       throw new Error(t("cacheInvalid"));
@@ -626,6 +655,29 @@
         state.customCpLoad = null;
       });
     state.customCpLoad = load;
+    return load;
+  }
+
+  async function ensureCustomCpRankCache(dungeonKey, force = false) {
+    const current = state.customCpRankData.get(dungeonKey);
+    if (current &&
+        String(current.generatedAt) === String(state.data?.generatedAt) &&
+        !force) {
+      return current;
+    }
+    if (state.customCpRankLoads.has(dungeonKey) && !force) {
+      return state.customCpRankLoads.get(dungeonKey);
+    }
+    const load = fetchCompressedJson(customCpRankCacheUrls(dungeonKey), force)
+      .then(cache => {
+        validateCustomCpRankCache(cache, dungeonKey);
+        state.customCpRankData.set(dungeonKey, cache);
+        return cache;
+      })
+      .finally(() => {
+        state.customCpRankLoads.delete(dungeonKey);
+      });
+    state.customCpRankLoads.set(dungeonKey, load);
     return load;
   }
 
@@ -875,6 +927,23 @@
   }
 
   function renderClassRanking() {
+    if (state.cpFilterMode === "custom" &&
+        !state.customCpRankData.has(state.dungeonKey)) {
+      showState("loading");
+      void ensureCustomCpRankCache(state.dungeonKey)
+        .then(() => {
+          if (state.mode === "class") {
+            renderClassRanking();
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          elements["error-message"].textContent =
+            error instanceof Error && error.message ? error.message : t("cacheUnavailable");
+          showState("error");
+        });
+      return;
+    }
     const view = findClassView();
     const players = view?.rows
       ?.find(item => item.jobName === state.selectedJob)
@@ -1035,10 +1104,12 @@
     if (!detailId) {
       return null;
     }
-    const source = state.cpFilterMode === "custom"
-      ? state.customCpData
-      : state.data;
-    return source?.classRankings?.[state.dungeonKey]?.details?.[detailId] || null;
+    const customDetail = state.cpFilterMode === "custom"
+      ? state.customCpData?.classRankings?.[state.dungeonKey]?.details?.[detailId]
+      : null;
+    return customDetail ||
+      state.data?.classRankings?.[state.dungeonKey]?.details?.[detailId] ||
+      null;
   }
 
   async function resolveDetailLookupKey(player) {
@@ -1798,20 +1869,13 @@
   }
 
   function findSummaryView() {
-    const customTierIndexes = state.cpFilterMode === "custom"
-      ? new Set(matchingCustomCpTiers().map(tier => Number(tier.index)))
-      : null;
-    const source = customTierIndexes ? state.customCpData : state.data;
-    const views = (source?.views || []).filter(view =>
+    if (state.cpFilterMode === "custom") {
+      return buildCustomExactSummaryView();
+    }
+    const views = (state.data?.views || []).filter(view =>
       view.dungeonKey === state.dungeonKey &&
       Number(view.bossIndex) === state.bossIndex &&
-      (customTierIndexes
-        ? customTierIndexes.has(Number(view.cpTierIndex))
-        : Number(view.cpTierIndex) === state.cpTierIndex));
-    if (state.cpFilterMode === "custom") {
-      const selected = selectPeriodViews(views);
-      return mergeCustomSummaryViews(selected);
-    }
+      Number(view.cpTierIndex) === state.cpTierIndex);
     return selectPeriodViews(views)[0];
   }
 
@@ -1828,42 +1892,237 @@
   }
 
   function findClassView() {
-    const customTierIndexes = state.cpFilterMode === "custom"
-      ? new Set(matchingCustomCpTiers().map(tier => Number(tier.index)))
-      : null;
-    const source = customTierIndexes ? state.customCpData : state.data;
-    const classRanking = source?.classRankings?.[state.dungeonKey];
+    if (state.cpFilterMode === "custom") {
+      return buildCustomExactClassView();
+    }
+    const classRanking = state.data?.classRankings?.[state.dungeonKey];
     const views = classRanking?.views?.filter(view =>
       Number(view.bossIndex) === state.bossIndex &&
-      (customTierIndexes
-        ? customTierIndexes.has(Number(view.cpTierIndex))
-        : Number(view.cpTierIndex) === state.cpTierIndex)) || [];
-    if (state.cpFilterMode === "custom") {
-      const selected = [];
-      const viewsByTier = new Map();
-      for (const view of views) {
-        const tierIndex = Number(view.cpTierIndex);
-        const tierViews = viewsByTier.get(tierIndex) || [];
-        tierViews.push(view);
-        viewsByTier.set(tierIndex, tierViews);
-      }
-      for (const tierViews of viewsByTier.values()) {
-        const matching = tierViews.filter(view =>
-          normalizePeriod(view.period) ===
-            (state.period === "Weekly" ? "All" : state.period));
-        const view = state.period === "Weekly"
-          ? matching[matching.length - 1]
-          : matching[0];
-        if (view) {
-          selected.push(view);
-        }
-      }
-      return mergeCustomClassViews(selected);
-    }
+      Number(view.cpTierIndex) === state.cpTierIndex) || [];
     if (state.period === "Weekly") {
       return [...views].reverse().find(view => normalizePeriod(view.period) === "All");
     }
     return views.find(view => normalizePeriod(view.period) === state.period);
+  }
+
+  function buildCustomExactSummaryView() {
+    const buckets = filterCustomCpSummaryBuckets(state.period);
+    const previousBuckets = state.period === "Weekly"
+      ? filterCustomCpSummaryBuckets("PreviousWeekly")
+      : [];
+    const previousByJob = aggregateCustomCpSummary(previousBuckets);
+    const currentByJob = aggregateCustomCpSummary(buckets);
+    const rows = [...currentByJob.entries()]
+      .map(([jobName, current]) => {
+        const previous = previousByJob.get(jobName);
+        return {
+          jobName,
+          sampleCount: current.sampleCount,
+          minDps: current.minDps,
+          p25Dps: current.p25Dps,
+          medianDps: current.medianDps,
+          p75Dps: current.p75Dps,
+          maxDps: current.maxDps,
+          dpsPercentiles: state.period === "Weekly" && previous
+            ? [previous.p75Dps, current.p75Dps, previous.sampleCount]
+            : null,
+        };
+      });
+    const playerSampleCount = [...currentByJob.values()]
+      .reduce((sum, row) => sum + row.sampleCount, 0);
+    return {
+      dungeonKey: state.dungeonKey,
+      bossIndex: state.bossIndex,
+      cpTierIndex: -1,
+      cpTierLabel: customCpRangeLabel(),
+      period: state.period === "Weekly" ? "All" : state.period,
+      periodLabel: state.period === "Weekly"
+        ? customCpWeeklyPeriodLabel()
+        : state.period,
+      generatedAt: state.customCpData?.generatedAt,
+      recordCount: 0,
+      playerSampleCount,
+      rows,
+    };
+  }
+
+  function buildCustomExactClassView() {
+    const bestByCharacter = new Map();
+    for (const bucket of filterCustomCpRankBuckets(state.period)) {
+      const jobName = String(bucket.J || "");
+      for (const player of Array.isArray(bucket.L) ? bucket.L : []) {
+        const name = String(player.N || "");
+        const serverId = Number(player.S) || 0;
+        if (!name || serverId <= 0) {
+          continue;
+        }
+        const participant = String(player.G || `${serverId}:${name}`);
+        const key = `${jobName}\u0000${participant}`;
+        const current = bestByCharacter.get(key);
+        if (!current || Number(player.X) > Number(current.player.X)) {
+          bestByCharacter.set(key, { jobName, player, bossIndex: Number(bucket.B) || 0 });
+        }
+      }
+    }
+    const rows = JOB_ORDER.map(jobName => {
+      const players = [...bestByCharacter.values()]
+        .filter(item => item.jobName === jobName)
+        .sort((left, right) =>
+          Number(right.player.X) - Number(left.player.X) ||
+          Number(left.player.S) - Number(right.player.S) ||
+          String(left.player.N).localeCompare(String(right.player.N)))
+        .slice(0, 20)
+        .map((item, index) => ({
+          rank: index + 1,
+          name: String(item.player.N || ""),
+          serverId: Number(item.player.S) || 0,
+          combatPower: Number(item.player.C) || 0,
+          durationSeconds: Number(item.player.U) || 0,
+          partyJobNames: null,
+          dps: Number(item.player.X) || 0,
+          P: String(item.player.P || ""),
+          B: item.bossIndex,
+          D: state.dungeonKey === "training-dummy-60s"
+            ? String(item.player.R || "")
+            : null,
+          Q: null,
+          H: null,
+          T: item.player.T || null,
+        }));
+      return { jobName, players };
+    }).filter(row => row.players.length > 0);
+    return {
+      bossIndex: state.bossIndex,
+      cpTierIndex: -1,
+      period: state.period === "Weekly" ? "All" : state.period,
+      rows,
+    };
+  }
+
+  function filterCustomCpSummaryBuckets(period) {
+    const buckets = state.customCpData?.summaryBucketsByDungeon?.[state.dungeonKey];
+    if (!Array.isArray(buckets)) {
+      return [];
+    }
+    const periodMask = customCpPeriodMask(period);
+    return buckets.filter(bucket =>
+      Number(bucket.K) >= state.customCpMinK &&
+      Number(bucket.K) <= state.customCpMaxK &&
+      (state.bossIndex === 0 || Number(bucket.B) === state.bossIndex) &&
+      (Number(bucket.M) & periodMask) !== 0);
+  }
+
+  function filterCustomCpRankBuckets(period) {
+    const buckets = state.customCpRankData.get(state.dungeonKey)?.rankBuckets;
+    if (!Array.isArray(buckets)) {
+      return [];
+    }
+    const periodMask = customCpPeriodMask(period);
+    return buckets.filter(bucket =>
+      Number(bucket.K) >= state.customCpMinK &&
+      Number(bucket.K) <= state.customCpMaxK &&
+      (state.bossIndex === 0 || Number(bucket.B) === state.bossIndex) &&
+      Number(bucket.M) === periodMask);
+  }
+
+  function customCpPeriodMask(period) {
+    if (period === "Today") return 1;
+    if (period === "Recent14Days") return 2;
+    if (period === "All") return 4;
+    if (period === "Weekly") return 8;
+    if (period === "PreviousWeekly") return 16;
+    return 0;
+  }
+
+  function aggregateCustomCpSummary(buckets) {
+    const bucketsByJob = new Map();
+    for (const bucket of buckets) {
+      const jobName = String(bucket.J || "");
+      if (!jobName) {
+        continue;
+      }
+      const rows = bucketsByJob.get(jobName) || [];
+      rows.push(bucket);
+      bucketsByJob.set(jobName, rows);
+    }
+    const summaryByJob = new Map();
+    for (const [jobName, rows] of bucketsByJob) {
+      const samples = [];
+      let sampleCount = 0;
+      for (const row of rows) {
+        const count = Math.max(0, Number(row.N) || 0);
+        sampleCount += count;
+        const weight = count / 5;
+        for (const value of [row.L, row.A, row.E, row.H, row.X]) {
+          const dps = Number(value);
+          if (dps > 0 && weight > 0) {
+            samples.push([dps, weight]);
+          }
+        }
+      }
+      samples.sort((left, right) => left[0] - right[0]);
+      summaryByJob.set(jobName, {
+        sampleCount,
+        minDps: weightedQuantile(samples, 0),
+        p25Dps: weightedQuantile(samples, 0.25),
+        medianDps: weightedQuantile(samples, 0.5),
+        p75Dps: weightedQuantile(samples, 0.75),
+        maxDps: weightedQuantile(samples, 1),
+      });
+    }
+    return summaryByJob;
+  }
+
+  function percentile(sortedValues, quantile) {
+    if (sortedValues.length === 0) {
+      return 0;
+    }
+    if (sortedValues.length === 1) {
+      return sortedValues[0];
+    }
+    const position = Math.max(0, Math.min(1, quantile)) * (sortedValues.length - 1);
+    const lower = Math.floor(position);
+    const upper = Math.ceil(position);
+    if (lower === upper) {
+      return sortedValues[lower];
+    }
+    const weight = position - lower;
+    return sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * weight;
+  }
+
+  function customCpWeeklyPeriodLabel() {
+    return String(state.customCpData?.currentWeekPeriodLabel || "") ||
+      (state.customCpData?.views || [])
+      .find(view =>
+        view.dungeonKey === state.dungeonKey &&
+        parseWeeklyRange(view.periodLabel))
+      ?.periodLabel || "";
+  }
+
+  function customCpWeeklyRange(previous) {
+    const range = parseWeeklyRange(customCpWeeklyPeriodLabel());
+    if (!range || !previous) {
+      return range;
+    }
+    return {
+      start: new Date(range.start.getTime() - 7 * 24 * 60 * 60 * 1000),
+      end: new Date(range.end.getTime() - 7 * 24 * 60 * 60 * 1000),
+    };
+  }
+
+  function koreaDayStart(timestamp) {
+    if (!Number.isFinite(timestamp)) {
+      return Number.NaN;
+    }
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date(timestamp));
+    const value = type => Number(parts.find(part => part.type === type)?.value || 0);
+    return Date.UTC(value("year"), value("month") - 1, value("day")) -
+      9 * 60 * 60 * 1000;
   }
 
   function mergeCustomSummaryViews(views) {
