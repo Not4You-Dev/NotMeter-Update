@@ -1803,6 +1803,13 @@
   }
 
   function applyBuffIcon(element, code, rawCode, size) {
+    const preferred = globalThis.NotMeterCombatDetailBuffs.iconSource({ code, rawCode });
+    const preferredManifest = preferred ? state.iconAtlases[preferred.type] : null;
+    if (preferred && Object.hasOwn(preferredManifest?.icons || {}, preferred.key)) {
+      applyAtlasIcon(element, preferred.type, preferred.key, size);
+      return;
+    }
+
     const manifest = state.iconAtlases.buff;
     if (manifest) {
       for (const candidate of [rawCode, code]) {
