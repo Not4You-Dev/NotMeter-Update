@@ -105,6 +105,9 @@
       rank: "순위",
       job: "직업",
       sample: "표본",
+      recordSample: "기록 표본",
+      recordSampleValue: "{count}회",
+      recordSampleTooltip: "전투 기록 {count}회이며 동일 캐릭터의 반복 기록이 포함될 수 있습니다",
       top25: "상위 25%",
       median: "중앙값",
       max: "최고",
@@ -129,6 +132,8 @@
       allPeriod: "전체 기간",
       records: "기록",
       samples: "표본",
+      recordSamples: "기록 표본",
+      recordSamplesValue: "기록 표본 {count}회",
       updated: "갱신",
       rankingEntryGuideTitle: "랭킹 등록 기준 안내",
       rankingEntryGuideSubtitle: "기록이 보이지 않을 때 먼저 확인해 주세요",
@@ -155,8 +160,9 @@
       weeklyGuideRankingTitle: "랭킹 반영 방식",
       weeklyGuideRanking: "직업 순서는 이번 주 상위 25% DPS로 정렬됩니다. 화살표는 변화 추세만 보여주며 개인 순위, TOP 20 순위, 상위 % 계산에는 영향을 주지 않습니다.",
       weeklyGuideNote: "직전 주에 같은 조건의 기록이 없으면 화살표가 표시되지 않습니다. 화살표에 마우스를 올리면 이전·현재 DPS와 표본 수를 확인할 수 있습니다.",
-      classDps: "{job} DPS 1~20위",
-      top20: "TOP 20",
+      classDps: "{job} DPS 1~{count}위",
+      top20: "TOP {count}",
+      uniqueRankers: "표시 캐릭터 {count}명 · 동일 캐릭터는 선택 조건에서 가장 높은 DPS 기록만 표시",
       backToJobs: "직업 목록으로",
       party: "파티",
       viewDetails: "보기",
@@ -219,6 +225,9 @@
       rank: "Rank",
       job: "Class",
       sample: "Samples",
+      recordSample: "Combat samples",
+      recordSampleValue: "{count} runs",
+      recordSampleTooltip: "{count} combat records; repeated runs by the same character may be included",
       top25: "Top 25%",
       median: "Median",
       max: "Highest",
@@ -243,6 +252,8 @@
       allPeriod: "All time",
       records: "records",
       samples: "samples",
+      recordSamples: "combat samples",
+      recordSamplesValue: "{count} combat samples",
       updated: "updated",
       rankingEntryGuideTitle: "Ranking eligibility",
       rankingEntryGuideSubtitle: "Check these rules when a combat record does not appear",
@@ -269,8 +280,9 @@
       weeklyGuideRankingTitle: "How ranking uses it",
       weeklyGuideRanking: "Classes are sorted by this week's top-25% DPS. The arrow only shows a trend and does not affect individual ranks, Top 20 ranks, or percentile calculations.",
       weeklyGuideNote: "No arrow is shown when the previous week has no records under the same filters. Hover over an arrow to see the previous and current DPS and sample counts.",
-      classDps: "{job} DPS — Top 20",
-      top20: "TOP 20",
+      classDps: "{job} DPS — Top {count}",
+      top20: "TOP {count}",
+      uniqueRankers: "{count} characters shown · only each character's highest DPS under these filters is shown",
       backToJobs: "Back to classes",
       party: "PARTY",
       viewDetails: "View",
@@ -376,7 +388,8 @@
       "daily-user-count", "language-button", "dungeon-filter", "boss-filter", "cp-filter",
       "custom-cp-panel", "custom-cp-min", "custom-cp-max", "custom-cp-apply", "custom-cp-result",
       "period-filter", "refresh-button", "retry-button", "snapshot-title", "snapshot-caption",
-      "sample-meta", "generated-meta", "weekly-guide", "class-heading", "class-title", "class-caption",
+      "sample-meta", "generated-meta", "weekly-guide", "class-heading", "class-title",
+      "class-badge", "class-caption", "sample-column-heading",
       "back-button", "loading-state", "error-state", "error-message", "empty-state",
       "summary-view", "summary-rows", "class-view", "class-rows", "cache-age",
       "combat-detail-modal", "detail-close", "detail-job-icon", "detail-title",
@@ -837,6 +850,8 @@
 
   function renderSummary() {
     const view = findSummaryView();
+    elements["sample-column-heading"].textContent =
+      t(state.cpFilterMode === "custom" ? "recordSample" : "sample");
     elements["class-heading"].hidden = true;
     elements["class-view"].hidden = true;
     if (!view || !Array.isArray(view.rows) || view.rows.length === 0) {
@@ -897,7 +912,18 @@
     jobCell.append(jobWrap);
     tr.append(jobCell);
 
-    tr.append(numericCell(formatInteger(row.sampleCount), "summary-sample", t("sample")));
+    const sampleCell = numericCell(
+      state.cpFilterMode === "custom"
+        ? t("recordSampleValue", { count: formatInteger(row.sampleCount) })
+        : formatInteger(row.sampleCount),
+      "summary-sample",
+      t(state.cpFilterMode === "custom" ? "recordSample" : "sample"));
+    if (state.cpFilterMode === "custom") {
+      sampleCell.title = t("recordSampleTooltip", {
+        count: formatInteger(row.sampleCount),
+      });
+    }
+    tr.append(sampleCell);
     tr.append(numericCell(formatDps(row.p75Dps), "accent summary-p75", t("top25")));
     tr.append(numericCell(formatDps(row.medianDps), "median summary-median", t("median")));
     tr.append(numericCell(formatDps(row.maxDps), "max summary-max", t("max")));
@@ -953,8 +979,14 @@
       .slice(0, 20);
 
     elements["class-heading"].hidden = false;
-    elements["class-title"].textContent = t("classDps", { job: jobName(state.selectedJob) });
-    elements["class-caption"].textContent = filterDescription();
+    elements["class-title"].textContent = t("classDps", {
+      job: jobName(state.selectedJob),
+      count: sorted.length,
+    });
+    elements["class-badge"].textContent = t("top20", { count: sorted.length });
+    elements["class-caption"].textContent = state.cpFilterMode === "custom"
+      ? `${filterDescription()} · ${t("uniqueRankers", { count: sorted.length })}`
+      : filterDescription();
     elements["summary-view"].hidden = true;
     updateSnapshot(findSummaryView());
     if (sorted.length === 0) {
@@ -2257,7 +2289,9 @@
     elements["weekly-guide"].hidden = state.period !== "Weekly";
     elements["sample-meta"].textContent = view
       ? state.cpFilterMode === "custom"
-        ? `${t("samples")} ${formatInteger(view.playerSampleCount)}`
+        ? t("recordSamplesValue", {
+            count: formatInteger(view.playerSampleCount),
+          })
         : `${t("records")} ${formatInteger(view.recordCount)} · ${t("samples")} ${formatInteger(view.playerSampleCount)}`
       : "—";
     elements["generated-meta"].textContent = state.data
