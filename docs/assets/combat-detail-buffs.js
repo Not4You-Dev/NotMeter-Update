@@ -36,6 +36,11 @@
     return Math.floor(compactCode(value) / 10000) * 10000;
   }
 
+  function isCommonAbnormalCode(value) {
+    const normalized = compactCode(value);
+    return normalized >= 19000000 && normalized < 19010000;
+  }
+
   function iconSource(buff) {
     const name = String(buff?.name || "").trim().toLocaleLowerCase();
     const isAmplificationPrayer =
@@ -79,11 +84,20 @@
 
   function displayName(buff, locale, manifest) {
     const recordedName = String(buff?.name || "").trim();
+    const names = locale === "en" ? manifest?.namesEn : manifest?.namesKo;
+    const rawCode = compactCode(buff?.rawCode);
+    const storedCode = compactCode(buff?.code);
+    if (rawCode !== storedCode && isCommonAbnormalCode(rawCode)) {
+      const exactName = String(names?.[String(rawCode)] || "").trim();
+      if (exactName) {
+        return exactName;
+      }
+    }
+
     if (locale !== "en" && recordedName) {
       return recordedName;
     }
 
-    const names = locale === "en" ? manifest?.namesEn : manifest?.namesKo;
     for (const candidate of [buff?.rawCode, buff?.code]) {
       const name = String(names?.[String(code(candidate))] || "").trim();
       if (name) {
