@@ -420,11 +420,7 @@
     });
     elements["dungeon-filter"].addEventListener("change", event => {
       closeCombatDetail();
-      state.dungeonKey = event.target.value;
-      state.bossIndex = 0;
-      state.cpTierIndex = 0;
-      state.mode = "summary";
-      state.selectedJob = "";
+      applyDungeonSelection(event.target.value);
       populateFilters();
       render();
     });
@@ -496,6 +492,13 @@
         closeCombatDetail();
       }
     });
+  }
+
+  function applyDungeonSelection(dungeonKey) {
+    state.dungeonKey = dungeonKey;
+    state.bossIndex = 0;
+    state.mode = "summary";
+    state.selectedJob = "";
   }
 
   async function loadCache(force = false, preserveView = false) {
