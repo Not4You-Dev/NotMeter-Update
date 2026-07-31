@@ -16,6 +16,7 @@
   const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
   const DETAIL_MEMORY_LIMIT = 48;
+  const DETAIL_REQUEST_TIMEOUT_MS = 5_000;
   const CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
   const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
@@ -143,7 +144,7 @@
       rankingEntryCalculation: "최고 CP − 최저 CP로 계산하며 정확히 200K인 경우도 제외됩니다. 예를 들어 900K와 700K가 함께 기록되면 차이가 200K이므로 등록되지 않습니다.",
       rankingEntryPurposeTitle: "적용 목적",
       rankingEntryPurpose: "버스 또는 전투력 격차가 큰 파티의 기록으로 인해 직업별 DPS 통계가 왜곡되는 것을 방지하기 위한 기준입니다.",
-      rankingEntryNote: "CP를 알 수 없는 파티원은 차이 계산에서 제외됩니다. 일반 던전 기록은 이 기준 외에도 확정 처치와 파티원 5인 이상 등의 집계 조건을 모두 충족해야 하며, 훈련용 허수아비는 별도 기준을 사용합니다.",
+      rankingEntryNote: "CP를 알 수 없는 파티원은 차이 계산에서 제외됩니다. 일반 던전 기록은 확정 처치와 파티원 5인 이상 조건을 충족해야 하며, 1인 콘텐츠인 악몽은 1인 이상 확정 처치부터 집계합니다. 훈련용 허수아비는 별도 기준을 사용합니다.",
       weeklyCompare: "▲▼는 직전 주 동일 조건의 직업별 상위 25% DPS 변화",
       weeklyTooltip: "직전 주 동일 조건 비교",
       weeklyGuideTitle: "▲▼ 이번 주 변화 표시 안내",
@@ -263,7 +264,7 @@
       rankingEntryCalculation: "The spread is highest CP − lowest CP, and exactly 200K is also excluded. For example, a party containing both 900K and 700K characters has a 200K spread and will not be registered.",
       rankingEntryPurposeTitle: "Why this rule exists",
       rankingEntryPurpose: "This prevents carry runs and parties with very large CP gaps from distorting class DPS statistics.",
-      rankingEntryNote: "Party members whose CP is unknown are not included in the spread calculation. Regular dungeon records must also meet every other eligibility rule, including a confirmed kill and at least five party members. Training-dummy records use separate rules.",
+      rankingEntryNote: "Party members whose CP is unknown are not included in the spread calculation. Regular dungeon records require a confirmed kill and at least five players. Nightmare is solo content and accepts confirmed kills with one or more players. Training-dummy records use separate rules.",
       weeklyCompare: "▲▼ shows the change in each class's top-25% DPS under the same filters",
       weeklyTooltip: "Previous week, same filters",
       weeklyGuideTitle: "What the ▲▼ weekly change means",
@@ -1304,8 +1305,9 @@
 
   async function loadRankingCombatDetailCore(lookupKey) {
     const generation = String(state.data?.generatedAt || "");
+    const requestPath = `${lookupKey}?g=${encodeURIComponent(generation)}`;
     const request = new Request(
-      `${DETAIL_ENDPOINT}${lookupKey}?g=${encodeURIComponent(generation)}`,
+      `${DETAIL_ENDPOINT}${requestPath}`,
       { mode: "cors", credentials: "omit" });
     let cache = null;
     if ("caches" in window) {
@@ -1324,24 +1326,42 @@
       }
     }
 
-    const response = await fetch(request, {
-      cache: "no-cache",
-      headers: { Accept: "application/json" },
-    });
-    if (!response.ok) {
-      const error = new Error(`${t("detailUnavailable")} (${response.status})`);
-      error.status = response.status;
-      throw error;
-    }
-    const cacheCopy = response.clone();
-    const document = await parseRankingCombatDetail(response, lookupKey);
+    const { detailDocument, cacheCopy } = await downloadRankingCombatDetail(
+      requestPath,
+      lookupKey);
     if (cache) {
       try {
         await cache.put(request, cacheCopy);
       } catch {
       }
     }
-    return document;
+    return detailDocument;
+  }
+
+  async function downloadRankingCombatDetail(requestPath, lookupKey) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(
+      () => controller.abort(),
+      DETAIL_REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch(`${DETAIL_ENDPOINT}${requestPath}`, {
+        mode: "cors",
+        credentials: "omit",
+        cache: "default",
+        headers: { Accept: "application/json" },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const error = new Error(`${t("detailUnavailable")} (${response.status})`);
+        error.status = response.status;
+        throw error;
+      }
+      const cacheCopy = response.clone();
+      const detailDocument = await parseRankingCombatDetail(response, lookupKey);
+      return { detailDocument, cacheCopy };
+    } finally {
+      window.clearTimeout(timeout);
+    }
   }
 
   async function parseRankingCombatDetail(response, lookupKey) {
@@ -1503,6 +1523,7 @@
 
     const buffs = Array.isArray(detail.buffs)
       ? [...detail.buffs]
+          .filter(buff => globalThis.NotMeterCombatDetailBuffs.shouldDisplay(buff))
           .sort((left, right) =>
             Number(right.uptimeSeconds) - Number(left.uptimeSeconds) ||
             Number(right.count) - Number(left.count) ||
