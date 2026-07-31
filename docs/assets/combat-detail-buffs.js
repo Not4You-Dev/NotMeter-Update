@@ -13,6 +13,26 @@
     17400057,
     17400058,
   ]);
+  const NON_GAMEPLAY_DETAIL_BUFF_CODES = new Set([
+    1096,
+    1097,
+    1098,
+    1099,
+    1100,
+    1101,
+    1102,
+    1168,
+    18064961,
+    19000000,
+    19000001,
+    19000062,
+    19000070,
+    19000071,
+    19000074,
+    19000079,
+    19007001,
+    19007007,
+  ]);
 
   function code(value) {
     const parsed = Math.abs(Number(value) || 0);
@@ -39,6 +59,20 @@
   function isCommonAbnormalCode(value) {
     const normalized = compactCode(value);
     return normalized >= 19000000 && normalized < 19010000;
+  }
+
+  function shouldDisplay(buff) {
+    const rawCode = compactCode(buff?.rawCode);
+    const identityCode = rawCode > 0 ? rawCode : compactCode(buff?.code);
+    if (NON_GAMEPLAY_DETAIL_BUFF_CODES.has(identityCode)) {
+      return false;
+    }
+
+    const name = String(buff?.name || "").trim().toLocaleLowerCase();
+    return !name.startsWith("테스트용_") &&
+      !name.startsWith("for testing_") &&
+      name !== "사라진 상승기류" &&
+      name !== "still air";
   }
 
   function iconSource(buff) {
@@ -112,6 +146,7 @@
     displayName,
     iconSource,
     isEnhanced,
+    shouldDisplay,
     skillIconSource,
   });
 })();
