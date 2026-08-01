@@ -434,6 +434,7 @@ button:focus-visible,
 }
 
 .snapshot-meta {
+  position: relative;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
@@ -446,6 +447,96 @@ button:focus-visible,
   font-size: 10.5px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.generated-status {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
+}
+
+#cache-age {
+  color: #70e8df;
+}
+
+#cache-age:not(:empty)::before {
+  margin-right: 7px;
+  color: #426779;
+  content: "·";
+}
+
+.refresh-schedule {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.refresh-schedule summary {
+  display: inline-flex;
+  width: 21px;
+  height: 21px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #3abcb6;
+  border-radius: 50%;
+  background: #0c4245;
+  color: #74f4e9;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 950;
+  list-style: none;
+}
+
+.refresh-schedule summary::-webkit-details-marker {
+  display: none;
+}
+
+.refresh-schedule summary:hover,
+.refresh-schedule[open] summary {
+  border-color: #78f6ec;
+  background: #12565a;
+  color: #eaffff;
+}
+
+.refresh-schedule summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.refresh-schedule-card {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 10px);
+  right: -7px;
+  width: min(370px, calc(100vw - 32px));
+  padding: 13px 14px;
+  border: 1px solid #2d6870;
+  border-radius: 10px;
+  background: #0a1a24;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.42);
+  color: #a9c1cf;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.55;
+  white-space: normal;
+}
+
+.refresh-schedule-card b {
+  display: block;
+  margin-bottom: 8px;
+  color: #effafa;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.refresh-schedule-card p {
+  margin: 0;
+}
+
+.refresh-schedule-card p + p {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(63, 105, 121, 0.46);
 }
 
 .meta-divider {
@@ -1402,6 +1493,10 @@ tr:nth-child(3) .rank-badge {
   color: #4ce1d4;
 }
 
+.detail-death-metric strong {
+  color: #ff7349;
+}
+
 .detail-cp-metric {
   border-color: #245c66;
   background: #102128;
@@ -1552,6 +1647,22 @@ tr:nth-child(3) .rank-badge {
   border-radius: 8px 0 0 8px;
   background: rgba(29, 157, 147, 0.25);
   pointer-events: none;
+}
+
+.detail-skill-row.healing .detail-skill-bar {
+  background: rgba(67, 194, 224, 0.28);
+}
+
+.detail-skill-row.support .detail-skill-bar {
+  background: rgba(224, 180, 77, 0.3);
+}
+
+.detail-skill-row.healing .detail-skill-damage {
+  color: #6fd8ee;
+}
+
+.detail-skill-row.support .detail-skill-damage {
+  color: #e5c264;
 }
 
 .detail-skill-icon,
@@ -1995,6 +2106,21 @@ tr:nth-child(3) .rank-badge {
     overflow: visible;
     justify-content: flex-start;
     white-space: normal;
+  }
+
+  .generated-status {
+    flex-wrap: wrap;
+  }
+
+  .refresh-schedule {
+    position: static;
+  }
+
+  .refresh-schedule-card {
+    top: calc(100% + 8px);
+    right: 7px;
+    left: 7px;
+    width: auto;
   }
 
   .ranking-panel {

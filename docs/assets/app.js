@@ -136,6 +136,11 @@
       recordSamples: "기록 표본",
       recordSamplesValue: "기록 표본 {count}회",
       updated: "갱신",
+      refreshScheduleAria: "통계 갱신 시간 안내",
+      refreshScheduleTitle: "통계 갱신 시간 안내",
+      refreshScheduleCadence: "통계 집계는 매시 정각과 30분에 시작합니다.",
+      refreshScheduleDelay: "표시된 시각은 통계 생성본의 기준 시각입니다. 기록량이 많으면 집계·압축·업로드 처리에 시간이 더 걸려 홈페이지 반영이 늦어질 수 있습니다.",
+      refreshSchedulePage: "열어 둔 홈페이지는 약 5분마다 새 통계를 확인합니다. 바로 확인하려면 ‘새로고침’을 눌러주세요.",
       rankingEntryGuideTitle: "랭킹 등록 기준 안내",
       rankingEntryGuideSubtitle: "기록이 보이지 않을 때 먼저 확인해 주세요",
       rankingEntrySpreadTitle: "파티 전투력 차이",
@@ -175,6 +180,7 @@
       partyMembers: "파티원",
       totalDamage: "총 데미지",
       contribution: "기여도",
+      deathCount: "사망 횟수",
       combatPower: "전투력 CP",
       hits: "타수",
       hitRate: "적중률",
@@ -183,6 +189,7 @@
       skillBreakdown: "스킬 피해 내역",
       skill: "스킬",
       damage: "데미지",
+      damageHealing: "피해 / 치유",
       share: "비중",
       average: "평균",
       averageInterval: "평균 간격",
@@ -202,7 +209,9 @@
       doubleDamage: "강타",
       periodicDamage: "지속피해",
       healing: "치유",
+      healingCount: "치유 횟수",
       drainHealing: "흡혈",
+      useCount: "사용",
       averageDamage: "평균 데미지",
       recordedBuffsNone: "기록된 버프 없음",
       agoNow: "방금 갱신",
@@ -256,6 +265,11 @@
       recordSamples: "combat samples",
       recordSamplesValue: "{count} combat samples",
       updated: "updated",
+      refreshScheduleAria: "Statistics refresh schedule",
+      refreshScheduleTitle: "Statistics refresh schedule",
+      refreshScheduleCadence: "Statistics generation starts at the top and half past every hour.",
+      refreshScheduleDelay: "The displayed time is the snapshot's generation time. Large data volumes can make aggregation, compression, and upload take longer, so the website may update later.",
+      refreshSchedulePage: "An open page checks for new statistics about every five minutes. Select Refresh to check immediately.",
       rankingEntryGuideTitle: "Ranking eligibility",
       rankingEntryGuideSubtitle: "Check these rules when a combat record does not appear",
       rankingEntrySpreadTitle: "Party CP spread",
@@ -295,6 +309,7 @@
       partyMembers: "Party members",
       totalDamage: "Total damage",
       contribution: "Contribution",
+      deathCount: "Deaths",
       combatPower: "Combat Power",
       hits: "Hits",
       hitRate: "Hit rate",
@@ -303,6 +318,7 @@
       skillBreakdown: "Skill Damage",
       skill: "Skill",
       damage: "Damage",
+      damageHealing: "Damage / Healing",
       share: "Share",
       average: "Average",
       averageInterval: "Avg. interval",
@@ -322,7 +338,9 @@
       doubleDamage: "Power hit",
       periodicDamage: "Periodic",
       healing: "Healing",
+      healingCount: "Healing count",
       drainHealing: "Drain",
+      useCount: "Used",
       averageDamage: "Average damage",
       recordedBuffsNone: "No recorded buffs",
       agoNow: "Updated just now",
@@ -395,7 +413,7 @@
       "summary-view", "summary-rows", "class-view", "class-rows", "cache-age",
       "combat-detail-modal", "detail-close", "detail-job-icon", "detail-title",
       "detail-character", "detail-duration", "detail-cp", "detail-total-damage",
-      "detail-dps", "detail-share", "detail-summary-duration", "detail-hits",
+      "detail-dps", "detail-share", "detail-summary-duration", "detail-death-count", "detail-hits",
       "detail-parry-rate", "detail-critical-rate", "detail-front-rate", "detail-back-rate",
       "detail-perfect-rate", "detail-double-rate", "detail-evade-rate", "detail-cp-row",
       "detail-visible-count", "detail-settings-toggle", "detail-settings-options",
@@ -1482,6 +1500,9 @@
       ? "—"
       : formatPercent(detail.sharePercent);
     elements["detail-summary-duration"].textContent = formatDuration(durationSeconds);
+    elements["detail-death-count"].textContent = unavailableReason
+      ? "—"
+      : formatInteger(Math.max(0, Number(detail.deathCount) || 0));
     elements["detail-hits"].textContent = unavailableReason ? "—" : formatInteger(detail.hitCount);
     elements["detail-parry-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.parryRate);
     elements["detail-critical-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.criticalRate);
@@ -1494,8 +1515,15 @@
 
     const skills = Array.isArray(detail.skills)
       ? [...detail.skills]
-          .filter(skill => Number(skill.totalDamage) > 0)
-          .sort((left, right) => Number(right.totalDamage) - Number(left.totalDamage))
+          .filter(skill =>
+            Number(skill.totalDamage) > 0 ||
+            Number(skill.healingAmount) > 0 ||
+            Number(skill.drainHealingAmount) > 0 ||
+            Number(skill.useCount) > 0)
+          .sort((left, right) =>
+            Number(right.totalDamage) - Number(left.totalDamage) ||
+            Number(right.healingAmount) - Number(left.healingAmount) ||
+            Number(right.useCount) - Number(left.useCount))
       : [];
     const skillRows = document.createDocumentFragment();
     if (unavailableReason) {
@@ -1586,7 +1614,14 @@
   function buildDetailSkillRow(skill) {
     const row = document.createElement("article");
     row.className = "detail-skill-row";
-    row.title = `${String(skill.skillName || "—")}\n${formatInteger(skill.minHit)} ~ ${formatInteger(skill.maxHit)}`;
+    const totalDamage = Math.max(0, Number(skill.totalDamage) || 0);
+    const healingAmount = Math.max(0, Number(skill.healingAmount) || 0);
+    const useCount = Math.max(0, Number(skill.useCount) || 0);
+    row.classList.toggle("healing", totalDamage <= 0 && healingAmount > 0);
+    row.classList.toggle("support", totalDamage <= 0 && healingAmount <= 0);
+    row.title = totalDamage > 0
+      ? `${String(skill.skillName || "—")}\n${formatInteger(skill.minHit)} ~ ${formatInteger(skill.maxHit)}`
+      : String(skill.skillName || "—");
 
     const bar = document.createElement("span");
     bar.className = "detail-skill-bar";
@@ -1602,10 +1637,16 @@
 
     const damage = document.createElement("strong");
     damage.className = "detail-skill-damage";
-    damage.append(document.createTextNode(formatInteger(skill.totalDamage)));
-    const share = document.createElement("span");
-    share.textContent = ` (${formatPercent(skill.damagePercentage, 1)})`;
-    damage.append(share);
+    if (totalDamage > 0) {
+      damage.append(document.createTextNode(formatInteger(totalDamage)));
+      const share = document.createElement("span");
+      share.textContent = ` (${formatPercent(skill.damagePercentage, 1)})`;
+      damage.append(share);
+    } else if (healingAmount > 0) {
+      damage.textContent = `${t("healing")} ${formatCompact(healingAmount)}`;
+    } else {
+      damage.textContent = `${t("useCount")} ${formatUseCount(useCount)}`;
+    }
 
     const chips = document.createElement("div");
     chips.className = "detail-skill-chips";
@@ -1613,13 +1654,16 @@
     if (Number.isFinite(interval) && interval > 0) {
       chips.append(buildDetailChip(t("averageInterval"), `${interval.toFixed(2)}ms`, "accent"));
     }
+    if (useCount > 0) {
+      chips.append(buildDetailChip(t("useCount"), formatUseCount(useCount), "accent"));
+    }
     if (isDetailMetricVisible("specialization")) {
       chips.append(buildSpecializationChip(skill.specializationFlags));
     }
-    if (isDetailMetricVisible("hits")) {
+    if (isDetailMetricVisible("hits") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("hits"), formatInteger(skill.hitCount)));
     }
-    if (isDetailMetricVisible("parry")) {
+    if (isDetailMetricVisible("parry") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("parry"), formatPercent(skill.parryRate), "accent"));
     }
     if (isDetailMetricVisible("avoidance") && Number(skill.evadeCount) > 0) {
@@ -1627,24 +1671,24 @@
         t("avoidance"),
         `${formatInteger(skill.evadeCount)} / ${formatPercent(skill.evadeRate)}`));
     }
-    if (isDetailMetricVisible("multiHit")) {
+    if (isDetailMetricVisible("multiHit") && Number(skill.hitCount) > 0) {
       const hits = Math.max(0, Number(skill.hitCount) || 0);
       const ratio = hits > 0 ? (Number(skill.multiHitCount) || 0) / hits * 100 : 0;
       chips.append(buildDetailChip(t("multiHit"), formatPercent(ratio), "double"));
     }
-    if (isDetailMetricVisible("critical")) {
+    if (isDetailMetricVisible("critical") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("critical"), formatPercent(skill.criticalRate), "critical"));
     }
-    if (isDetailMetricVisible("front")) {
+    if (isDetailMetricVisible("front") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("front"), formatPositionPercent(skill.frontAttackRate), "position"));
     }
-    if (isDetailMetricVisible("back")) {
+    if (isDetailMetricVisible("back") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("back"), formatPositionPercent(skill.backAttackRate), "position"));
     }
-    if (isDetailMetricVisible("perfect")) {
+    if (isDetailMetricVisible("perfect") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("perfect"), formatPercent(skill.perfectRate), "perfect"));
     }
-    if (isDetailMetricVisible("double")) {
+    if (isDetailMetricVisible("double") && Number(skill.hitCount) > 0) {
       chips.append(buildDetailChip(t("doubleDamage"), formatPercent(skill.doubleDamageRate), "double"));
     }
     if (isDetailMetricVisible("periodic") &&
@@ -1657,15 +1701,23 @@
     if (isDetailMetricVisible("healing") && Number(skill.healingAmount) > 0) {
       chips.append(buildDetailChip(t("healing"), formatCompact(skill.healingAmount), "healing"));
     }
+    if (Number(skill.healingHitCount) > 0) {
+      chips.append(buildDetailChip(t("healingCount"), formatInteger(skill.healingHitCount), "healing"));
+    }
     if (isDetailMetricVisible("drainHealing") && Number(skill.drainHealingAmount) > 0) {
       chips.append(buildDetailChip(t("drainHealing"), formatCompact(skill.drainHealingAmount), "healing"));
     }
-    if (isDetailMetricVisible("averageDamage")) {
+    if (isDetailMetricVisible("averageDamage") && totalDamage > 0) {
       chips.append(buildDetailChip(t("averageDamage"), formatCompact(skill.averageDamage)));
     }
 
     row.append(bar, icon, name, damage, chips);
     return row;
+  }
+
+  function formatUseCount(value) {
+    const count = formatInteger(Math.max(0, Number(value) || 0));
+    return state.locale === "ko" ? `${count}회` : `${count}x`;
   }
 
   function buildDetailChip(label, value, modifier = "") {
@@ -2371,7 +2423,12 @@
       elements["cache-age"].textContent = "";
       return;
     }
-    const ageMinutes = Math.max(0, Math.floor((Date.now() - Date.parse(state.data.generatedAt)) / 60_000));
+    const generatedAt = Date.parse(state.data.generatedAt);
+    if (!Number.isFinite(generatedAt)) {
+      elements["cache-age"].textContent = "";
+      return;
+    }
+    const ageMinutes = Math.max(0, Math.floor((Date.now() - generatedAt) / 60_000));
     elements["cache-age"].textContent = ageMinutes < 2
       ? t("agoNow")
       : ageMinutes < 60
@@ -2387,6 +2444,12 @@
       const key = element.dataset.i18n;
       if (COPY[state.locale][key]) {
         element.textContent = t(key);
+      }
+    });
+    document.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
+      const key = element.dataset.i18nAriaLabel;
+      if (COPY[state.locale][key]) {
+        element.setAttribute("aria-label", t(key));
       }
     });
     syncCustomCpControls();
