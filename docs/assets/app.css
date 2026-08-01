@@ -144,6 +144,67 @@ p {
   gap: 9px;
 }
 
+.service-links {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.service-link {
+  display: inline-flex;
+  height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 13px;
+  border: 1px solid #314d61;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(18, 38, 54, 0.96), rgba(9, 24, 36, 0.96));
+  color: #dceaf1;
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+  transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+.service-link svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  fill: currentColor;
+}
+
+.discord-link {
+  border-color: #405577;
+  background: linear-gradient(180deg, rgba(32, 45, 69, 0.96), rgba(15, 27, 45, 0.96));
+  color: #dfe7ff;
+}
+
+.download-link {
+  border-color: #28736f;
+  background: linear-gradient(180deg, rgba(20, 70, 69, 0.94), rgba(10, 42, 44, 0.96));
+  color: #dffffb;
+}
+
+.discord-link:hover {
+  border-color: #627dab;
+  background: linear-gradient(180deg, rgba(44, 59, 89, 0.98), rgba(20, 35, 57, 0.98));
+  color: #fff;
+}
+
+.download-link:hover {
+  border-color: #39aaa2;
+  background: linear-gradient(180deg, rgba(24, 91, 87, 0.98), rgba(11, 52, 53, 0.98));
+  color: #fff;
+}
+
+.service-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .live-pill,
 .ghost-button {
   min-height: 38px;
@@ -2109,10 +2170,47 @@ tr:nth-child(3) .rank-badge {
   }
 }
 
+@media (max-width: 720px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    justify-content: stretch;
+  }
+
+  .topbar-actions {
+    display: contents;
+  }
+
+  .service-links {
+    width: 100%;
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .service-link {
+    flex: 1 1 0;
+  }
+
+  .live-pill {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .ghost-button {
+    grid-column: 3;
+    grid-row: 1;
+    margin-left: 6px;
+  }
+}
+
 @media (max-width: 600px) {
   .app-shell {
     width: min(100% - 16px, 1220px);
     padding-top: 10px;
+  }
+
+  .topbar .live-pill {
+    display: none;
   }
 
   .topbar {
@@ -2592,12 +2690,6 @@ tr:nth-child(3) .rank-badge {
 
   .detail-buff {
     width: 100%;
-  }
-}
-
-@media (max-width: 420px) {
-  .topbar .live-pill {
-    display: none;
   }
 }
 
