@@ -40,7 +40,6 @@
     19007001,
     19007007,
   ]);
-
   function code(value) {
     const parsed = Math.abs(Number(value) || 0);
     return Number.isSafeInteger(parsed) ? parsed : 0;
@@ -123,6 +122,14 @@
     return null;
   }
 
+  function skillDisplayName(skill) {
+    const recordedName = String(skill?.skillName || "").trim() || "—";
+    const level = Math.trunc(Number(skill?.skillLevel) || 0);
+    return level > 0 && level <= 99
+      ? `${recordedName} - Lv.${level}`
+      : recordedName;
+  }
+
   function displayName(buff, locale, manifest) {
     const recordedName = String(buff?.name || "").trim();
     const names = locale === "en" ? manifest?.namesEn : manifest?.namesKo;
@@ -154,6 +161,7 @@
     iconSource,
     isEnhanced,
     shouldDisplay,
+    skillDisplayName,
     skillIconSource,
   });
 })();

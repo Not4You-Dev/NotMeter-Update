@@ -1768,6 +1768,7 @@ tr:nth-child(3) .rank-badge {
   border-radius: 6px;
 }
 
+.detail-skill-title,
 .detail-skill-name,
 .detail-skill-damage,
 .detail-skill-chips {
@@ -1775,8 +1776,18 @@ tr:nth-child(3) .rank-badge {
   z-index: 1;
 }
 
-.detail-skill-name {
+.detail-skill-title {
+  display: flex;
+  min-width: 0;
+  grid-column: 2;
+  grid-row: 1;
   align-self: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-skill-name {
+  min-width: 0;
   overflow: hidden;
   color: #eef6fa;
   font-size: 12.5px;
@@ -1786,6 +1797,8 @@ tr:nth-child(3) .rank-badge {
 }
 
 .detail-skill-damage {
+  grid-column: 3;
+  grid-row: 1;
   align-self: center;
   color: #2ddcc4;
   font-size: 13px;
@@ -1805,9 +1818,49 @@ tr:nth-child(3) .rank-badge {
   display: flex;
   min-width: 0;
   grid-column: 2 / 4;
+  grid-row: 2;
   align-items: center;
   overflow: hidden;
   gap: 5px;
+}
+
+.detail-level-badge {
+  display: inline-grid;
+  width: 40px;
+  min-width: 40px;
+  height: 14px;
+  overflow: hidden;
+  grid-template-columns: 14px 24px;
+  align-items: center;
+  border: 1px solid rgba(60, 124, 118, 0.57);
+  border-radius: 4px;
+  background: #092d2d;
+  box-sizing: border-box;
+  font-variant-numeric: tabular-nums;
+  line-height: 12px;
+  pointer-events: none;
+}
+
+.detail-level-prefix,
+.detail-level-number {
+  display: flex;
+  height: 12px;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.detail-level-prefix {
+  border-right: 1px solid rgba(49, 101, 97, 0.59);
+  color: #83a6a2;
+  font-size: 7px;
+  font-weight: 600;
+}
+
+.detail-level-number {
+  color: #69e0d6;
+  font-size: 9px;
+  font-weight: 900;
 }
 
 .detail-chip {
@@ -1940,21 +1993,45 @@ tr:nth-child(3) .rank-badge {
   min-width: 0;
 }
 
-.detail-buff-text strong,
-.detail-buff-text span {
+.detail-buff-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.detail-buff-title strong {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.detail-buff-title .detail-level-badge {
+  display: inline-grid;
+  flex: 0 0 40px;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+.detail-buff-title .detail-level-badge span {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.detail-buff-title strong,
+.detail-buff-text > span {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.detail-buff-text strong {
+.detail-buff-title strong {
   color: #eef6fa;
   font-size: 11px;
   line-height: 13px;
 }
 
-.detail-buff-text span {
+.detail-buff-text > span {
   color: #dcaaFF;
   font-size: 10px;
   font-weight: 900;

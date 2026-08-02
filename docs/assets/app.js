@@ -168,7 +168,7 @@
       weeklyGuideMeaningTitle: "퍼센트 의미",
       weeklyGuideMeaning: "변화율은 (이번 주 P75−직전 주 P75)÷직전 주 P75×100으로 계산합니다. ▲2.4%는 이번 주 값이 2.4% 높고, ▼2.4%는 2.4% 낮다는 뜻입니다.",
       weeklyGuideRankingTitle: "랭킹 반영 방식",
-      weeklyGuideRanking: "직업 순서는 이번 주 상위 25% DPS로 정렬됩니다. 화살표는 변화 추세만 보여주며 개인 순위, TOP 20 순위, 상위 % 계산에는 영향을 주지 않습니다.",
+      weeklyGuideRanking: "직업 순서는 이번 주 상위 25% DPS로 정렬됩니다. 처치 기록의 상위 %와 구간 1~20위도 이번 주 동일 조건을 기준으로 계산하며, 통계 홈페이지의 전체 기간 TOP 20은 그대로 유지됩니다.",
       weeklyGuideNote: "직전 주에 같은 조건의 기록이 없으면 화살표가 표시되지 않습니다. 화살표에 마우스를 올리면 이전·현재 DPS와 표본 수를 확인할 수 있습니다.",
       classDps: "{job} DPS 1~{count}위",
       top20: "TOP {count}",
@@ -301,7 +301,7 @@
       weeklyGuideMeaningTitle: "Percentage meaning",
       weeklyGuideMeaning: "The change is calculated as (this week's P75 − previous week's P75) ÷ previous week's P75 × 100. ▲2.4% means this week's value is 2.4% higher, while ▼2.4% means it is 2.4% lower.",
       weeklyGuideRankingTitle: "How ranking uses it",
-      weeklyGuideRanking: "Classes are sorted by this week's top-25% DPS. The arrow only shows a trend and does not affect individual ranks, Top 20 ranks, or percentile calculations.",
+      weeklyGuideRanking: "Classes are sorted by this week's top-25% DPS. Combat Records also calculate Top % and ranks 1–20 from this week's matching data, while the website's all-time Top 20 remains unchanged.",
       weeklyGuideNote: "No arrow is shown when the previous week has no records under the same filters. Hover over an arrow to see the previous and current DPS and sample counts.",
       classDps: "{job} DPS — Top {count}",
       top20: "TOP {count}",
@@ -1622,14 +1622,16 @@
   function buildDetailSkillRow(skill) {
     const row = document.createElement("article");
     row.className = "detail-skill-row";
+    const skillDisplayName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill) ||
+      String(skill.skillName || "—");
     const totalDamage = Math.max(0, Number(skill.totalDamage) || 0);
     const healingAmount = Math.max(0, Number(skill.healingAmount) || 0);
     const useCount = Math.max(0, Number(skill.useCount) || 0);
     row.classList.toggle("healing", totalDamage <= 0 && healingAmount > 0);
     row.classList.toggle("support", totalDamage <= 0 && healingAmount <= 0);
     row.title = totalDamage > 0
-      ? `${String(skill.skillName || "—")}\n${formatInteger(skill.minHit)} ~ ${formatInteger(skill.maxHit)}`
-      : String(skill.skillName || "—");
+      ? `${skillDisplayName}\n${formatInteger(skill.minHit)} ~ ${formatInteger(skill.maxHit)}`
+      : skillDisplayName;
 
     const bar = document.createElement("span");
     bar.className = "detail-skill-bar";
@@ -1639,9 +1641,16 @@
     icon.className = "detail-skill-icon";
     applyDetailSkillIcon(icon, skill, 28);
 
+    const title = document.createElement("span");
+    title.className = "detail-skill-title";
     const name = document.createElement("strong");
     name.className = "detail-skill-name";
-    name.textContent = String(skill.skillName || "—");
+    name.textContent = skillDisplayName;
+    title.append(name);
+    const levelBadge = buildDetailSkillLevelBadge(skill.skillLevel);
+    if (levelBadge) {
+      title.append(levelBadge);
+    }
 
     const damage = document.createElement("strong");
     damage.className = "detail-skill-damage";
@@ -1719,8 +1728,26 @@
       chips.append(buildDetailChip(t("averageDamage"), formatCompact(skill.averageDamage)));
     }
 
-    row.append(bar, icon, name, damage, chips);
+    row.append(bar, icon, title, damage, chips);
     return row;
+  }
+
+  function buildDetailSkillLevelBadge(value) {
+    const level = Math.trunc(Number(value) || 0);
+    if (level < 1 || level > 99) {
+      return null;
+    }
+    const badge = document.createElement("span");
+    badge.className = "detail-level-badge";
+    badge.setAttribute("aria-label", `Level ${level}`);
+    const prefix = document.createElement("span");
+    prefix.className = "detail-level-prefix";
+    prefix.textContent = "LV";
+    const number = document.createElement("span");
+    number.className = "detail-level-number";
+    number.textContent = String(level);
+    badge.append(prefix, number);
+    return badge;
   }
 
   function formatUseCount(value) {
@@ -1778,12 +1805,19 @@
 
     const text = document.createElement("div");
     text.className = "detail-buff-text";
+    const title = document.createElement("div");
+    title.className = "detail-buff-title";
     const name = document.createElement("strong");
     name.textContent = buffDisplayName(buff);
+    title.append(name);
+    const levelBadge = buildDetailSkillLevelBadge(buff.skillLevel);
+    if (levelBadge) {
+      title.append(levelBadge);
+    }
     const uptime = document.createElement("span");
     uptime.textContent =
       `${formatPercent(ratio)} · ${formatDuration(seconds)} · x${Math.max(1, Number(buff.count) || 0)}`;
-    text.append(name, uptime);
+    text.append(title, uptime);
 
     const gauge = document.createElement("span");
     gauge.className = "detail-buff-gauge";
