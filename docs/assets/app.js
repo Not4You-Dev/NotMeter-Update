@@ -108,13 +108,12 @@
       discord: "디스코드",
       download: "다운로드",
       fieldBossPageTitle: "NotMeter 필드보스 현황",
-      fieldBossPageSubtitle: "딜미터기와 동일한 공유 캐시에서 서버별 출현 시간을 확인합니다",
+      fieldBossPageSubtitle: "서버별 필드보스 출현 현황",
       fieldBossStatus: "필드보스 현황",
-      fieldBossDescription: "딜미터기와 동일한 공유 캐시에서 서버별 출현 시간을 확인합니다",
       backToRanking: "랭킹으로 돌아가기",
       server: "서버",
-      fieldBossCacheTitle: "공유 캐시 기준",
-      fieldBossCacheDescription: "약 5분마다 최신 시간을 확인합니다",
+      fieldBossServerSearchPlaceholder: "서버명 또는 초성 검색",
+      fieldBossServerNoResults: "일치하는 서버가 없습니다",
       fieldBossLoading: "필드보스 공유 캐시를 불러오는 중입니다",
       fieldBossLoadError: "필드보스 캐시를 불러오지 못했습니다",
       fieldBossEmpty: "선택한 서버에서 수집된 필드보스 시간이 아직 없습니다",
@@ -266,13 +265,12 @@
       discord: "Discord",
       download: "Download",
       fieldBossPageTitle: "NotMeter Field Boss Status",
-      fieldBossPageSubtitle: "View server spawn timers from the same shared cache used by NotMeter",
+      fieldBossPageSubtitle: "Field-boss spawn status by server",
       fieldBossStatus: "Field Boss Status",
-      fieldBossDescription: "View server spawn timers from the same shared cache used by NotMeter",
       backToRanking: "Back to rankings",
       server: "Server",
-      fieldBossCacheTitle: "Shared cache",
-      fieldBossCacheDescription: "Checks for updated timers about every five minutes",
+      fieldBossServerSearchPlaceholder: "Search server name or Korean initials",
+      fieldBossServerNoResults: "No matching servers",
       fieldBossLoading: "Loading the shared field-boss cache",
       fieldBossLoadError: "Unable to load the field-boss cache",
       fieldBossEmpty: "No field-boss timers have been collected for this server yet",
@@ -448,7 +446,9 @@
     visibleMetrics: loadVisibleMetrics(),
     fieldBossData: null,
     fieldBossLoad: null,
-    fieldBossServerId: Number(localStorage.getItem("notmeter-field-boss-server-id")) || 0,
+    fieldBossServerId: Number(localStorage.getItem("notmeter-field-boss-server-id")) || 1001,
+    fieldBossServerSearchOpen: false,
+    fieldBossServerSearchIndex: -1,
     fieldBossRegion: -1,
     fieldBossLastSyncAt: 0,
     fieldBossCountdownElements: new Map(),
@@ -492,7 +492,8 @@
     for (const id of [
       "page-title", "page-subtitle", "daily-user-count", "language-button",
       "field-boss-button", "field-boss-surface", "field-boss-back-button",
-      "field-boss-server", "field-boss-refresh-button", "field-boss-retry-button",
+      "field-boss-server", "field-boss-server-results",
+      "field-boss-refresh-button", "field-boss-retry-button",
       "field-boss-snapshot", "field-boss-snapshot-title", "field-boss-snapshot-caption",
       "field-boss-entry-count", "field-boss-cache-age", "field-boss-loading-state",
       "field-boss-error-state", "field-boss-error-message", "field-boss-empty-state",
@@ -538,11 +539,27 @@
       }
     });
     elements["field-boss-back-button"].addEventListener("click", returnToRanking);
-    elements["field-boss-server"].addEventListener("change", event => {
-      state.fieldBossServerId = Number(event.target.value) || 0;
-      localStorage.setItem("notmeter-field-boss-server-id", String(state.fieldBossServerId));
-      state.fieldBossRegion = resolveDefaultFieldBossRegion(state.fieldBossServerId);
-      renderFieldBoss();
+    elements["field-boss-server"].addEventListener("focus", event => {
+      event.target.select();
+      openFieldBossServerSearch();
+    });
+    elements["field-boss-server"].addEventListener("input", () => {
+      state.fieldBossServerSearchIndex = -1;
+      openFieldBossServerSearch();
+    });
+    elements["field-boss-server"].addEventListener("keydown", handleFieldBossServerKeydown);
+    elements["field-boss-server-results"].addEventListener("pointerdown", event => {
+      const option = event.target.closest("[data-server-id]");
+      if (!option) {
+        return;
+      }
+      event.preventDefault();
+      selectFieldBossServer(Number(option.dataset.serverId));
+    });
+    document.addEventListener("pointerdown", event => {
+      if (!event.target.closest(".field-boss-server-field")) {
+        closeFieldBossServerSearch(true);
+      }
     });
     elements["field-boss-refresh-button"].addEventListener("click", () => {
       void loadFieldBossCache(true);
@@ -735,6 +752,7 @@
     elements["field-boss-surface"].hidden = true;
     elements["field-boss-button"].classList.remove("active");
     elements["field-boss-button"].setAttribute("aria-pressed", "false");
+    closeFieldBossServerSearch(true);
     stopFieldBossClock();
     updatePageIdentity();
   }
@@ -872,31 +890,166 @@
   }
 
   function populateFieldBossServers() {
-    const select = elements["field-boss-server"];
-    const fragment = document.createDocumentFragment();
-    const groups = [
-      [1, state.locale === "ko" ? "천족" : "Elyos", SERVER_NAMES_ELYOS],
-      [2, state.locale === "ko" ? "마족" : "Asmodian", SERVER_NAMES_ASMODIAN],
-    ];
     if (!isKnownServerId(state.fieldBossServerId)) {
-      const cachedServer = state.fieldBossData?.servers?.[0];
-      state.fieldBossServerId = Number(cachedServer?.serverId) || 1001;
+      state.fieldBossServerId = 1001;
     }
-    for (const [group, label, names] of groups) {
-      const optionGroup = document.createElement("optgroup");
-      optionGroup.label = label;
-      names.forEach((name, index) => {
-        const serverId = group * 1000 + index + 1;
-        const option = document.createElement("option");
-        option.value = String(serverId);
-        option.textContent = name;
-        option.selected = serverId === state.fieldBossServerId;
-        optionGroup.append(option);
+
+    const input = elements["field-boss-server"];
+    if (!state.fieldBossServerSearchOpen || document.activeElement !== input) {
+      input.value = fullServerName(state.fieldBossServerId) || "시엘";
+    }
+    if (state.fieldBossServerSearchOpen) {
+      renderFieldBossServerResults();
+    }
+  }
+
+  function allFieldBossServers() {
+    return [
+      ...SERVER_NAMES_ELYOS.map((name, index) => ({
+        serverId: 1001 + index,
+        name,
+        faction: state.locale === "ko" ? "천족" : "Elyos",
+      })),
+      ...SERVER_NAMES_ASMODIAN.map((name, index) => ({
+        serverId: 2001 + index,
+        name,
+        faction: state.locale === "ko" ? "마족" : "Asmodian",
+      })),
+    ];
+  }
+
+  function normalizeFieldBossServerQuery(value) {
+    return String(value || "").normalize("NFC").trim().toLocaleLowerCase("ko-KR");
+  }
+
+  function koreanInitials(value) {
+    const initials = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+    let result = "";
+    for (const character of String(value || "")) {
+      const code = character.charCodeAt(0);
+      result += code >= 0xac00 && code <= 0xd7a3
+        ? initials[Math.floor((code - 0xac00) / 588)]
+        : character;
+    }
+    return result;
+  }
+
+  function matchingFieldBossServers(query) {
+    const normalized = normalizeFieldBossServerQuery(query);
+    const servers = allFieldBossServers();
+    if (!normalized) {
+      return servers.slice(0, 12);
+    }
+    return servers.filter(server =>
+      normalizeFieldBossServerQuery(server.name).startsWith(normalized) ||
+      koreanInitials(server.name).startsWith(normalized)).slice(0, 12);
+  }
+
+  function openFieldBossServerSearch() {
+    state.fieldBossServerSearchOpen = true;
+    renderFieldBossServerResults();
+  }
+
+  function closeFieldBossServerSearch(restoreValue = false) {
+    state.fieldBossServerSearchOpen = false;
+    state.fieldBossServerSearchIndex = -1;
+    elements["field-boss-server-results"].hidden = true;
+    elements["field-boss-server"].setAttribute("aria-expanded", "false");
+    elements["field-boss-server"].removeAttribute("aria-activedescendant");
+    if (restoreValue) {
+      elements["field-boss-server"].value =
+        fullServerName(state.fieldBossServerId) || "시엘";
+    }
+  }
+
+  function renderFieldBossServerResults() {
+    if (!state.fieldBossServerSearchOpen) {
+      return;
+    }
+    const input = elements["field-boss-server"];
+    const results = elements["field-boss-server-results"];
+    const matches = matchingFieldBossServers(input.value);
+    const fragment = document.createDocumentFragment();
+
+    if (matches.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "field-boss-server-no-results";
+      empty.textContent = t("fieldBossServerNoResults");
+      fragment.append(empty);
+      state.fieldBossServerSearchIndex = -1;
+    } else {
+      state.fieldBossServerSearchIndex = Math.min(
+        state.fieldBossServerSearchIndex, matches.length - 1);
+      matches.forEach((server, index) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.id = `field-boss-server-option-${server.serverId}`;
+        option.className = "field-boss-server-option";
+        option.dataset.serverId = String(server.serverId);
+        option.setAttribute("role", "option");
+        option.setAttribute("aria-selected", String(server.serverId === state.fieldBossServerId));
+        option.classList.toggle("active", index === state.fieldBossServerSearchIndex);
+
+        const name = document.createElement("strong");
+        name.textContent = server.name;
+        const faction = document.createElement("span");
+        faction.textContent = server.faction;
+        option.append(name, faction);
+        fragment.append(option);
       });
-      fragment.append(optionGroup);
     }
-    select.replaceChildren(fragment);
-    select.value = String(state.fieldBossServerId);
+
+    results.replaceChildren(fragment);
+    results.hidden = false;
+    input.setAttribute("aria-expanded", "true");
+    const active = matches[state.fieldBossServerSearchIndex];
+    if (active) {
+      input.setAttribute("aria-activedescendant", `field-boss-server-option-${active.serverId}`);
+      results.querySelector(".active")?.scrollIntoView({ block: "nearest" });
+    } else {
+      input.removeAttribute("aria-activedescendant");
+    }
+  }
+
+  function handleFieldBossServerKeydown(event) {
+    const matches = matchingFieldBossServers(event.currentTarget.value);
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      state.fieldBossServerSearchOpen = true;
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const start = state.fieldBossServerSearchIndex < 0
+        ? (direction > 0 ? -1 : matches.length)
+        : state.fieldBossServerSearchIndex;
+      state.fieldBossServerSearchIndex = Math.max(
+        0, Math.min(matches.length - 1, start + direction));
+      renderFieldBossServerResults();
+      return;
+    }
+    if (event.key === "Enter" && matches.length > 0) {
+      event.preventDefault();
+      const index = state.fieldBossServerSearchIndex >= 0
+        ? state.fieldBossServerSearchIndex
+        : 0;
+      selectFieldBossServer(matches[index].serverId);
+      return;
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closeFieldBossServerSearch(true);
+      event.currentTarget.blur();
+    }
+  }
+
+  function selectFieldBossServer(serverId) {
+    if (!isKnownServerId(serverId)) {
+      return;
+    }
+    state.fieldBossServerId = serverId;
+    localStorage.setItem("notmeter-field-boss-server-id", String(serverId));
+    state.fieldBossRegion = resolveDefaultFieldBossRegion(serverId);
+    closeFieldBossServerSearch(false);
+    elements["field-boss-server"].value = fullServerName(serverId);
+    renderFieldBoss();
   }
 
   function renderFieldBoss() {
@@ -3064,6 +3217,12 @@
       const key = element.dataset.i18nAriaLabel;
       if (COPY[state.locale][key]) {
         element.setAttribute("aria-label", t(key));
+      }
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
+      const key = element.dataset.i18nPlaceholder;
+      if (COPY[state.locale][key]) {
+        element.setAttribute("placeholder", t(key));
       }
     });
     updatePageIdentity();
