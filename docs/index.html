@@ -18,10 +18,11 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260802-4">
+  <link rel="stylesheet" href="./assets/app.css?v=20260803-2">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260802-4" defer></script>
-  <script src="./assets/app.js?v=20260802-4" defer></script>
+  <script src="./assets/field-boss-catalog.js?v=20260803-2" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260803-2" defer></script>
+  <script src="./assets/app.js?v=20260803-2" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -32,12 +33,18 @@
       <div class="brand">
         <img class="brand-icon" src="./assets/notmeter-icon.png" width="44" height="44" alt="">
         <div>
-          <h1 data-i18n="title">NotMeter 던전 통계</h1>
-          <p data-i18n="subtitle">직업별 상위 25% DPS 기준으로 정렬합니다</p>
+          <h1 id="page-title">NotMeter 던전 통계</h1>
+          <p id="page-subtitle">직업별 상위 25% DPS 기준으로 정렬합니다</p>
         </div>
       </div>
       <div class="topbar-actions">
         <nav class="service-links" aria-label="NotMeter 바로가기">
+          <button class="service-link field-boss-link" id="field-boss-button" type="button" aria-pressed="false">
+            <span class="service-link-icon field-boss-link-icon" aria-hidden="true">
+              <img src="./assets/boss-icon.png" alt="">
+            </span>
+            <span class="service-link-label" data-i18n="fieldBoss">필드보스</span>
+          </button>
           <a class="service-link discord-link" href="https://discord.com/invite/DuAuuhdrwy" target="_blank" rel="noopener noreferrer">
             <span class="service-link-icon discord-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
@@ -63,6 +70,69 @@
         <button class="ghost-button" id="language-button" type="button" aria-label="Switch language">EN</button>
       </div>
     </header>
+
+    <section class="field-boss-surface" id="field-boss-surface" hidden>
+      <div class="field-boss-heading">
+        <div class="field-boss-heading-copy">
+          <span class="field-boss-heading-icon" aria-hidden="true">
+            <img src="./assets/boss-icon.png" alt="">
+          </span>
+          <div>
+            <h2 data-i18n="fieldBossStatus">필드보스 현황</h2>
+            <p data-i18n="fieldBossDescription">딜미터기와 동일한 공유 캐시에서 서버별 출현 시간을 확인합니다</p>
+          </div>
+        </div>
+        <button class="ranking-back-button field-boss-back-button" id="field-boss-back-button" type="button">
+          <span class="ranking-back-button-icon" aria-hidden="true">←</span>
+          <span data-i18n="backToRanking">랭킹으로 돌아가기</span>
+        </button>
+      </div>
+
+      <div class="field-boss-controls">
+        <label class="filter-field field-boss-server-field">
+          <span data-i18n="server">서버</span>
+          <select id="field-boss-server"></select>
+        </label>
+        <div class="field-boss-cache-note">
+          <strong data-i18n="fieldBossCacheTitle">공유 캐시 기준</strong>
+          <span data-i18n="fieldBossCacheDescription">약 5분마다 최신 시간을 확인합니다</span>
+        </div>
+        <button class="refresh-button" id="field-boss-refresh-button" type="button">
+          <span class="refresh-glyph" aria-hidden="true">↻</span>
+          <span data-i18n="refresh">새로고침</span>
+        </button>
+      </div>
+
+      <div class="field-boss-snapshot" id="field-boss-snapshot" hidden>
+        <div>
+          <strong id="field-boss-snapshot-title">—</strong>
+          <span id="field-boss-snapshot-caption">—</span>
+        </div>
+        <div class="field-boss-snapshot-meta">
+          <strong id="field-boss-entry-count">—</strong>
+          <span id="field-boss-cache-age">—</span>
+        </div>
+      </div>
+
+      <div class="field-boss-state" id="field-boss-loading-state">
+        <div class="spinner" aria-hidden="true"></div>
+        <p data-i18n="fieldBossLoading">필드보스 공유 캐시를 불러오는 중입니다</p>
+      </div>
+      <div class="field-boss-state field-boss-error-state" id="field-boss-error-state" hidden>
+        <div class="error-mark" aria-hidden="true">!</div>
+        <strong data-i18n="fieldBossLoadError">필드보스 캐시를 불러오지 못했습니다</strong>
+        <p id="field-boss-error-message"></p>
+        <button class="refresh-button compact" id="field-boss-retry-button" type="button" data-i18n="retry">다시 시도</button>
+      </div>
+      <div class="field-boss-state" id="field-boss-empty-state" hidden>
+        <p data-i18n="fieldBossEmpty">선택한 서버에서 수집된 필드보스 시간이 아직 없습니다</p>
+      </div>
+
+      <div class="field-boss-content" id="field-boss-content" hidden>
+        <nav class="field-boss-tabs" id="field-boss-tabs" aria-label="필드보스 지역"></nav>
+        <div class="field-boss-list" id="field-boss-list"></div>
+      </div>
+    </section>
 
     <section class="filter-panel" aria-label="통계 필터">
       <label class="filter-field">
