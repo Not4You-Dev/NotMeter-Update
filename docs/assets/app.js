@@ -1893,7 +1893,17 @@
       applyAtlasIcon(element, preferred.type, preferred.key, size);
       return;
     }
-    applySkillIcon(element, skill?.skillCode, skill?.rawSkillCode, size);
+
+    const skillKey = findSkillIconKey(skill?.rawSkillCode, skill?.skillCode);
+    if (skillKey) {
+      applyAtlasIcon(element, "skill", skillKey, size);
+      return;
+    }
+
+    const buffKey = findBuffIconKey(skill?.rawSkillCode, skill?.skillCode);
+    if (buffKey) {
+      applyAtlasIcon(element, "buff", buffKey, size);
+    }
   }
 
   function applyBuffIcon(element, buff, size) {
@@ -1906,17 +1916,27 @@
       return;
     }
 
-    const manifest = state.iconAtlases.buff;
-    if (manifest) {
-      for (const candidate of [rawCode, code]) {
-        const iconKey = manifest.codes?.[String(Math.abs(Number(candidate) || 0))];
-        if (iconKey && Object.hasOwn(manifest.icons, iconKey)) {
-          applyAtlasIcon(element, "buff", iconKey, size);
-          return;
-        }
-      }
+    const buffKey = findBuffIconKey(rawCode, code);
+    if (buffKey) {
+      applyAtlasIcon(element, "buff", buffKey, size);
+      return;
     }
     applySkillIcon(element, rawCode, code, size);
+  }
+
+  function findBuffIconKey(rawCode, fallbackCode) {
+    const manifest = state.iconAtlases.buff;
+    if (!manifest) {
+      return "";
+    }
+
+    for (const candidate of [rawCode, fallbackCode]) {
+      const iconKey = manifest.codes?.[String(Math.abs(Number(candidate) || 0))];
+      if (iconKey && Object.hasOwn(manifest.icons, iconKey)) {
+        return iconKey;
+      }
+    }
+    return "";
   }
 
   function applyAtlasIcon(element, type, key, size) {
