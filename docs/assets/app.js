@@ -9,16 +9,22 @@
     "./data/notmeter-ranking-custom-cp.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
   ];
+  const FIELD_BOSS_CACHE_URLS = [
+    "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/presence/notmeter-field-boss-public.json",
+    "https://cdn.jsdelivr.net/gh/Not4You-Dev/NotMeter-Update@main/presence/notmeter-field-boss-public.json",
+  ];
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
   const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v4";
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
+  const FIELD_BOSS_CACHE_SCHEMA = "notmeter-field-boss-public-cache-v1";
   const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
   const DETAIL_MEMORY_LIMIT = 48;
   const DETAIL_REQUEST_TIMEOUT_MS = 5_000;
   const CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
   const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
+  const FIELD_BOSS_CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
   const INTERNAL_REPLAY_PERIOD_LABEL = "__notmeter_replay_top20_v1__";
@@ -72,6 +78,9 @@
     "나즈문", "겔코스", "파톤", "펠레이르", "엘비다", "케투", "파이디온", "노툰", "무르트",
     "로탄", "쿠하푸", "두안카", "브로크", "왈터", "푸라킨", "이그누스",
   ];
+  const FIELD_BOSS_REGIONS = Array.isArray(globalThis.NotMeterFieldBossCatalog)
+    ? globalThis.NotMeterFieldBossCatalog
+    : [];
   const DETAIL_METRICS = [
     ["specialization", "specialization"],
     ["hits", "hits"],
@@ -95,8 +104,33 @@
       title: "NotMeter 던전 통계",
       subtitle: "직업별 상위 25% DPS 기준으로 정렬합니다",
       dailyUsers: "일일 사용자",
+      fieldBoss: "필드보스",
       discord: "디스코드",
       download: "다운로드",
+      fieldBossPageTitle: "NotMeter 필드보스 현황",
+      fieldBossPageSubtitle: "딜미터기와 동일한 공유 캐시에서 서버별 출현 시간을 확인합니다",
+      fieldBossStatus: "필드보스 현황",
+      fieldBossDescription: "딜미터기와 동일한 공유 캐시에서 서버별 출현 시간을 확인합니다",
+      backToRanking: "랭킹으로 돌아가기",
+      server: "서버",
+      fieldBossCacheTitle: "공유 캐시 기준",
+      fieldBossCacheDescription: "약 5분마다 최신 시간을 확인합니다",
+      fieldBossLoading: "필드보스 공유 캐시를 불러오는 중입니다",
+      fieldBossLoadError: "필드보스 캐시를 불러오지 못했습니다",
+      fieldBossEmpty: "선택한 서버에서 수집된 필드보스 시간이 아직 없습니다",
+      fieldBossServerStatus: "{server} 필드보스 현황",
+      fieldBossEntryCount: "시간 {entries}개 · 지역 {regions}개",
+      fieldBossGenerated: "캐시 갱신 {time}",
+      fieldBossNoTime: "시간 정보 없음",
+      fieldBossNoTimeDetail: "해당 서버에서 시간이 수집되지 않았습니다",
+      fieldBossExpected: "출현 예정 {time}",
+      fieldBossReached: "출현 시간 도달",
+      fieldBossHoursLeft: "{hours}시간 {minutes}분 {seconds}초 전",
+      fieldBossMinutesLeft: "{minutes}분 {seconds}초 전",
+      fieldBossSecondsLeft: "{seconds}초 전",
+      fieldBossCacheNow: "방금 갱신",
+      fieldBossCacheMinutes: "{value}분 전 갱신",
+      fieldBossCacheHours: "{value}시간 전 갱신",
       dungeon: "던전",
       boss: "보스",
       period: "기간",
@@ -228,8 +262,33 @@
       title: "NotMeter Dungeon Statistics",
       subtitle: "Classes are ranked by top-quartile DPS",
       dailyUsers: "Daily users",
+      fieldBoss: "Field Boss",
       discord: "Discord",
       download: "Download",
+      fieldBossPageTitle: "NotMeter Field Boss Status",
+      fieldBossPageSubtitle: "View server spawn timers from the same shared cache used by NotMeter",
+      fieldBossStatus: "Field Boss Status",
+      fieldBossDescription: "View server spawn timers from the same shared cache used by NotMeter",
+      backToRanking: "Back to rankings",
+      server: "Server",
+      fieldBossCacheTitle: "Shared cache",
+      fieldBossCacheDescription: "Checks for updated timers about every five minutes",
+      fieldBossLoading: "Loading the shared field-boss cache",
+      fieldBossLoadError: "Unable to load the field-boss cache",
+      fieldBossEmpty: "No field-boss timers have been collected for this server yet",
+      fieldBossServerStatus: "{server} Field Boss Status",
+      fieldBossEntryCount: "{entries} timers · {regions} regions",
+      fieldBossGenerated: "Cache updated {time}",
+      fieldBossNoTime: "No timer data",
+      fieldBossNoTimeDetail: "No timer has been collected from this server",
+      fieldBossExpected: "Expected {time}",
+      fieldBossReached: "Spawn time reached",
+      fieldBossHoursLeft: "{hours}h {minutes}m {seconds}s left",
+      fieldBossMinutesLeft: "{minutes}m {seconds}s left",
+      fieldBossSecondsLeft: "{seconds}s left",
+      fieldBossCacheNow: "Updated just now",
+      fieldBossCacheMinutes: "Updated {value}m ago",
+      fieldBossCacheHours: "Updated {value}h ago",
       dungeon: "Dungeon",
       boss: "Boss",
       period: "Period",
@@ -379,6 +438,7 @@
     detailMemory: new Map(),
     detailLoads: new Map(),
     mode: "summary",
+    surfaceMode: "ranking",
     loading: false,
     lastCacheSyncAt: 0,
     iconAtlases: {
@@ -386,6 +446,13 @@
       buff: null,
     },
     visibleMetrics: loadVisibleMetrics(),
+    fieldBossData: null,
+    fieldBossLoad: null,
+    fieldBossServerId: Number(localStorage.getItem("notmeter-field-boss-server-id")) || 0,
+    fieldBossRegion: -1,
+    fieldBossLastSyncAt: 0,
+    fieldBossCountdownElements: new Map(),
+    fieldBossClock: 0,
   };
 
   const elements = {};
@@ -397,22 +464,40 @@
     renderDetailSettings();
     void loadIconAtlases();
     void loadCache();
+    if (history.state?.notMeterStatsView === "field-boss") {
+      openFieldBossView(false);
+    }
     window.setInterval(updateCacheAge, 60_000);
     window.setInterval(() => {
       if (!document.hidden) {
         void syncLatestCache();
+        if (state.surfaceMode === "fieldBoss" &&
+            Date.now() - state.fieldBossLastSyncAt >= FIELD_BOSS_CACHE_SYNC_INTERVAL_MS) {
+          void loadFieldBossCache();
+        }
       }
     }, CACHE_SYNC_INTERVAL_MS);
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
         void syncLatestCache();
+        if (state.surfaceMode === "fieldBoss" &&
+            Date.now() - state.fieldBossLastSyncAt >= FIELD_BOSS_CACHE_SYNC_INTERVAL_MS) {
+          void loadFieldBossCache();
+        }
       }
     });
   });
 
   function bindElements() {
     for (const id of [
-      "daily-user-count", "language-button", "dungeon-filter", "boss-filter", "cp-filter",
+      "page-title", "page-subtitle", "daily-user-count", "language-button",
+      "field-boss-button", "field-boss-surface", "field-boss-back-button",
+      "field-boss-server", "field-boss-refresh-button", "field-boss-retry-button",
+      "field-boss-snapshot", "field-boss-snapshot-title", "field-boss-snapshot-caption",
+      "field-boss-entry-count", "field-boss-cache-age", "field-boss-loading-state",
+      "field-boss-error-state", "field-boss-error-message", "field-boss-empty-state",
+      "field-boss-content", "field-boss-tabs", "field-boss-list",
+      "dungeon-filter", "boss-filter", "cp-filter",
       "custom-cp-panel", "custom-cp-min", "custom-cp-max", "custom-cp-apply", "custom-cp-result",
       "period-filter", "refresh-button", "retry-button", "snapshot-title", "snapshot-caption",
       "sample-meta", "generated-meta", "weekly-guide", "class-heading", "class-title",
@@ -444,6 +529,26 @@
         state.selectedDetail = openDetail;
         renderCombatDetail();
       }
+    });
+    elements["field-boss-button"].addEventListener("click", () => {
+      if (state.surfaceMode === "fieldBoss") {
+        returnToRanking();
+      } else {
+        openFieldBossView(true);
+      }
+    });
+    elements["field-boss-back-button"].addEventListener("click", returnToRanking);
+    elements["field-boss-server"].addEventListener("change", event => {
+      state.fieldBossServerId = Number(event.target.value) || 0;
+      localStorage.setItem("notmeter-field-boss-server-id", String(state.fieldBossServerId));
+      state.fieldBossRegion = resolveDefaultFieldBossRegion(state.fieldBossServerId);
+      renderFieldBoss();
+    });
+    elements["field-boss-refresh-button"].addEventListener("click", () => {
+      void loadFieldBossCache(true);
+    });
+    elements["field-boss-retry-button"].addEventListener("click", () => {
+      void loadFieldBossCache(true);
     });
     elements["dungeon-filter"].addEventListener("change", event => {
       closeCombatDetail();
@@ -493,6 +598,11 @@
       render();
     });
     window.addEventListener("popstate", event => {
+      if (event.state?.notMeterStatsView === "field-boss") {
+        openFieldBossView(false);
+        return;
+      }
+      closeFieldBossView();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
         state.selectedJob = job;
@@ -593,6 +703,443 @@
       return;
     }
     await loadCache(false, true);
+  }
+
+  function openFieldBossView(pushHistory) {
+    closeCombatDetail();
+    state.surfaceMode = "fieldBoss";
+    document.body.classList.add("field-boss-view");
+    elements["field-boss-surface"].hidden = false;
+    elements["field-boss-button"].classList.add("active");
+    elements["field-boss-button"].setAttribute("aria-pressed", "true");
+    updatePageIdentity();
+    startFieldBossClock();
+    if (pushHistory) {
+      history.pushState({ notMeterStatsView: "field-boss" }, "");
+    }
+    if (state.fieldBossData) {
+      renderFieldBoss();
+    } else {
+      showFieldBossState("loading");
+      void loadFieldBossCache();
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeFieldBossView() {
+    if (state.surfaceMode !== "fieldBoss") {
+      return;
+    }
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("field-boss-view");
+    elements["field-boss-surface"].hidden = true;
+    elements["field-boss-button"].classList.remove("active");
+    elements["field-boss-button"].setAttribute("aria-pressed", "false");
+    stopFieldBossClock();
+    updatePageIdentity();
+  }
+
+  function returnToRanking() {
+    if (history.state?.notMeterStatsView === "field-boss") {
+      history.back();
+      return;
+    }
+    closeFieldBossView();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function startFieldBossClock() {
+    if (state.fieldBossClock) {
+      return;
+    }
+    refreshFieldBossCountdowns();
+    state.fieldBossClock = window.setInterval(refreshFieldBossCountdowns, 1_000);
+  }
+
+  function stopFieldBossClock() {
+    if (!state.fieldBossClock) {
+      return;
+    }
+    window.clearInterval(state.fieldBossClock);
+    state.fieldBossClock = 0;
+  }
+
+  async function loadFieldBossCache(force = false) {
+    if (state.fieldBossLoad) {
+      return state.fieldBossLoad;
+    }
+    elements["field-boss-refresh-button"].disabled = true;
+    elements["field-boss-retry-button"].disabled = true;
+    if (!state.fieldBossData) {
+      showFieldBossState("loading");
+    }
+    const load = fetchFieldBossCache(force)
+      .then(cache => {
+        validateFieldBossCache(cache);
+        state.fieldBossData = cache;
+        state.fieldBossLastSyncAt = Date.now();
+        populateFieldBossServers();
+        state.fieldBossRegion = resolveDefaultFieldBossRegion(
+          state.fieldBossServerId,
+          state.fieldBossRegion);
+        if (state.surfaceMode === "fieldBoss") {
+          renderFieldBoss();
+        }
+        return cache;
+      })
+      .catch(error => {
+        console.error(error);
+        if (!state.fieldBossData && state.surfaceMode === "fieldBoss") {
+          elements["field-boss-error-message"].textContent =
+            error instanceof Error && error.message ? error.message : t("cacheUnavailable");
+          showFieldBossState("error");
+        }
+        return null;
+      })
+      .finally(() => {
+        state.fieldBossLoad = null;
+        elements["field-boss-refresh-button"].disabled = false;
+        elements["field-boss-retry-button"].disabled = false;
+      });
+    state.fieldBossLoad = load;
+    return load;
+  }
+
+  async function fetchFieldBossCache(force) {
+    const errors = [];
+    for (const baseUrl of FIELD_BOSS_CACHE_URLS) {
+      const separator = baseUrl.includes("?") ? "&" : "?";
+      const url = force ? `${baseUrl}${separator}v=${Date.now()}` : baseUrl;
+      try {
+        const response = await fetch(url, {
+          cache: force ? "reload" : "no-cache",
+          headers: { Accept: "application/json" },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const contentLength = Number(response.headers.get("content-length")) || 0;
+        if (contentLength > 1_500_000) {
+          throw new Error("cache is too large");
+        }
+        return await response.json();
+      } catch (error) {
+        errors.push(`${baseUrl}: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+    throw new Error(`${t("cacheUnavailable")} (${errors.join(" / ")})`);
+  }
+
+  function validateFieldBossCache(cache) {
+    if (!cache || cache.schema !== FIELD_BOSS_CACHE_SCHEMA ||
+        Number(cache.version) !== 1 || Number(cache.maximumRegions) !== 6 ||
+        !Number.isSafeInteger(Number(cache.generatedAt)) ||
+        !Array.isArray(cache.servers) || cache.servers.length > 256 ||
+        FIELD_BOSS_REGIONS.length !== 6) {
+      throw new Error(t("cacheInvalid"));
+    }
+    const knownServers = new Set();
+    for (const server of cache.servers) {
+      const serverId = Number(server?.serverId);
+      if (!isKnownServerId(serverId) || knownServers.has(serverId) ||
+          !Array.isArray(server.regions) || server.regions.length > 6) {
+        throw new Error(t("cacheInvalid"));
+      }
+      knownServers.add(serverId);
+      const knownRegions = new Set();
+      for (const region of server.regions) {
+        const regionIndex = Number(region?.region);
+        const catalog = FIELD_BOSS_REGIONS[regionIndex];
+        if (!Number.isInteger(regionIndex) || !catalog || knownRegions.has(regionIndex) ||
+            !Array.isArray(region.entries) || region.entries.length > catalog.bosses.length) {
+          throw new Error(t("cacheInvalid"));
+        }
+        knownRegions.add(regionIndex);
+        const allowedCodes = new Set(catalog.bosses.map(item => Number(item[0])));
+        const knownBosses = new Set();
+        for (const entry of region.entries) {
+          const bossCode = Number(entry?.bossCode);
+          const targetAt = Number(entry?.targetAt);
+          if (!allowedCodes.has(bossCode) || knownBosses.has(bossCode) ||
+              !Number.isSafeInteger(targetAt) || targetAt <= 0) {
+            throw new Error(t("cacheInvalid"));
+          }
+          knownBosses.add(bossCode);
+        }
+      }
+    }
+  }
+
+  function populateFieldBossServers() {
+    const select = elements["field-boss-server"];
+    const fragment = document.createDocumentFragment();
+    const groups = [
+      [1, state.locale === "ko" ? "천족" : "Elyos", SERVER_NAMES_ELYOS],
+      [2, state.locale === "ko" ? "마족" : "Asmodian", SERVER_NAMES_ASMODIAN],
+    ];
+    if (!isKnownServerId(state.fieldBossServerId)) {
+      const cachedServer = state.fieldBossData?.servers?.[0];
+      state.fieldBossServerId = Number(cachedServer?.serverId) || 1001;
+    }
+    for (const [group, label, names] of groups) {
+      const optionGroup = document.createElement("optgroup");
+      optionGroup.label = label;
+      names.forEach((name, index) => {
+        const serverId = group * 1000 + index + 1;
+        const option = document.createElement("option");
+        option.value = String(serverId);
+        option.textContent = name;
+        option.selected = serverId === state.fieldBossServerId;
+        optionGroup.append(option);
+      });
+      fragment.append(optionGroup);
+    }
+    select.replaceChildren(fragment);
+    select.value = String(state.fieldBossServerId);
+  }
+
+  function renderFieldBoss() {
+    if (state.surfaceMode !== "fieldBoss" || !state.fieldBossData) {
+      return;
+    }
+    updatePageIdentity();
+    populateFieldBossServers();
+    const server = currentFieldBossServer();
+    const regionsWithData = (server?.regions || [])
+      .filter(region => Array.isArray(region.entries) && region.entries.length > 0);
+    const entryCount = regionsWithData.reduce(
+      (total, region) => total + region.entries.length, 0);
+    const serverName = fullServerName(state.fieldBossServerId) || String(state.fieldBossServerId);
+    elements["field-boss-snapshot"].hidden = false;
+    elements["field-boss-snapshot-title"].textContent =
+      t("fieldBossServerStatus", { server: serverName });
+    elements["field-boss-snapshot-caption"].textContent = t("fieldBossGenerated", {
+      time: formatFieldBossCacheTime(state.fieldBossData.generatedAt),
+    });
+    elements["field-boss-entry-count"].textContent = t("fieldBossEntryCount", {
+      entries: entryCount,
+      regions: regionsWithData.length,
+    });
+    elements["field-boss-cache-age"].textContent = fieldBossCacheAgeText();
+
+    renderFieldBossTabs(server);
+    renderFieldBossRows(server);
+    showFieldBossState("content");
+  }
+
+  function currentFieldBossServer() {
+    return state.fieldBossData?.servers?.find(
+      server => Number(server.serverId) === state.fieldBossServerId) || null;
+  }
+
+  function resolveDefaultFieldBossRegion(serverId, preferred = -1) {
+    if (Number.isInteger(preferred) && preferred >= 0 && preferred < FIELD_BOSS_REGIONS.length) {
+      return preferred;
+    }
+    const server = state.fieldBossData?.servers?.find(
+      item => Number(item.serverId) === Number(serverId));
+    const available = [...(server?.regions || [])]
+      .filter(region => Array.isArray(region.entries) && region.entries.length > 0)
+      .sort((left, right) =>
+        Number(right.observedAt || 0) - Number(left.observedAt || 0));
+    return Number(available[0]?.region) || 0;
+  }
+
+  function renderFieldBossTabs(server) {
+    const byRegion = new Map((server?.regions || []).map(
+      region => [Number(region.region), region]));
+    const ordered = FIELD_BOSS_REGIONS.map((region, index) => ({
+      region,
+      index,
+      count: byRegion.get(index)?.entries?.length || 0,
+      observedAt: Number(byRegion.get(index)?.observedAt) || 0,
+    })).sort((left, right) =>
+      Number(right.count > 0) - Number(left.count > 0) ||
+      right.observedAt - left.observedAt ||
+      left.index - right.index);
+    const fragment = document.createDocumentFragment();
+    for (const item of ordered) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "field-boss-tab";
+      if (item.count > 0) {
+        button.classList.add("has-data");
+      }
+      if (item.index === state.fieldBossRegion) {
+        button.classList.add("active");
+        button.setAttribute("aria-current", "true");
+      }
+      const label = document.createElement("span");
+      label.textContent = item.region.names?.[state.locale] || item.region.names?.ko || item.region.key;
+      const count = document.createElement("span");
+      count.className = "field-boss-tab-count";
+      count.textContent = `${item.count}/${item.region.bosses.length}`;
+      button.append(label, count);
+      button.addEventListener("click", () => {
+        state.fieldBossRegion = item.index;
+        renderFieldBoss();
+      });
+      fragment.append(button);
+    }
+    elements["field-boss-tabs"].replaceChildren(fragment);
+  }
+
+  function renderFieldBossRows(server) {
+    const catalog = FIELD_BOSS_REGIONS[state.fieldBossRegion] || FIELD_BOSS_REGIONS[0];
+    const cachedRegion = server?.regions?.find(
+      region => Number(region.region) === state.fieldBossRegion);
+    const entries = new Map((cachedRegion?.entries || []).map(
+      entry => [Number(entry.bossCode), entry]));
+    const orderedBosses = catalog.bosses.map((boss, index) => ({
+      code: Number(boss[0]),
+      name: String(boss[1]),
+      index,
+      entry: entries.get(Number(boss[0])) || null,
+    })).sort((left, right) =>
+      Number(!left.entry) - Number(!right.entry) ||
+      Number(left.entry?.targetAt || Number.MAX_SAFE_INTEGER) -
+        Number(right.entry?.targetAt || Number.MAX_SAFE_INTEGER) ||
+      left.index - right.index);
+    state.fieldBossCountdownElements.clear();
+    const fragment = document.createDocumentFragment();
+    for (const boss of orderedBosses) {
+      const row = document.createElement("article");
+      row.className = `field-boss-row${boss.entry ? "" : " no-time"}`;
+      const icon = document.createElement("span");
+      icon.className = "field-boss-row-icon";
+      const image = document.createElement("img");
+      image.src = "./assets/boss-icon.png";
+      image.alt = "";
+      icon.append(image);
+      const copy = document.createElement("div");
+      copy.className = "field-boss-row-copy";
+      const name = document.createElement("strong");
+      name.textContent = boss.name;
+      const target = document.createElement("span");
+      target.textContent = boss.entry
+        ? t("fieldBossExpected", { time: formatFieldBossTargetTime(boss.entry.targetAt) })
+        : t("fieldBossNoTimeDetail");
+      copy.append(name, target);
+      const remaining = document.createElement("span");
+      remaining.className = "field-boss-remaining";
+      if (boss.entry) {
+        const targetAt = Number(boss.entry.targetAt);
+        state.fieldBossCountdownElements.set(remaining, targetAt);
+        updateFieldBossCountdownElement(remaining, targetAt);
+      } else {
+        remaining.classList.add("no-time");
+        remaining.textContent = t("fieldBossNoTime");
+      }
+      row.append(icon, copy, remaining);
+      fragment.append(row);
+    }
+    elements["field-boss-list"].replaceChildren(fragment);
+    refreshFieldBossCountdowns();
+  }
+
+  function refreshFieldBossCountdowns() {
+    if (state.surfaceMode !== "fieldBoss") {
+      return;
+    }
+    for (const [element, targetAt] of state.fieldBossCountdownElements) {
+      updateFieldBossCountdownElement(element, targetAt);
+    }
+    if (state.fieldBossData) {
+      elements["field-boss-cache-age"].textContent = fieldBossCacheAgeText();
+    }
+  }
+
+  function updateFieldBossCountdownElement(element, targetAt) {
+    const remaining = Number(targetAt) - Date.now();
+    element.textContent = formatFieldBossRemaining(remaining);
+    element.classList.remove("warning", "soon", "reached");
+    if (remaining <= 0) {
+      element.classList.add("reached");
+    } else if (remaining <= 10 * 60_000) {
+      element.classList.add("soon");
+    } else if (remaining <= 30 * 60_000) {
+      element.classList.add("warning");
+    }
+  }
+
+  function formatFieldBossRemaining(remainingMilliseconds) {
+    if (!Number.isFinite(remainingMilliseconds) || remainingMilliseconds <= 0) {
+      return t("fieldBossReached");
+    }
+    const totalSeconds = Math.max(0, Math.floor(remainingMilliseconds / 1_000));
+    const hours = Math.floor(totalSeconds / 3_600);
+    const minutes = Math.floor(totalSeconds % 3_600 / 60);
+    const seconds = totalSeconds % 60;
+    if (hours > 0) {
+      return t("fieldBossHoursLeft", {
+        hours,
+        minutes: String(minutes).padStart(2, "0"),
+        seconds: String(seconds).padStart(2, "0"),
+      });
+    }
+    if (minutes > 0) {
+      return t("fieldBossMinutesLeft", {
+        minutes,
+        seconds: String(seconds).padStart(2, "0"),
+      });
+    }
+    return t("fieldBossSecondsLeft", { seconds });
+  }
+
+  function formatFieldBossTargetTime(targetAt) {
+    const date = new Date(Number(targetAt));
+    if (!Number.isFinite(date.getTime())) {
+      return "—";
+    }
+    return new Intl.DateTimeFormat(state.locale === "ko" ? "ko-KR" : "en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }).format(date);
+  }
+
+  function formatFieldBossCacheTime(generatedAtSeconds) {
+    const date = new Date(Number(generatedAtSeconds) * 1_000);
+    return Number.isFinite(date.getTime()) ? formatDate(date.toISOString()) : "—";
+  }
+
+  function fieldBossCacheAgeText() {
+    const generatedAt = Number(state.fieldBossData?.generatedAt) * 1_000;
+    if (!Number.isFinite(generatedAt) || generatedAt <= 0) {
+      return "";
+    }
+    const ageMinutes = Math.max(0, Math.floor((Date.now() - generatedAt) / 60_000));
+    return ageMinutes < 2
+      ? t("fieldBossCacheNow")
+      : ageMinutes < 60
+        ? t("fieldBossCacheMinutes", { value: ageMinutes })
+        : t("fieldBossCacheHours", { value: Math.floor(ageMinutes / 60) });
+  }
+
+  function showFieldBossState(name) {
+    elements["field-boss-loading-state"].hidden = name !== "loading";
+    elements["field-boss-error-state"].hidden = name !== "error";
+    elements["field-boss-empty-state"].hidden = name !== "empty";
+    elements["field-boss-content"].hidden = name !== "content";
+    elements["field-boss-snapshot"].hidden = name !== "content";
+  }
+
+  function isKnownServerId(serverId) {
+    const group = Math.floor(Number(serverId) / 1_000);
+    const offset = Number(serverId) % 1_000;
+    const names = group === 1 ? SERVER_NAMES_ELYOS : group === 2 ? SERVER_NAMES_ASMODIAN : null;
+    return Number.isInteger(serverId) && Boolean(names?.[offset - 1]);
+  }
+
+  function fullServerName(serverId) {
+    const group = Math.floor(Number(serverId) / 1_000);
+    const offset = Number(serverId) % 1_000;
+    const names = group === 1 ? SERVER_NAMES_ELYOS : group === 2 ? SERVER_NAMES_ASMODIAN : null;
+    return names?.[offset - 1] || "";
   }
 
   async function fetchRankingCache(force) {
@@ -869,6 +1416,12 @@
   }
 
   function render() {
+    if (state.surfaceMode === "fieldBoss") {
+      if (state.fieldBossData) {
+        renderFieldBoss();
+      }
+      return;
+    }
     if (!state.data) {
       return;
     }
@@ -2500,7 +3053,6 @@
 
   function applyLocale() {
     document.documentElement.lang = state.locale;
-    document.title = t("title");
     elements["language-button"].textContent = state.locale === "ko" ? "EN" : "KO";
     document.querySelectorAll("[data-i18n]").forEach(element => {
       const key = element.dataset.i18n;
@@ -2514,8 +3066,21 @@
         element.setAttribute("aria-label", t(key));
       }
     });
+    updatePageIdentity();
     syncCustomCpControls();
     renderDetailSettings();
+    if (state.surfaceMode === "fieldBoss" && state.fieldBossData) {
+      renderFieldBoss();
+    }
+  }
+
+  function updatePageIdentity() {
+    const fieldBoss = state.surfaceMode === "fieldBoss";
+    const title = t(fieldBoss ? "fieldBossPageTitle" : "title");
+    const subtitle = t(fieldBoss ? "fieldBossPageSubtitle" : "subtitle");
+    document.title = title;
+    elements["page-title"].textContent = title;
+    elements["page-subtitle"].textContent = subtitle;
   }
 
   function showState(name) {
