@@ -1104,7 +1104,7 @@
 
   function formatFieldBossCacheTime(generatedAtSeconds) {
     const date = new Date(Number(generatedAtSeconds) * 1_000);
-    return Number.isFinite(date.getTime()) ? formatDate(date.toISOString()) : "—";
+    return Number.isFinite(date.getTime()) ? formatDateTime(date.toISOString()) : "—";
   }
 
   function fieldBossCacheAgeText() {
