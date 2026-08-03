@@ -432,6 +432,7 @@
     customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
     selectedJob: "",
+    rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
     detailLoads: new Map(),
@@ -606,7 +607,10 @@
     });
     elements["refresh-button"].addEventListener("click", () => void loadCache(true));
     elements["retry-button"].addEventListener("click", () => void loadCache(true));
-    elements["back-button"].addEventListener("click", () => {
+    elements["back-button"].addEventListener("click", event => {
+      if (isRepeatedPointerActivation(event)) {
+        return;
+      }
       if (history.state?.notMeterStatsView === "class") {
         history.back();
         return;
@@ -624,6 +628,7 @@
       if (event.state?.notMeterStatsView === "class" && job) {
         state.selectedJob = job;
         state.mode = "class";
+        blockRankingNavigation();
       } else {
         leaveClassView();
       }
@@ -651,8 +656,7 @@
   function applyDungeonSelection(dungeonKey) {
     state.dungeonKey = dungeonKey;
     state.bossIndex = 0;
-    state.mode = "summary";
-    state.selectedJob = "";
+    resetClassSelection();
   }
 
   async function loadCache(force = false, preserveView = false) {
@@ -690,8 +694,7 @@
         ? previousDungeon
         : cache.dungeons[0]?.key || "";
       if (!preserveView || state.dungeonKey !== previousDungeon) {
-        state.mode = "summary";
-        state.selectedJob = "";
+        resetClassSelection();
       }
       updateDailyUsers();
       populateFilters();
@@ -1613,8 +1616,12 @@
     tr.setAttribute("role", "button");
     tr.setAttribute("aria-label", `${jobName(row.jobName)} ${t("details")}`);
     const open = () => {
+      if (state.mode === "class" || isRankingNavigationBlocked()) {
+        return;
+      }
       state.selectedJob = row.jobName;
       state.mode = "class";
+      blockRankingNavigation();
       history.pushState({
         notMeterStatsView: "class",
         notMeterStatsJob: row.jobName,
@@ -1622,7 +1629,11 @@
       render();
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
-    tr.addEventListener("click", open);
+    tr.addEventListener("click", event => {
+      if (!isRepeatedPointerActivation(event)) {
+        open();
+      }
+    });
     tr.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
@@ -1759,6 +1770,9 @@
       "aria-label",
       `${formatCharacterName(player.name, player.serverId)} ${t("combatDetails")}`);
     const open = async () => {
+      if (isRankingNavigationBlocked()) {
+        return;
+      }
       if (detail) {
         openLegacyCombatDetail(player, detail);
       } else if (canBuildLookupKey) {
@@ -1767,7 +1781,11 @@
         openUnavailableCombatDetail(player, t("detailUnavailableOld"));
       }
     };
-    tr.addEventListener("click", () => void open());
+    tr.addEventListener("click", event => {
+      if (!isRepeatedPointerActivation(event)) {
+        void open();
+      }
+    });
     tr.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
@@ -3250,10 +3268,39 @@
     elements["class-view"].hidden = name !== "class";
   }
 
-  function leaveClassView() {
-    closeCombatDetail();
+  function isRepeatedPointerActivation(event) {
+    return Number(event?.detail) > 1;
+  }
+
+  function blockRankingNavigation() {
+    state.rankingNavigationBlockedUntil = Date.now() + 350;
+  }
+
+  function isRankingNavigationBlocked() {
+    return Date.now() < state.rankingNavigationBlockedUntil;
+  }
+
+  function replaceClassHistoryWithSummary() {
+    const current = globalThis.history?.state;
+    if (current?.notMeterStatsView !== "class") {
+      return false;
+    }
+    const summaryState = { ...current, notMeterStatsView: "summary" };
+    delete summaryState.notMeterStatsJob;
+    globalThis.history.replaceState(summaryState, "");
+    return true;
+  }
+
+  function resetClassSelection() {
     state.mode = "summary";
     state.selectedJob = "";
+    blockRankingNavigation();
+    replaceClassHistoryWithSummary();
+  }
+
+  function leaveClassView() {
+    closeCombatDetail();
+    resetClassSelection();
   }
 
   function currentDungeon() {
