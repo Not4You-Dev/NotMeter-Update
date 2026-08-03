@@ -13,6 +13,11 @@
     17400057,
     17400058,
   ]);
+  const SPIRIT_PACKET_SKILL_NAMES = new Map([
+    [160014, { ko: "원혼 날리기", en: "Toss Revenant" }],
+    [160015, { ko: "강렬한 일격", en: "Fierce Strike" }],
+    [160016, { ko: "어둠 폭발", en: "Shadow Explosion" }],
+  ]);
   const NON_GAMEPLAY_DETAIL_BUFF_CODES = new Set([
     1096,
     1097,
@@ -122,12 +127,16 @@
     return null;
   }
 
-  function skillDisplayName(skill) {
-    const recordedName = String(skill?.skillName || "").trim() || "—";
-    const level = Math.trunc(Number(skill?.skillLevel) || 0);
-    return level > 0 && level <= 99
-      ? `${recordedName} - Lv.${level}`
-      : recordedName;
+  function skillDisplayName(skill, locale) {
+    let recordedName = String(skill?.skillName || "").trim() || "—";
+    const rawCode = code(skill?.rawSkillCode);
+    if (rawCode >= 16001400 && rawCode <= 16001699) {
+      const packetSkill = SPIRIT_PACKET_SKILL_NAMES.get(Math.floor(rawCode / 100));
+      if (packetSkill) {
+        recordedName = locale === "en" ? packetSkill.en : packetSkill.ko;
+      }
+    }
+    return recordedName;
   }
 
   function displayName(buff, locale, manifest) {
