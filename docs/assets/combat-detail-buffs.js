@@ -18,6 +18,13 @@
     [160015, { ko: "강렬한 일격", en: "Fierce Strike" }],
     [160016, { ko: "어둠 폭발", en: "Shadow Explosion" }],
   ]);
+  const SPIRIT_PACKET_OWNERS = Object.freeze([
+    { minimum: 1, maximum: 4, ko: "불의 정령", en: "Fire Spirit", icon: "16100000" },
+    { minimum: 5, maximum: 8, ko: "물의 정령", en: "Water Spirit", icon: "16110000" },
+    { minimum: 9, maximum: 12, ko: "바람의 정령", en: "Wind Spirit", icon: "16120000" },
+    { minimum: 13, maximum: 16, ko: "땅의 정령", en: "Earth Spirit", icon: "16130000" },
+    { minimum: 17, maximum: 17, ko: "고대의 정령", en: "Ancient Spirit", icon: "16250000" },
+  ]);
   const NON_GAMEPLAY_DETAIL_BUFF_CODES = new Set([
     1096,
     1097,
@@ -112,6 +119,11 @@
   }
 
   function skillIconSource(skill) {
+    const spiritPacketSkill = resolveSpiritPacketSkill(skill);
+    if (spiritPacketSkill) {
+      return { type: "skill", key: spiritPacketSkill.owner.icon };
+    }
+
     const name = String(skill?.skillName || "").trim().toLocaleLowerCase();
     const isEarthBlessing =
       name === "대지의 축복" ||
@@ -129,14 +141,25 @@
 
   function skillDisplayName(skill, locale) {
     let recordedName = String(skill?.skillName || "").trim() || "—";
-    const rawCode = code(skill?.rawSkillCode);
-    if (rawCode >= 16001400 && rawCode <= 16001699) {
-      const packetSkill = SPIRIT_PACKET_SKILL_NAMES.get(Math.floor(rawCode / 100));
-      if (packetSkill) {
-        recordedName = locale === "en" ? packetSkill.en : packetSkill.ko;
-      }
+    const spiritPacketSkill = resolveSpiritPacketSkill(skill);
+    if (spiritPacketSkill) {
+      const language = locale === "en" ? "en" : "ko";
+      recordedName = `${spiritPacketSkill.owner[language]}: ${spiritPacketSkill.skill[language]}`;
     }
     return recordedName;
+  }
+
+  function resolveSpiritPacketSkill(skill) {
+    const rawCode = code(skill?.rawSkillCode) || code(skill?.skillCode);
+    if (rawCode < 16001400 || rawCode > 16001699) {
+      return null;
+    }
+
+    const packetSkill = SPIRIT_PACKET_SKILL_NAMES.get(Math.floor(rawCode / 100));
+    const variant = rawCode % 100;
+    const owner = SPIRIT_PACKET_OWNERS.find(candidate =>
+      variant >= candidate.minimum && variant <= candidate.maximum);
+    return packetSkill && owner ? { skill: packetSkill, owner } : null;
   }
 
   function displayName(buff, locale, manifest) {
