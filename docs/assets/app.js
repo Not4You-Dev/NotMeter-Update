@@ -13,6 +13,10 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/presence/notmeter-field-boss-public.json",
     "https://cdn.jsdelivr.net/gh/Not4You-Dev/NotMeter-Update@main/presence/notmeter-field-boss-public.json",
   ];
+  const FIELD_BOSS_CACHE_REF_URL =
+    "https://api.github.com/repos/Not4You-Dev/NotMeter-Update/git/ref/heads/main";
+  const FIELD_BOSS_CACHE_IMMUTABLE_ROOT =
+    "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update";
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
   const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v4";
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
@@ -24,7 +28,8 @@
   const DETAIL_REQUEST_TIMEOUT_MS = 5_000;
   const CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
   const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
-  const FIELD_BOSS_CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+  const FIELD_BOSS_CACHE_SYNC_INTERVAL_MS = 90 * 1000;
+  const FIELD_BOSS_CACHE_RESUME_THROTTLE_MS = 15 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
   const INTERNAL_REPLAY_PERIOD_LABEL = "__notmeter_replay_top20_v1__";
@@ -452,6 +457,8 @@
     fieldBossServerSearchIndex: -1,
     fieldBossRegion: -1,
     fieldBossLastSyncAt: 0,
+    fieldBossRevision: "",
+    fieldBossForceRefreshPending: false,
     fieldBossCountdownElements: new Map(),
     fieldBossClock: 0,
   };
@@ -472,21 +479,21 @@
     window.setInterval(() => {
       if (!document.hidden) {
         void syncLatestCache();
-        if (state.surfaceMode === "fieldBoss" &&
-            Date.now() - state.fieldBossLastSyncAt >= FIELD_BOSS_CACHE_SYNC_INTERVAL_MS) {
-          void loadFieldBossCache();
-        }
       }
     }, CACHE_SYNC_INTERVAL_MS);
+    window.setInterval(() => {
+      if (!document.hidden && state.surfaceMode === "fieldBoss") {
+        void syncLatestFieldBossCache();
+      }
+    }, FIELD_BOSS_CACHE_SYNC_INTERVAL_MS);
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
         void syncLatestCache();
-        if (state.surfaceMode === "fieldBoss" &&
-            Date.now() - state.fieldBossLastSyncAt >= FIELD_BOSS_CACHE_SYNC_INTERVAL_MS) {
-          void loadFieldBossCache();
-        }
+        void syncLatestFieldBossCache();
       }
     });
+    window.addEventListener("pageshow", () => void syncLatestFieldBossCache());
+    window.addEventListener("online", () => void syncLatestFieldBossCache(true));
   });
 
   function bindElements() {
@@ -725,6 +732,17 @@
     await loadCache(false, true);
   }
 
+  async function syncLatestFieldBossCache(force = false) {
+    if (state.surfaceMode !== "fieldBoss" || document.hidden) {
+      return;
+    }
+    if (!force &&
+        Date.now() - state.fieldBossLastSyncAt < FIELD_BOSS_CACHE_RESUME_THROTTLE_MS) {
+      return;
+    }
+    await loadFieldBossCache(force);
+  }
+
   function openFieldBossView(pushHistory) {
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
@@ -739,6 +757,7 @@
     }
     if (state.fieldBossData) {
       renderFieldBoss();
+      void syncLatestFieldBossCache();
     } else {
       showFieldBossState("loading");
       void loadFieldBossCache();
@@ -788,6 +807,9 @@
 
   async function loadFieldBossCache(force = false) {
     if (state.fieldBossLoad) {
+      if (force) {
+        state.fieldBossForceRefreshPending = true;
+      }
       return state.fieldBossLoad;
     }
     elements["field-boss-refresh-button"].disabled = true;
@@ -796,10 +818,24 @@
       showFieldBossState("loading");
     }
     const load = fetchFieldBossCache(force)
-      .then(cache => {
+      .then(result => {
+        const { cache, revision } = result;
         validateFieldBossCache(cache);
-        state.fieldBossData = cache;
+        const previousData = state.fieldBossData;
+        const previousRevision = state.fieldBossRevision;
         state.fieldBossLastSyncAt = Date.now();
+        state.fieldBossRevision = revision || previousRevision;
+        if (!shouldApplyFieldBossCache(
+          cache,
+          previousData,
+          revision,
+          previousRevision)) {
+          if (state.surfaceMode === "fieldBoss" && previousData) {
+            elements["field-boss-cache-age"].textContent = fieldBossCacheAgeText();
+          }
+          return previousData;
+        }
+        state.fieldBossData = cache;
         populateFieldBossServers();
         state.fieldBossRegion = resolveDefaultFieldBossRegion(
           state.fieldBossServerId,
@@ -819,9 +855,14 @@
         return null;
       })
       .finally(() => {
+        const forceRefreshPending = state.fieldBossForceRefreshPending;
+        state.fieldBossForceRefreshPending = false;
         state.fieldBossLoad = null;
         elements["field-boss-refresh-button"].disabled = false;
         elements["field-boss-retry-button"].disabled = false;
+        if (forceRefreshPending) {
+          queueMicrotask(() => void loadFieldBossCache(true));
+        }
       });
     state.fieldBossLoad = load;
     return load;
@@ -829,27 +870,75 @@
 
   async function fetchFieldBossCache(force) {
     const errors = [];
+    try {
+      const refResponse = await fetch(`${FIELD_BOSS_CACHE_REF_URL}?v=${Date.now()}`, {
+        cache: "no-store",
+        headers: { Accept: "application/vnd.github+json" },
+      });
+      if (!refResponse.ok) {
+        throw new Error(`HTTP ${refResponse.status}`);
+      }
+      const reference = await refResponse.json();
+      const revision = String(reference?.object?.sha || "").trim().toLowerCase();
+      if (!/^[0-9a-f]{40}$/.test(revision)) {
+        throw new Error("invalid branch revision");
+      }
+      if (!force &&
+          revision === state.fieldBossRevision &&
+          state.fieldBossData) {
+        return { cache: state.fieldBossData, revision };
+      }
+      const immutableUrl = fieldBossCacheUrlForRevision(revision);
+      const cache = await fetchFieldBossCacheJson(immutableUrl, "force-cache");
+      validateFieldBossCache(cache);
+      return { cache, revision };
+    } catch (error) {
+      errors.push(`${FIELD_BOSS_CACHE_REF_URL}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
     for (const baseUrl of FIELD_BOSS_CACHE_URLS) {
       const separator = baseUrl.includes("?") ? "&" : "?";
-      const url = force ? `${baseUrl}${separator}v=${Date.now()}` : baseUrl;
+      const url = `${baseUrl}${separator}v=${Date.now()}`;
       try {
-        const response = await fetch(url, {
-          cache: force ? "reload" : "no-cache",
-          headers: { Accept: "application/json" },
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        const contentLength = Number(response.headers.get("content-length")) || 0;
-        if (contentLength > 1_500_000) {
-          throw new Error("cache is too large");
-        }
-        return await response.json();
+        const cache = await fetchFieldBossCacheJson(url, "no-store");
+        validateFieldBossCache(cache);
+        return { cache, revision: "" };
       } catch (error) {
         errors.push(`${baseUrl}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
     throw new Error(`${t("cacheUnavailable")} (${errors.join(" / ")})`);
+  }
+
+  function fieldBossCacheUrlForRevision(revision) {
+    return `${FIELD_BOSS_CACHE_IMMUTABLE_ROOT}/${revision}/presence/notmeter-field-boss-public.json`;
+  }
+
+  async function fetchFieldBossCacheJson(url, cacheMode) {
+    const response = await fetch(url, {
+      cache: cacheMode,
+      headers: { Accept: "application/json" },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const contentLength = Number(response.headers.get("content-length")) || 0;
+    if (contentLength > 1_500_000) {
+      throw new Error("cache is too large");
+    }
+    return await response.json();
+  }
+
+  function shouldApplyFieldBossCache(cache, current, revision = "", currentRevision = "") {
+    if (!current) {
+      return true;
+    }
+    const nextGeneration = Number(cache?.generatedAt) || 0;
+    const currentGeneration = Number(current?.generatedAt) || 0;
+    if (nextGeneration !== currentGeneration) {
+      return nextGeneration > currentGeneration;
+    }
+    return Boolean(revision && revision !== currentRevision);
   }
 
   function validateFieldBossCache(cache) {
@@ -3485,7 +3574,7 @@
   function formatCombatPower(value) {
     const number = Math.max(0, Number(value) || 0);
     if (number >= 1_000_000) {
-      return `${trimFixed(number / 1_000_000, 2)}M`;
+      return `${formatInteger(Math.floor(number / 1_000))}M`;
     }
     if (number >= 1_000) {
       return `${trimFixed(number / 1_000, 1)}K`;
