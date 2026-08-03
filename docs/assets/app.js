@@ -2328,7 +2328,7 @@
   function buildDetailSkillRow(skill) {
     const row = document.createElement("article");
     row.className = "detail-skill-row";
-    const skillDisplayName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill) ||
+    const skillDisplayName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill, state.locale) ||
       String(skill.skillName || "—");
     const totalDamage = Math.max(0, Number(skill.totalDamage) || 0);
     const healingAmount = Math.max(0, Number(skill.healingAmount) || 0);
