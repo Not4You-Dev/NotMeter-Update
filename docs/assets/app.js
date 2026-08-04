@@ -6,6 +6,7 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking.json.gz",
   ];
   const CUSTOM_CP_CACHE_URLS = [
+    "https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/summary",
     "./data/notmeter-ranking-custom-cp.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
   ];
@@ -64,6 +65,7 @@
     "musphel-hard": "Musphel's Grail (Hard)",
     "fallen-deva-hard": "Fallen Daeva's Castle (Hard)",
     "abyss-horn-4": "Abyssal Horn Cavern (Stage 4)",
+    "nightmare-atheron-10": "Nightmare: Awakened Atheron (Stage 10)",
   };
   const SERVER_NAMES_ELYOS = [
     "시엘", "네자칸", "바이젤", "카이시넬", "유스티엘", "아리엘", "프레기온", "메스람타에다",
@@ -109,6 +111,7 @@
       title: "NotMeter 던전 통계",
       subtitle: "직업별 상위 25% DPS 기준으로 정렬합니다",
       dailyUsers: "일일 사용자",
+      classTop10: "클래스 TOP 10",
       fieldBoss: "필드보스",
       discord: "디스코드",
       download: "다운로드",
@@ -116,6 +119,24 @@
       fieldBossPageSubtitle: "서버별 필드보스 출현 현황",
       fieldBossStatus: "필드보스 현황",
       backToRanking: "랭킹으로 돌아가기",
+      classTop10PageTitle: "NotMeter 클래스별 종합 TOP 10",
+      classTop10PageSubtitle: "모든 콘텐츠 TOP 20 성적을 합산한 클래스별 종합 랭킹",
+      classTop10Title: "클래스별 종합 TOP 10",
+      classTop10Description: "모든 던전·악몽·허수아비 TOP 20 성적을 합산한 클래스별 종합 랭킹입니다.",
+      classTop10ScoreTitle: "점수 계산",
+      classTop10ScoreText: "1위 100점부터 20위 5점까지 5점 간격으로 환산합니다.",
+      classTop10EntryTitle: "종합 랭킹 조건",
+      classTop10EntryText: "현재 통계의 모든 콘텐츠에서 클래스 TOP 20 기록이 있어야 합니다.",
+      classTop10DedupeTitle: "중복 기록 처리",
+      classTop10DedupeText: "동일 던전의 여러 CP 구간은 최고 순위 한 건만 반영하고, 동점은 총합 DPS로 결정합니다.",
+      classTop10Pending: "종합 랭킹 캐시 갱신을 기다리는 중입니다.",
+      classTop10Empty: "모든 콘텐츠 TOP 20 조건을 충족한 기록이 아직 없습니다.",
+      combinedScore: "종합 점수",
+      totalDps: "총합 DPS",
+      firstPlaces: "1위 횟수",
+      contentResults: "콘텐츠 성적",
+      pointsUnit: "{value}점",
+      firstPlacesValue: "{value}회",
       server: "서버",
       fieldBossServerSearchPlaceholder: "서버명 또는 초성 검색",
       fieldBossServerNoResults: "일치하는 서버가 없습니다",
@@ -266,6 +287,7 @@
       title: "NotMeter Dungeon Statistics",
       subtitle: "Classes are ranked by top-quartile DPS",
       dailyUsers: "Daily users",
+      classTop10: "Class TOP 10",
       fieldBoss: "Field Boss",
       discord: "Discord",
       download: "Download",
@@ -273,6 +295,24 @@
       fieldBossPageSubtitle: "Field-boss spawn status by server",
       fieldBossStatus: "Field Boss Status",
       backToRanking: "Back to rankings",
+      classTop10PageTitle: "NotMeter Class Overall TOP 10",
+      classTop10PageSubtitle: "Class rankings combining Top 20 results across all content",
+      classTop10Title: "Class Overall TOP 10",
+      classTop10Description: "A class leaderboard combining Top 20 results from every dungeon, Nightmare, and the training dummy.",
+      classTop10ScoreTitle: "Scoring",
+      classTop10ScoreText: "Ranks convert in five-point steps, from 100 points for 1st to 5 points for 20th.",
+      classTop10EntryTitle: "Eligibility",
+      classTop10EntryText: "A character needs a class Top 20 result in every currently tracked content.",
+      classTop10DedupeTitle: "Duplicate records",
+      classTop10DedupeText: "Only the best rank across CP brackets for each dungeon counts; total DPS breaks score ties.",
+      classTop10Pending: "Waiting for the overall-ranking cache to refresh.",
+      classTop10Empty: "No character has met the all-content Top 20 requirement yet.",
+      combinedScore: "Overall score",
+      totalDps: "Total DPS",
+      firstPlaces: "1st places",
+      contentResults: "Content results",
+      pointsUnit: "{value} pts",
+      firstPlacesValue: "{value}",
       server: "Server",
       fieldBossServerSearchPlaceholder: "Search server name or Korean initials",
       fieldBossServerNoResults: "No matching servers",
@@ -437,6 +477,7 @@
     customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
     selectedJob: "",
+    selectedOverallJob: "",
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -474,6 +515,8 @@
     void loadCache();
     if (history.state?.notMeterStatsView === "field-boss") {
       openFieldBossView(false);
+    } else if (history.state?.notMeterStatsView === "class-top10") {
+      openClassTop10View(false);
     }
     window.setInterval(updateCacheAge, 60_000);
     window.setInterval(() => {
@@ -499,6 +542,9 @@
   function bindElements() {
     for (const id of [
       "page-title", "page-subtitle", "daily-user-count", "language-button",
+      "class-top10-button", "class-top10-surface", "class-top10-back-button",
+      "class-top10-tabs", "class-top10-pending", "class-top10-empty",
+      "class-top10-view", "class-top10-rows",
       "field-boss-button", "field-boss-surface", "field-boss-back-button",
       "field-boss-server", "field-boss-server-results",
       "field-boss-refresh-button", "field-boss-retry-button",
@@ -539,6 +585,16 @@
         renderCombatDetail();
       }
     });
+    elements["class-top10-button"].addEventListener("click", () => {
+      if (state.surfaceMode === "classTop10") {
+        returnToRankingFromClassTop10();
+      } else {
+        openClassTop10View(true);
+      }
+    });
+    elements["class-top10-back-button"].addEventListener(
+      "click",
+      returnToRankingFromClassTop10);
     elements["field-boss-button"].addEventListener("click", () => {
       if (state.surfaceMode === "fieldBoss") {
         returnToRanking();
@@ -630,7 +686,12 @@
         openFieldBossView(false);
         return;
       }
+      if (event.state?.notMeterStatsView === "class-top10") {
+        openClassTop10View(false);
+        return;
+      }
       closeFieldBossView();
+      closeClassTop10View();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
         state.selectedJob = job;
@@ -743,7 +804,46 @@
     await loadFieldBossCache(force);
   }
 
+  function openClassTop10View(pushHistory) {
+    closeFieldBossView();
+    closeCombatDetail();
+    state.surfaceMode = "classTop10";
+    document.body.classList.add("class-top10-view");
+    elements["class-top10-surface"].hidden = false;
+    elements["class-top10-button"].classList.add("active");
+    elements["class-top10-button"].setAttribute("aria-pressed", "true");
+    updatePageIdentity();
+    renderClassTop10();
+    if (pushHistory) {
+      history.pushState({ notMeterStatsView: "class-top10" }, "");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeClassTop10View() {
+    if (state.surfaceMode !== "classTop10") {
+      return;
+    }
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("class-top10-view");
+    elements["class-top10-surface"].hidden = true;
+    elements["class-top10-button"].classList.remove("active");
+    elements["class-top10-button"].setAttribute("aria-pressed", "false");
+    updatePageIdentity();
+  }
+
+  function returnToRankingFromClassTop10() {
+    if (history.state?.notMeterStatsView === "class-top10") {
+      history.back();
+      return;
+    }
+    closeClassTop10View();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function openFieldBossView(pushHistory) {
+    closeClassTop10View();
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
     document.body.classList.add("field-boss-view");
@@ -1454,6 +1554,7 @@
     const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
     const fileName = `notmeter-ranking-custom-cp-${safeKey}.json.gz`;
     return [
+      `https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/${safeKey}`,
       `./data/${fileName}`,
       `https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/${fileName}`,
     ];
@@ -1667,6 +1768,10 @@
       }
       return;
     }
+    if (state.surfaceMode === "classTop10") {
+      renderClassTop10();
+      return;
+    }
     if (!state.data) {
       return;
     }
@@ -1674,6 +1779,146 @@
     updateDailyUsers();
     updateCacheAge();
     state.mode === "class" ? renderClassRanking() : renderSummary();
+  }
+
+  function renderClassTop10() {
+    const snapshot = state.data?.classOverall;
+    const available = snapshot && Array.isArray(snapshot.jobs);
+    elements["class-top10-pending"].hidden = available;
+    elements["class-top10-empty"].hidden = true;
+    elements["class-top10-view"].hidden = true;
+    if (!available) {
+      elements["class-top10-tabs"].replaceChildren();
+      elements["class-top10-rows"].replaceChildren();
+      return;
+    }
+
+    const jobsByName = new Map(snapshot.jobs.map(job => [job.jobName, job]));
+    if (!JOB_ORDER.includes(state.selectedOverallJob)) {
+      state.selectedOverallJob = JOB_ORDER.find(job =>
+        Array.isArray(jobsByName.get(job)?.players) &&
+        jobsByName.get(job).players.length > 0) || JOB_ORDER[0];
+    }
+    renderClassTop10Tabs(jobsByName);
+
+    const players = [...(jobsByName.get(state.selectedOverallJob)?.players || [])]
+      .sort((left, right) => Number(left.rank) - Number(right.rank))
+      .slice(0, 10);
+    if (players.length === 0) {
+      elements["class-top10-empty"].hidden = false;
+      elements["class-top10-rows"].replaceChildren();
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    players.forEach(player => fragment.append(buildClassTop10Row(player)));
+    elements["class-top10-rows"].replaceChildren(fragment);
+    elements["class-top10-view"].hidden = false;
+  }
+
+  function renderClassTop10Tabs(jobsByName) {
+    const fragment = document.createDocumentFragment();
+    for (const job of JOB_ORDER) {
+      const count = jobsByName.get(job)?.players?.length || 0;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "class-top10-tab";
+      button.classList.toggle("active", job === state.selectedOverallJob);
+      button.setAttribute("aria-pressed", String(job === state.selectedOverallJob));
+      button.append(createJobIcon(job));
+      const label = document.createElement("span");
+      label.textContent = jobName(job);
+      const badge = document.createElement("b");
+      badge.textContent = String(count);
+      button.append(label, badge);
+      button.addEventListener("click", () => {
+        state.selectedOverallJob = job;
+        renderClassTop10();
+      });
+      fragment.append(button);
+    }
+    elements["class-top10-tabs"].replaceChildren(fragment);
+  }
+
+  function buildClassTop10Row(player) {
+    const tr = document.createElement("tr");
+    tr.className = "class-top10-row";
+    tr.append(cellWithRank(player.rank));
+
+    const characterCell = document.createElement("td");
+    characterCell.className = "class-top10-character";
+    const character = document.createElement("div");
+    character.className = "character-main";
+    character.append(createJobIcon(state.selectedOverallJob));
+    const name = document.createElement("span");
+    name.className = "character-name";
+    name.textContent = formatCharacterName(player.name, player.serverId);
+    character.append(name);
+    if (isTaiwanName(player.name)) {
+      const badge = document.createElement("span");
+      badge.className = "tw-badge";
+      badge.title = state.locale === "en" ? "Taiwan server" : "대만 서버";
+      character.append(badge);
+    }
+    characterCell.append(character);
+    tr.append(characterCell);
+
+    tr.append(numericCell(
+      t("pointsUnit", { value: formatInteger(player.score) }),
+      "accent class-top10-score",
+      t("combinedScore")));
+    tr.append(numericCell(
+      formatDps(player.totalDps),
+      "class-top10-total-dps",
+      t("totalDps")));
+    tr.append(numericCell(
+      t("firstPlacesValue", { value: formatInteger(player.firstPlaceCount) }),
+      "class-top10-firsts",
+      t("firstPlaces")));
+
+    const resultsCell = document.createElement("td");
+    resultsCell.className = "class-top10-results-cell";
+    const results = document.createElement("div");
+    results.className = "class-top10-results";
+    for (const placement of player.placements || []) {
+      const chip = document.createElement("span");
+      chip.className = "class-top10-result";
+      chip.title =
+        `${placement.dungeonName}\n` +
+        `${t("rank")} ${placement.rank} · DPS ${formatInteger(placement.dps)}`;
+      const label = document.createElement("span");
+      label.textContent = compactOverallDungeonName(
+        placement.dungeonKey,
+        placement.dungeonName);
+      const rank = document.createElement("b");
+      rank.textContent = `#${placement.rank}`;
+      chip.append(label, rank);
+      results.append(chip);
+    }
+    resultsCell.append(results);
+    tr.append(resultsCell);
+    return tr;
+  }
+
+  function compactOverallDungeonName(dungeonKey, displayName) {
+    const names = state.locale === "en"
+      ? {
+          "training-dummy-60s": "Dummy",
+          "bakron-trial": "Bakron",
+          "musphel-hard": "Musphel",
+          "fallen-deva-hard": "Fallen Daeva",
+          "abyss-horn-4": "Abyss",
+          "nightmare-atheron-10": "Nightmare",
+        }
+      : {
+          "training-dummy-60s": "허수아비",
+          "bakron-trial": "바크론",
+          "musphel-hard": "무스펠",
+          "fallen-deva-hard": "타락 데바",
+          "abyss-horn-4": "심연",
+          "nightmare-atheron-10": "악몽",
+        };
+    return names[dungeonKey] || displayName || dungeonKey;
   }
 
   function renderSummary() {
@@ -3342,8 +3587,17 @@
 
   function updatePageIdentity() {
     const fieldBoss = state.surfaceMode === "fieldBoss";
-    const title = t(fieldBoss ? "fieldBossPageTitle" : "title");
-    const subtitle = t(fieldBoss ? "fieldBossPageSubtitle" : "subtitle");
+    const classTop10 = state.surfaceMode === "classTop10";
+    const title = t(fieldBoss
+      ? "fieldBossPageTitle"
+      : classTop10
+        ? "classTop10PageTitle"
+        : "title");
+    const subtitle = t(fieldBoss
+      ? "fieldBossPageSubtitle"
+      : classTop10
+        ? "classTop10PageSubtitle"
+        : "subtitle");
     document.title = title;
     elements["page-title"].textContent = title;
     elements["page-subtitle"].textContent = subtitle;
