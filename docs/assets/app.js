@@ -127,7 +127,7 @@
       classTop10PageTitle: "NotMeter 클래스별 종합 TOP 10",
       classTop10PageSubtitle: "모든 CP·모든 콘텐츠 TOP 20 성적을 합산한 클래스별 종합 랭킹",
       classTop10Title: "클래스별 종합 TOP 10",
-      classTop10Description: "모든 CP의 던전·악몽·허수아비 TOP 20 성적을 합산해 모든 직업을 한 페이지에 표시합니다.",
+      classTop10Description: "모든 CP의 던전·악몽·허수아비 TOP 20 성적을 합산한 클래스별 종합 랭킹입니다.",
       classTop10ScoreTitle: "점수 계산",
       classTop10ScoreText: "1위 100점부터 20위 5점까지 5점 간격으로 환산합니다.",
       classTop10EntryTitle: "종합 랭킹 조건",
@@ -136,9 +136,6 @@
       classTop10DedupeText: "모든 CP 구간 후보를 합쳐 콘텐츠·직업별 순위를 다시 계산하며, 캐릭터별 최고 DPS 한 건만 반영합니다.",
       classTop10Pending: "종합 랭킹 캐시 갱신을 기다리는 중입니다.",
       classTop10Empty: "종합 랭킹에 반영할 TOP 20 기록이 아직 없습니다.",
-      classTop10JobHeading: "{job} TOP 10",
-      classTop10JobCount: "{value}명",
-      classTop10JobEmpty: "이 직업의 TOP 20 기록이 아직 없습니다.",
       classTop10ObservedCp: "집계 기록 중 최고 전투력 {value} CP",
       combinedScore: "종합 점수",
       totalDps: "총합 DPS",
@@ -307,7 +304,7 @@
       classTop10PageTitle: "NotMeter Class Overall TOP 10",
       classTop10PageSubtitle: "Class rankings combining all-CP Top 20 results across all content",
       classTop10Title: "Class Overall TOP 10",
-      classTop10Description: "All classes on one page, combining all-CP Top 20 results from every dungeon, Nightmare, and the training dummy.",
+      classTop10Description: "A class leaderboard combining all-CP Top 20 results from every dungeon, Nightmare, and the training dummy.",
       classTop10ScoreTitle: "Scoring",
       classTop10ScoreText: "Ranks convert in five-point steps, from 100 points for 1st to 5 points for 20th.",
       classTop10EntryTitle: "Eligibility",
@@ -316,9 +313,6 @@
       classTop10DedupeText: "Candidates from every CP bracket are reranked per content and class, keeping each character's best DPS result.",
       classTop10Pending: "Waiting for the overall-ranking cache to refresh.",
       classTop10Empty: "No Top 20 result is available for the overall ranking yet.",
-      classTop10JobHeading: "{job} TOP 10",
-      classTop10JobCount: "{value} players",
-      classTop10JobEmpty: "No Top 20 result is available for this class yet.",
       classTop10ObservedCp: "Highest CP among ranked results: {value} CP",
       combinedScore: "Overall score",
       totalDps: "Total DPS",
@@ -490,6 +484,7 @@
     customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
     selectedJob: "",
+    selectedOverallJob: "",
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -555,8 +550,8 @@
     for (const id of [
       "page-title", "page-subtitle", "daily-user-count", "language-button",
       "class-top10-button", "class-top10-surface", "class-top10-back-button",
-      "class-top10-pending", "class-top10-empty",
-      "class-top10-view", "class-top10-groups",
+      "class-top10-tabs", "class-top10-pending", "class-top10-empty",
+      "class-top10-view", "class-top10-rows",
       "field-boss-button", "field-boss-surface", "field-boss-back-button",
       "field-boss-server", "field-boss-server-results",
       "field-boss-refresh-button", "field-boss-retry-button",
@@ -1839,87 +1834,57 @@
     elements["class-top10-empty"].hidden = true;
     elements["class-top10-view"].hidden = true;
     if (!available) {
-      elements["class-top10-groups"].replaceChildren();
+      elements["class-top10-tabs"].replaceChildren();
+      elements["class-top10-rows"].replaceChildren();
       return;
     }
 
     const jobsByName = new Map(snapshot.jobs.map(job => [job.jobName, job]));
-    const fragment = document.createDocumentFragment();
-    let playerCount = 0;
-    for (const job of JOB_ORDER) {
-      const players = [...(jobsByName.get(job)?.players || [])]
-        .sort((left, right) => Number(left.rank) - Number(right.rank))
-        .slice(0, 10);
-      playerCount += players.length;
-      fragment.append(buildClassTop10JobSection(job, players));
+    if (!JOB_ORDER.includes(state.selectedOverallJob)) {
+      state.selectedOverallJob = JOB_ORDER.find(job =>
+        Array.isArray(jobsByName.get(job)?.players) &&
+        jobsByName.get(job).players.length > 0) || JOB_ORDER[0];
     }
-    elements["class-top10-groups"].replaceChildren(fragment);
-    if (playerCount === 0) {
+    renderClassTop10Tabs(jobsByName);
+
+    const players = [...(jobsByName.get(state.selectedOverallJob)?.players || [])]
+      .sort((left, right) => Number(left.rank) - Number(right.rank))
+      .slice(0, 10);
+    if (players.length === 0) {
       elements["class-top10-empty"].hidden = false;
+      elements["class-top10-rows"].replaceChildren();
       return;
     }
 
+    const fragment = document.createDocumentFragment();
+    players.forEach(player =>
+      fragment.append(buildClassTop10Row(player, state.selectedOverallJob)));
+    elements["class-top10-rows"].replaceChildren(fragment);
     elements["class-top10-view"].hidden = false;
   }
 
-  function buildClassTop10JobSection(job, players) {
-    const section = document.createElement("section");
-    section.className = "class-top10-job-section";
-
-    const heading = document.createElement("div");
-    heading.className = "class-top10-job-heading";
-    heading.append(createJobIcon(job));
-    const title = document.createElement("h3");
-    title.textContent = t("classTop10JobHeading", { job: jobName(job) });
-    const count = document.createElement("span");
-    count.className = "class-top10-job-count";
-    count.textContent = t("classTop10JobCount", { value: players.length });
-    heading.append(title, count);
-    section.append(heading);
-
-    if (players.length === 0) {
-      const empty = document.createElement("p");
-      empty.className = "class-top10-job-empty";
-      empty.textContent = t("classTop10JobEmpty");
-      section.append(empty);
-      return section;
-    }
-
-    const scroll = document.createElement("div");
-    scroll.className = "table-scroll class-top10-job-table-scroll";
-    const table = document.createElement("table");
-    table.className = "ranking-table class-top10-table";
-    table.append(buildClassTop10TableHead());
-    const body = document.createElement("tbody");
+  function renderClassTop10Tabs(jobsByName) {
     const fragment = document.createDocumentFragment();
-    players.forEach(player => fragment.append(buildClassTop10Row(player, job)));
-    body.append(fragment);
-    table.append(body);
-    scroll.append(table);
-    section.append(scroll);
-    return section;
-  }
-
-  function buildClassTop10TableHead() {
-    const head = document.createElement("thead");
-    const row = document.createElement("tr");
-    const headings = [
-      ["rank", "rank-column"],
-      ["character", ""],
-      ["combinedScore", "number-column"],
-      ["totalDps", "number-column"],
-      ["firstPlaces", "number-column"],
-      ["contentResults", ""],
-    ];
-    for (const [key, className] of headings) {
-      const th = document.createElement("th");
-      th.scope = "col";
-      th.className = className;
-      th.textContent = t(key);
-      row.append(th);
+    for (const job of JOB_ORDER) {
+      const count = jobsByName.get(job)?.players?.length || 0;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "class-top10-tab";
+      button.classList.toggle("active", job === state.selectedOverallJob);
+      button.setAttribute("aria-pressed", String(job === state.selectedOverallJob));
+      button.append(createJobIcon(job));
+      const label = document.createElement("span");
+      label.textContent = jobName(job);
+      const badge = document.createElement("b");
+      badge.textContent = String(count);
+      button.append(label, badge);
+      button.addEventListener("click", () => {
+        state.selectedOverallJob = job;
+        renderClassTop10();
+      });
+      fragment.append(button);
     }
-    head.append(row);
-    return head;
+    elements["class-top10-tabs"].replaceChildren(fragment);
   }
 
   function buildClassTop10Row(player, job) {
