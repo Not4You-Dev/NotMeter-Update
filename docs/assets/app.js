@@ -5,6 +5,10 @@
     "./data/notmeter-ranking.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking.json.gz",
   ];
+  const CLASS_OVERALL_CACHE_URLS = [
+    "./data/notmeter-ranking-class-overall.json.gz",
+    "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-class-overall.json.gz",
+  ];
   const CUSTOM_CP_CACHE_URLS = [
     "https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/summary",
     "./data/notmeter-ranking-custom-cp.json.gz",
@@ -19,6 +23,7 @@
   const FIELD_BOSS_CACHE_IMMUTABLE_ROOT =
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update";
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
+  const EXPECTED_CLASS_OVERALL_SCHEMA = "notmeter-web-class-overall-v1";
   const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v4";
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
@@ -738,12 +743,35 @@
     }
 
     try {
-      const cache = await fetchRankingCache(force);
+      const [cache, classOverallCache] = await Promise.all([
+        fetchRankingCache(force),
+        fetchClassOverallCache(force).catch(error => {
+          console.warn("class overall cache unavailable", error);
+          return null;
+        }),
+      ]);
       validateCache(cache);
+      if (classOverallCache) {
+        validateClassOverallCache(classOverallCache);
+        if (String(classOverallCache.generatedAt) === String(cache.generatedAt)) {
+          cache.classOverall = classOverallCache.classOverall;
+          cache.classOverallGeneratedAt = classOverallCache.generatedAt;
+        } else {
+          console.warn("class overall cache generation mismatch", {
+            rankingGeneratedAt: cache.generatedAt,
+            classOverallGeneratedAt: classOverallCache.generatedAt,
+          });
+        }
+      }
+      if (cache.classOverall && !cache.classOverallGeneratedAt) {
+        cache.classOverallGeneratedAt = cache.generatedAt;
+      }
       state.lastCacheSyncAt = Date.now();
       if (preserveView &&
         state.data &&
-        String(cache.generatedAt) === String(state.data.generatedAt)) {
+        String(cache.generatedAt) === String(state.data.generatedAt) &&
+        String(cache.classOverallGeneratedAt || "") ===
+          String(state.data.classOverallGeneratedAt || "")) {
         return;
       }
       const previousDungeon = state.dungeonKey;
@@ -1491,6 +1519,10 @@
     return fetchCompressedJson(CACHE_URLS, force);
   }
 
+  async function fetchClassOverallCache(force) {
+    return fetchCompressedJson(CLASS_OVERALL_CACHE_URLS, force);
+  }
+
   async function fetchCompressedJson(urls, force) {
     const errors = [];
     for (const baseUrl of urls) {
@@ -1530,6 +1562,18 @@
     if (!cache || cache.schema !== EXPECTED_SCHEMA || cache.version !== 1 ||
         !Array.isArray(cache.dungeons) || !Array.isArray(cache.views) ||
         !cache.classRankings || !cache.generatedAt) {
+      throw new Error(t("cacheInvalid"));
+    }
+  }
+
+  function validateClassOverallCache(cache) {
+    if (!cache ||
+        cache.schema !== EXPECTED_CLASS_OVERALL_SCHEMA ||
+        Number(cache.version) !== 1 ||
+        !cache.generatedAt ||
+        !cache.classOverall ||
+        !Array.isArray(cache.classOverall.contents) ||
+        !Array.isArray(cache.classOverall.jobs)) {
       throw new Error(t("cacheInvalid"));
     }
   }
