@@ -125,17 +125,21 @@
       fieldBossStatus: "필드보스 현황",
       backToRanking: "랭킹으로 돌아가기",
       classTop10PageTitle: "NotMeter 클래스별 종합 TOP 10",
-      classTop10PageSubtitle: "모든 콘텐츠 TOP 20 성적을 합산한 클래스별 종합 랭킹",
+      classTop10PageSubtitle: "모든 CP·모든 콘텐츠 TOP 20 성적을 합산한 클래스별 종합 랭킹",
       classTop10Title: "클래스별 종합 TOP 10",
-      classTop10Description: "모든 던전·악몽·허수아비 TOP 20 성적을 합산한 클래스별 종합 랭킹입니다.",
+      classTop10Description: "모든 CP의 던전·악몽·허수아비 TOP 20 성적을 합산해 모든 직업을 한 페이지에 표시합니다.",
       classTop10ScoreTitle: "점수 계산",
       classTop10ScoreText: "1위 100점부터 20위 5점까지 5점 간격으로 환산합니다.",
       classTop10EntryTitle: "종합 랭킹 조건",
-      classTop10EntryText: "현재 통계의 모든 콘텐츠에서 클래스 TOP 20 기록이 있어야 합니다.",
+      classTop10EntryText: "TOP 20에 진입한 콘텐츠 수를 우선하고, 종합 점수와 총합 DPS 순으로 TOP 10을 선정합니다.",
       classTop10DedupeTitle: "중복 기록 처리",
-      classTop10DedupeText: "동일 던전의 여러 CP 구간은 최고 순위 한 건만 반영하고, 동점은 총합 DPS로 결정합니다.",
+      classTop10DedupeText: "모든 CP 구간 후보를 합쳐 콘텐츠·직업별 순위를 다시 계산하며, 캐릭터별 최고 DPS 한 건만 반영합니다.",
       classTop10Pending: "종합 랭킹 캐시 갱신을 기다리는 중입니다.",
-      classTop10Empty: "모든 콘텐츠 TOP 20 조건을 충족한 기록이 아직 없습니다.",
+      classTop10Empty: "종합 랭킹에 반영할 TOP 20 기록이 아직 없습니다.",
+      classTop10JobHeading: "{job} TOP 10",
+      classTop10JobCount: "{value}명",
+      classTop10JobEmpty: "이 직업의 TOP 20 기록이 아직 없습니다.",
+      classTop10ObservedCp: "집계 기록 중 최고 전투력 {value} CP",
       combinedScore: "종합 점수",
       totalDps: "총합 DPS",
       firstPlaces: "1위 횟수",
@@ -301,17 +305,21 @@
       fieldBossStatus: "Field Boss Status",
       backToRanking: "Back to rankings",
       classTop10PageTitle: "NotMeter Class Overall TOP 10",
-      classTop10PageSubtitle: "Class rankings combining Top 20 results across all content",
+      classTop10PageSubtitle: "Class rankings combining all-CP Top 20 results across all content",
       classTop10Title: "Class Overall TOP 10",
-      classTop10Description: "A class leaderboard combining Top 20 results from every dungeon, Nightmare, and the training dummy.",
+      classTop10Description: "All classes on one page, combining all-CP Top 20 results from every dungeon, Nightmare, and the training dummy.",
       classTop10ScoreTitle: "Scoring",
       classTop10ScoreText: "Ranks convert in five-point steps, from 100 points for 1st to 5 points for 20th.",
       classTop10EntryTitle: "Eligibility",
-      classTop10EntryText: "A character needs a class Top 20 result in every currently tracked content.",
+      classTop10EntryText: "Content coverage ranks first, followed by overall score and total DPS when selecting each class Top 10.",
       classTop10DedupeTitle: "Duplicate records",
-      classTop10DedupeText: "Only the best rank across CP brackets for each dungeon counts; total DPS breaks score ties.",
+      classTop10DedupeText: "Candidates from every CP bracket are reranked per content and class, keeping each character's best DPS result.",
       classTop10Pending: "Waiting for the overall-ranking cache to refresh.",
-      classTop10Empty: "No character has met the all-content Top 20 requirement yet.",
+      classTop10Empty: "No Top 20 result is available for the overall ranking yet.",
+      classTop10JobHeading: "{job} TOP 10",
+      classTop10JobCount: "{value} players",
+      classTop10JobEmpty: "No Top 20 result is available for this class yet.",
+      classTop10ObservedCp: "Highest CP among ranked results: {value} CP",
       combinedScore: "Overall score",
       totalDps: "Total DPS",
       firstPlaces: "1st places",
@@ -482,7 +490,6 @@
     customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
     selectedJob: "",
-    selectedOverallJob: "",
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -548,8 +555,8 @@
     for (const id of [
       "page-title", "page-subtitle", "daily-user-count", "language-button",
       "class-top10-button", "class-top10-surface", "class-top10-back-button",
-      "class-top10-tabs", "class-top10-pending", "class-top10-empty",
-      "class-top10-view", "class-top10-rows",
+      "class-top10-pending", "class-top10-empty",
+      "class-top10-view", "class-top10-groups",
       "field-boss-button", "field-boss-surface", "field-boss-back-button",
       "field-boss-server", "field-boss-server-results",
       "field-boss-refresh-button", "field-boss-retry-button",
@@ -1832,59 +1839,90 @@
     elements["class-top10-empty"].hidden = true;
     elements["class-top10-view"].hidden = true;
     if (!available) {
-      elements["class-top10-tabs"].replaceChildren();
-      elements["class-top10-rows"].replaceChildren();
+      elements["class-top10-groups"].replaceChildren();
       return;
     }
 
     const jobsByName = new Map(snapshot.jobs.map(job => [job.jobName, job]));
-    if (!JOB_ORDER.includes(state.selectedOverallJob)) {
-      state.selectedOverallJob = JOB_ORDER.find(job =>
-        Array.isArray(jobsByName.get(job)?.players) &&
-        jobsByName.get(job).players.length > 0) || JOB_ORDER[0];
+    const fragment = document.createDocumentFragment();
+    let playerCount = 0;
+    for (const job of JOB_ORDER) {
+      const players = [...(jobsByName.get(job)?.players || [])]
+        .sort((left, right) => Number(left.rank) - Number(right.rank))
+        .slice(0, 10);
+      playerCount += players.length;
+      fragment.append(buildClassTop10JobSection(job, players));
     }
-    renderClassTop10Tabs(jobsByName);
-
-    const players = [...(jobsByName.get(state.selectedOverallJob)?.players || [])]
-      .sort((left, right) => Number(left.rank) - Number(right.rank))
-      .slice(0, 10);
-    if (players.length === 0) {
+    elements["class-top10-groups"].replaceChildren(fragment);
+    if (playerCount === 0) {
       elements["class-top10-empty"].hidden = false;
-      elements["class-top10-rows"].replaceChildren();
       return;
     }
 
-    const fragment = document.createDocumentFragment();
-    players.forEach(player => fragment.append(buildClassTop10Row(player)));
-    elements["class-top10-rows"].replaceChildren(fragment);
     elements["class-top10-view"].hidden = false;
   }
 
-  function renderClassTop10Tabs(jobsByName) {
-    const fragment = document.createDocumentFragment();
-    for (const job of JOB_ORDER) {
-      const count = jobsByName.get(job)?.players?.length || 0;
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "class-top10-tab";
-      button.classList.toggle("active", job === state.selectedOverallJob);
-      button.setAttribute("aria-pressed", String(job === state.selectedOverallJob));
-      button.append(createJobIcon(job));
-      const label = document.createElement("span");
-      label.textContent = jobName(job);
-      const badge = document.createElement("b");
-      badge.textContent = String(count);
-      button.append(label, badge);
-      button.addEventListener("click", () => {
-        state.selectedOverallJob = job;
-        renderClassTop10();
-      });
-      fragment.append(button);
+  function buildClassTop10JobSection(job, players) {
+    const section = document.createElement("section");
+    section.className = "class-top10-job-section";
+
+    const heading = document.createElement("div");
+    heading.className = "class-top10-job-heading";
+    heading.append(createJobIcon(job));
+    const title = document.createElement("h3");
+    title.textContent = t("classTop10JobHeading", { job: jobName(job) });
+    const count = document.createElement("span");
+    count.className = "class-top10-job-count";
+    count.textContent = t("classTop10JobCount", { value: players.length });
+    heading.append(title, count);
+    section.append(heading);
+
+    if (players.length === 0) {
+      const empty = document.createElement("p");
+      empty.className = "class-top10-job-empty";
+      empty.textContent = t("classTop10JobEmpty");
+      section.append(empty);
+      return section;
     }
-    elements["class-top10-tabs"].replaceChildren(fragment);
+
+    const scroll = document.createElement("div");
+    scroll.className = "table-scroll class-top10-job-table-scroll";
+    const table = document.createElement("table");
+    table.className = "ranking-table class-top10-table";
+    table.append(buildClassTop10TableHead());
+    const body = document.createElement("tbody");
+    const fragment = document.createDocumentFragment();
+    players.forEach(player => fragment.append(buildClassTop10Row(player, job)));
+    body.append(fragment);
+    table.append(body);
+    scroll.append(table);
+    section.append(scroll);
+    return section;
   }
 
-  function buildClassTop10Row(player) {
+  function buildClassTop10TableHead() {
+    const head = document.createElement("thead");
+    const row = document.createElement("tr");
+    const headings = [
+      ["rank", "rank-column"],
+      ["character", ""],
+      ["combinedScore", "number-column"],
+      ["totalDps", "number-column"],
+      ["firstPlaces", "number-column"],
+      ["contentResults", ""],
+    ];
+    for (const [key, className] of headings) {
+      const th = document.createElement("th");
+      th.scope = "col";
+      th.className = className;
+      th.textContent = t(key);
+      row.append(th);
+    }
+    head.append(row);
+    return head;
+  }
+
+  function buildClassTop10Row(player, job) {
     const tr = document.createElement("tr");
     tr.className = "class-top10-row";
     tr.append(cellWithRank(player.rank));
@@ -1893,7 +1931,7 @@
     characterCell.className = "class-top10-character";
     const character = document.createElement("div");
     character.className = "character-main";
-    character.append(createJobIcon(state.selectedOverallJob));
+    character.append(createJobIcon(job));
     const name = document.createElement("span");
     name.className = "character-name";
     name.textContent = formatCharacterName(player.name, player.serverId);
@@ -1903,6 +1941,24 @@
       badge.className = "tw-badge";
       badge.title = state.locale === "en" ? "Taiwan server" : "대만 서버";
       character.append(badge);
+    }
+    const observedCombatPower = Math.max(
+      0,
+      ...(player.placements || []).map(placement =>
+        Math.trunc(Number(placement.combatPower) || 0)));
+    if (observedCombatPower > 0) {
+      const cp = document.createElement("span");
+      cp.className = "cp-badge class-top10-cp";
+      const cpIcon = document.createElement("img");
+      cpIcon.src = "./assets/combat-power.png";
+      cpIcon.alt = "";
+      const value = document.createElement("span");
+      value.textContent = formatCombatPower(observedCombatPower);
+      cp.title = t("classTop10ObservedCp", {
+        value: formatInteger(observedCombatPower),
+      });
+      cp.append(cpIcon, value);
+      character.append(cp);
     }
     characterCell.append(character);
     tr.append(characterCell);
@@ -1931,7 +1987,7 @@
         `${placement.dungeonName}\n` +
         `${t("rank")} ${placement.rank} · DPS ${formatInteger(placement.dps)}`;
       const label = document.createElement("span");
-      label.textContent = compactOverallDungeonName(
+      label.textContent = fullOverallDungeonName(
         placement.dungeonKey,
         placement.dungeonName);
       const rank = document.createElement("b");
@@ -1944,22 +2000,22 @@
     return tr;
   }
 
-  function compactOverallDungeonName(dungeonKey, displayName) {
+  function fullOverallDungeonName(dungeonKey, displayName) {
     const names = state.locale === "en"
       ? {
-          "training-dummy-60s": "Dummy",
-          "bakron-trial": "Bakron",
-          "musphel-hard": "Musphel",
-          "fallen-deva-hard": "Fallen Daeva",
-          "abyss-horn-4": "Abyss",
+          "training-dummy-60s": "Training Dummy (1 min)",
+          "bakron-trial": "Trial: Bakron's Sky Island",
+          "musphel-hard": "Musphel's Holy Grail (Hard)",
+          "fallen-deva-hard": "Fallen Daeva Castle (Hard)",
+          "abyss-horn-4": "Abyss Horn Cavern (Stage 4)",
           "nightmare-atheron-10": "Nightmare",
         }
       : {
-          "training-dummy-60s": "허수아비",
-          "bakron-trial": "바크론",
-          "musphel-hard": "무스펠",
-          "fallen-deva-hard": "타락 데바",
-          "abyss-horn-4": "심연",
+          "training-dummy-60s": "훈련용 허수아비 (1분)",
+          "bakron-trial": "시련: 바크론의 공중섬",
+          "musphel-hard": "무스펠의 성배(어려움)",
+          "fallen-deva-hard": "타락한 데바의 성(어려움)",
+          "abyss-horn-4": "심연의 뿔 암굴(4단계)",
           "nightmare-atheron-10": "악몽",
         };
     return names[dungeonKey] || displayName || dungeonKey;
