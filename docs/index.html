@@ -18,11 +18,11 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260804-10">
+  <link rel="stylesheet" href="./assets/app.css?v=20260804-11">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
-  <script src="./assets/field-boss-catalog.js?v=20260804-10" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260804-10" defer></script>
-  <script src="./assets/app.js?v=20260804-10" defer></script>
+  <script src="./assets/field-boss-catalog.js?v=20260804-11" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260804-11" defer></script>
+  <script src="./assets/app.js?v=20260804-11" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -157,7 +157,7 @@
         <div>
           <span class="class-top10-kicker">ALL CONTENT</span>
           <h2 data-i18n="classTop10Title">클래스별 종합 TOP 10</h2>
-          <p data-i18n="classTop10Description">모든 CP의 던전·악몽·허수아비 TOP 20 성적을 합산해 모든 직업을 한 페이지에 표시합니다.</p>
+          <p data-i18n="classTop10Description">모든 CP의 던전·악몽·허수아비 TOP 20 성적을 합산한 클래스별 종합 랭킹입니다.</p>
         </div>
         <button class="ranking-back-button" id="class-top10-back-button" type="button">
           <span class="ranking-back-button-icon" aria-hidden="true">←</span>
@@ -189,6 +189,8 @@
         </article>
       </div>
 
+      <nav class="class-top10-tabs" id="class-top10-tabs" aria-label="클래스 선택"></nav>
+
       <div class="class-top10-state" id="class-top10-pending" hidden>
         <div class="spinner" aria-hidden="true"></div>
         <strong data-i18n="classTop10Pending">종합 랭킹 캐시 갱신을 기다리는 중입니다.</strong>
@@ -197,8 +199,20 @@
         <strong data-i18n="classTop10Empty">모든 콘텐츠 TOP 20 조건을 충족한 기록이 아직 없습니다.</strong>
       </div>
 
-      <div class="class-top10-list" id="class-top10-view" hidden>
-        <div id="class-top10-groups"></div>
+      <div class="table-scroll class-top10-table-scroll" id="class-top10-view" hidden>
+        <table class="ranking-table class-top10-table">
+          <thead>
+            <tr>
+              <th class="rank-column" data-i18n="rank">순위</th>
+              <th data-i18n="character">캐릭터</th>
+              <th class="number-column" data-i18n="combinedScore">종합 점수</th>
+              <th class="number-column" data-i18n="totalDps">총합 DPS</th>
+              <th class="number-column" data-i18n="firstPlaces">1위 횟수</th>
+              <th data-i18n="contentResults">콘텐츠 성적</th>
+            </tr>
+          </thead>
+          <tbody id="class-top10-rows"></tbody>
+        </table>
       </div>
     </section>
 
