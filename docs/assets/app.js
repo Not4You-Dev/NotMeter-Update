@@ -1,15 +1,19 @@
 (() => {
   "use strict";
 
+  const IWINV_RANKING_CACHE_ROOT = "https://not4you.iwinv.net/api/ranking/v1";
   const CACHE_URLS = [
+    `${IWINV_RANKING_CACHE_ROOT}/snapshot`,
     "./data/notmeter-ranking.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking.json.gz",
   ];
   const CLASS_OVERALL_CACHE_URLS = [
+    `${IWINV_RANKING_CACHE_ROOT}/class-overall`,
     "./data/notmeter-ranking-class-overall.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-class-overall.json.gz",
   ];
   const CUSTOM_CP_CACHE_URLS = [
+    `${IWINV_RANKING_CACHE_ROOT}/custom-cp/summary`,
     "https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/summary",
     "./data/notmeter-ranking-custom-cp.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
@@ -28,10 +32,14 @@
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const FIELD_BOSS_CACHE_SCHEMA = "notmeter-field-boss-public-cache-v1";
-  const DETAIL_ENDPOINT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/";
+  const DETAIL_ENDPOINTS = [
+    `${IWINV_RANKING_CACHE_ROOT}/details/`,
+    "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/",
+  ];
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
   const DETAIL_MEMORY_LIMIT = 48;
   const DETAIL_REQUEST_TIMEOUT_MS = 5_000;
+  const CACHE_REQUEST_TIMEOUT_MS = 8_000;
   const CACHE_SYNC_INTERVAL_MS = 5 * 60 * 1000;
   const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
   const FIELD_BOSS_CACHE_SYNC_INTERVAL_MS = 90 * 1000;
@@ -131,7 +139,7 @@
       classTop10ScoreTitle: "점수 계산",
       classTop10ScoreText: "1위 100점부터 20위 5점까지 5점 간격으로 환산합니다.",
       classTop10EntryTitle: "종합 랭킹 조건",
-      classTop10EntryText: "TOP 20에 진입한 콘텐츠 수를 우선하고, 종합 점수와 총합 DPS 순으로 TOP 10을 선정합니다.",
+      classTop10EntryText: "종합 점수, 총합 DPS, 1위 횟수, TOP 20 진입 콘텐츠 수 순으로 TOP 10을 선정합니다.",
       classTop10DedupeTitle: "중복 기록 처리",
       classTop10DedupeText: "전체 CP·전체 기간 TOP 20의 실제 순위를 그대로 사용하며, 캐릭터별 최고 DPS와 갱신된 CP를 함께 반영합니다.",
       classTop10Pending: "종합 랭킹 캐시 갱신을 기다리는 중입니다.",
@@ -308,7 +316,7 @@
       classTop10ScoreTitle: "Scoring",
       classTop10ScoreText: "Ranks convert in five-point steps, from 100 points for 1st to 5 points for 20th.",
       classTop10EntryTitle: "Eligibility",
-      classTop10EntryText: "Content coverage ranks first, followed by overall score and total DPS when selecting each class Top 10.",
+      classTop10EntryText: "Each class Top 10 is ordered by overall score, total DPS, 1st-place count, then Top 20 content coverage.",
       classTop10DedupeTitle: "Duplicate records",
       classTop10DedupeText: "Uses the exact All CP and All Time Top 20 rank, keeping each character's best DPS with their updated CP.",
       classTop10Pending: "Waiting for the overall-ranking cache to refresh.",
@@ -1530,10 +1538,15 @@
     for (const baseUrl of urls) {
       const separator = baseUrl.includes("?") ? "&" : "?";
       const url = force ? `${baseUrl}${separator}v=${Date.now()}` : baseUrl;
+      const controller = typeof AbortController === "function" ? new AbortController() : null;
+      const timeoutId = controller
+        ? window.setTimeout(() => controller.abort(), CACHE_REQUEST_TIMEOUT_MS)
+        : 0;
       try {
         const response = await fetch(url, {
           cache: force ? "reload" : "no-cache",
           headers: { Accept: "application/gzip, application/json" },
+          signal: controller?.signal,
         });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
@@ -1543,6 +1556,10 @@
         return JSON.parse(text);
       } catch (error) {
         errors.push(`${baseUrl}: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        if (timeoutId) {
+          window.clearTimeout(timeoutId);
+        }
       }
     }
     throw new Error(`${t("cacheUnavailable")} (${errors.join(" / ")})`);
@@ -1600,6 +1617,7 @@
     const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
     const fileName = `notmeter-ranking-custom-cp-${safeKey}.json.gz`;
     return [
+      `${IWINV_RANKING_CACHE_ROOT}/custom-cp/${safeKey}`,
       `https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/${safeKey}`,
       `./data/${fileName}`,
       `https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/${fileName}`,
@@ -2456,7 +2474,7 @@
     const generation = String(state.data?.generatedAt || "");
     const requestPath = `${lookupKey}?g=${encodeURIComponent(generation)}`;
     const request = new Request(
-      `${DETAIL_ENDPOINT}${requestPath}`,
+      `${DETAIL_ENDPOINTS[0]}${requestPath}`,
       { mode: "cors", credentials: "omit" });
     let cache = null;
     if ("caches" in window) {
@@ -2488,29 +2506,40 @@
   }
 
   async function downloadRankingCombatDetail(requestPath, lookupKey) {
-    const controller = new AbortController();
-    const timeout = window.setTimeout(
-      () => controller.abort(),
-      DETAIL_REQUEST_TIMEOUT_MS);
-    try {
-      const response = await fetch(`${DETAIL_ENDPOINT}${requestPath}`, {
-        mode: "cors",
-        credentials: "omit",
-        cache: "default",
-        headers: { Accept: "application/json" },
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        const error = new Error(`${t("detailUnavailable")} (${response.status})`);
-        error.status = response.status;
-        throw error;
+    const failures = [];
+    const statuses = [];
+    for (const endpoint of DETAIL_ENDPOINTS) {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(
+        () => controller.abort(),
+        DETAIL_REQUEST_TIMEOUT_MS);
+      try {
+        const response = await fetch(`${endpoint}${requestPath}`, {
+          mode: "cors",
+          credentials: "omit",
+          cache: "default",
+          headers: { Accept: "application/json" },
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          statuses.push(response.status);
+          throw new Error(`${t("detailUnavailable")} (${response.status})`);
+        }
+        const cacheCopy = response.clone();
+        const detailDocument = await parseRankingCombatDetail(response, lookupKey);
+        return { detailDocument, cacheCopy };
+      } catch (error) {
+        failures.push(error instanceof Error ? error.message : String(error));
+      } finally {
+        window.clearTimeout(timeout);
       }
-      const cacheCopy = response.clone();
-      const detailDocument = await parseRankingCombatDetail(response, lookupKey);
-      return { detailDocument, cacheCopy };
-    } finally {
-      window.clearTimeout(timeout);
     }
+
+    const error = new Error(`${t("detailUnavailable")} (${failures.join(" / ")})`);
+    error.status = statuses.length > 0 && statuses.every(status => status === 404)
+      ? 404
+      : 0;
+    throw error;
   }
 
   async function parseRankingCombatDetail(response, lookupKey) {

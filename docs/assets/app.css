@@ -1491,7 +1491,6 @@ button:focus-visible,
 .class-top10-tab .job-icon-frame {
   width: 25px;
   height: 25px;
-  border-radius: 6px;
 }
 
 .class-top10-tab .job-icon-frame img {
@@ -1868,10 +1867,10 @@ tr:nth-child(3) .rank-badge {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  border: 1px solid #345365;
-  border-radius: 8px;
-  background: #122432;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .job-icon-frame img {
@@ -2077,7 +2076,6 @@ tr:nth-child(3) .rank-badge {
 .party-icons .job-icon-frame {
   width: 19px;
   height: 19px;
-  border-radius: 5px;
 }
 
 .party-icons .job-icon-frame img {
