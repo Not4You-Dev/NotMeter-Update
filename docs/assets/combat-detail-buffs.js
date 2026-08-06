@@ -14,16 +14,16 @@
     17400058,
   ]);
   const SPIRIT_PACKET_SKILL_NAMES = new Map([
-    [160014, { ko: "원혼 날리기", en: "Toss Revenant" }],
-    [160015, { ko: "강렬한 일격", en: "Fierce Strike" }],
-    [160016, { ko: "어둠 폭발", en: "Shadow Explosion" }],
+    [160014, { ko: "원혼 날리기", en: "Toss Revenant", "zh-TW": "飛擲冤魂" }],
+    [160015, { ko: "강렬한 일격", en: "Fierce Strike", "zh-TW": "強烈一擊" }],
+    [160016, { ko: "어둠 폭발", en: "Shadow Explosion", "zh-TW": "黑暗爆炸" }],
   ]);
   const SPIRIT_PACKET_OWNERS = Object.freeze([
-    { minimum: 1, maximum: 4, ko: "불의 정령", en: "Fire Spirit", icon: "16100000" },
-    { minimum: 5, maximum: 8, ko: "물의 정령", en: "Water Spirit", icon: "16110000" },
-    { minimum: 9, maximum: 12, ko: "바람의 정령", en: "Wind Spirit", icon: "16120000" },
-    { minimum: 13, maximum: 16, ko: "땅의 정령", en: "Earth Spirit", icon: "16130000" },
-    { minimum: 17, maximum: 17, ko: "고대의 정령", en: "Ancient Spirit", icon: "16250000" },
+    { minimum: 1, maximum: 4, ko: "불의 정령", en: "Fire Spirit", "zh-TW": "火之精靈", icon: "16100000" },
+    { minimum: 5, maximum: 8, ko: "물의 정령", en: "Water Spirit", "zh-TW": "水之精靈", icon: "16110000" },
+    { minimum: 9, maximum: 12, ko: "바람의 정령", en: "Wind Spirit", "zh-TW": "風之精靈", icon: "16120000" },
+    { minimum: 13, maximum: 16, ko: "땅의 정령", en: "Earth Spirit", "zh-TW": "地之精靈", icon: "16130000" },
+    { minimum: 17, maximum: 17, ko: "고대의 정령", en: "Ancient Spirit", "zh-TW": "古代精靈", icon: "16250000" },
   ]);
   const NON_GAMEPLAY_DETAIL_BUFF_CODES = new Set([
     1096,
@@ -88,8 +88,10 @@
 
     const name = String(buff?.name || "").trim().toLocaleLowerCase();
     return !name.startsWith("테스트용_") &&
+      !name.startsWith("測試用_") &&
       !name.startsWith("for testing_") &&
       name !== "사라진 상승기류" &&
+      name !== "消失的上升氣流" &&
       name !== "still air";
   }
 
@@ -97,9 +99,11 @@
     const name = String(buff?.name || "").trim().toLocaleLowerCase();
     const isAmplificationPrayer =
       name === "증폭의 기도" ||
+      name === "增幅祈禱" ||
       name === "prayer of amplification";
     const isEarthBlessing =
       name === "대지의 축복" ||
+      name === "大地祝福" ||
       name === "earth's blessing" ||
       name === "earth’s blessing";
 
@@ -127,6 +131,7 @@
     const name = String(skill?.skillName || "").trim().toLocaleLowerCase();
     const isEarthBlessing =
       name === "대지의 축복" ||
+      name === "大地祝福" ||
       name === "earth's blessing" ||
       name === "earth’s blessing";
 
@@ -143,7 +148,7 @@
     let recordedName = String(skill?.skillName || "").trim() || "—";
     const spiritPacketSkill = resolveSpiritPacketSkill(skill);
     if (spiritPacketSkill) {
-      const language = locale === "en" ? "en" : "ko";
+      const language = locale === "en" ? "en" : locale === "zh-TW" ? "zh-TW" : "ko";
       recordedName = `${spiritPacketSkill.owner[language]}: ${spiritPacketSkill.skill[language]}`;
     }
     return recordedName;

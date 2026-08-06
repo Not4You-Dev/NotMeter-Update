@@ -1,7 +1,7 @@
 globalThis.NotMeterFieldBossCatalog = [
   {
     key: "verteron",
-    names: { ko: "베르테론", en: "Verteron" },
+    names: { ko: "베르테론", en: "Verteron", "zh-TW": "斐爾特朗" },
     bosses: [
       [2100040, "썩은 쿠타르"], [2100076, "광투사 쿠산"],
       [2100003, "동쪽의 네이켈"], [2100050, "서쪽의 케르논"],
@@ -19,7 +19,7 @@ globalThis.NotMeterFieldBossCatalog = [
   },
   {
     key: "altgard",
-    names: { ko: "알트가르드", en: "Altgard" },
+    names: { ko: "알트가르드", en: "Altgard", "zh-TW": "亞爾特蓋德" },
     bosses: [
       [2400017, "녹아내린 다나르"], [2400074, "검은 전사 아에드"],
       [2400140, "충실한 라지트"], [2400141, "광전사 발그"],
@@ -37,7 +37,7 @@ globalThis.NotMeterFieldBossCatalog = [
   },
   {
     key: "eltnen",
-    names: { ko: "엘테넨", en: "Eltnen" },
+    names: { ko: "엘테넨", en: "Eltnen", "zh-TW": "耶爾特奈" },
     bosses: [
       [2101217, "응집된 베레놈"], [2101218, "옛 두목 비고르"],
       [2101257, "꺾인 날개 츠바인"], [2101278, "탐욕의 이게티스"],
@@ -49,7 +49,7 @@ globalThis.NotMeterFieldBossCatalog = [
   },
   {
     key: "morheim",
-    names: { ko: "모르헤임", en: "Morheim" },
+    names: { ko: "모르헤임", en: "Morheim", "zh-TW": "莫爾海姆" },
     bosses: [
       [2406034, "경계의 방랑자 파르곤"], [2406035, "포식의 거수 발라크"],
       [2406071, "핏빛 눈보라 레눌프"], [2406093, "서리갑옷 하르칸"],
@@ -61,7 +61,7 @@ globalThis.NotMeterFieldBossCatalog = [
   },
   {
     key: "abyss-lower",
-    names: { ko: "어비스 하층", en: "Abyss Lower" },
+    names: { ko: "어비스 하층", en: "Abyss Lower", "zh-TW": "深淵下層" },
     bosses: [
       [2600068, "정령왕 아그로"], [2600089, "감시자 카이라"],
       [2600084, "수호신장 나흐마"], [2600093, "수호신장 나흐마"],
@@ -71,7 +71,7 @@ globalThis.NotMeterFieldBossCatalog = [
   },
   {
     key: "abyss-middle",
-    names: { ko: "어비스 중층", en: "Abyss Middle" },
+    names: { ko: "어비스 중층", en: "Abyss Middle", "zh-TW": "深淵中層" },
     bosses: [
       [2600150, "분노한 수호신장 나흐마"], [2600156, "분노한 수호신장 나흐마"],
       [2600520, "처형관 드라모스"], [2600521, "반역자 듀칼"],

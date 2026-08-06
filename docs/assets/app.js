@@ -32,6 +32,13 @@
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const FIELD_BOSS_CACHE_SCHEMA = "notmeter-field-boss-public-cache-v1";
+  const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260806-2";
+  const SUPPORTED_LOCALES = ["ko", "en", "zh-TW"];
+  const LANGUAGE_BUTTON_LABELS = {
+    ko: "EN",
+    en: "繁中",
+    "zh-TW": "한국어",
+  };
   const DETAIL_ENDPOINTS = [
     `${IWINV_RANKING_CACHE_ROOT}/details/`,
     "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/",
@@ -80,6 +87,17 @@
     "abyss-horn-4": "Abyssal Horn Cavern (Stage 4)",
     "nightmare-atheron-10": "Nightmare: Awakened Atheron (Stage 10)",
   };
+  const DUNGEON_NAMES_ZH_TW = {
+    "training-dummy-60s": "訓練用稻草人（1分鐘）",
+    "bakron-trial": "試煉：巴克隆空中島",
+    "musphel-hard": "穆斯費爾聖杯（困難）",
+    "fallen-deva-hard": "墮落守護者之城（困難）",
+    "abyss-horn-4": "深淵角岩窟（第4階段）",
+    "nightmare-atheron-10": "惡夢：覺醒阿特隆（第10階段）",
+  };
+  const GAME_NAME_OVERRIDES_ZH_TW = {
+    "각성한 아테론 10단계": "覺醒阿特隆 第10階段",
+  };
   const SERVER_NAMES_ELYOS = [
     "시엘", "네자칸", "바이젤", "카이시넬", "유스티엘", "아리엘", "프레기온", "메스람타에다",
     "히타니에", "나니아", "타하바타", "루터스", "페르노스", "다미누", "카사카", "바카르마",
@@ -126,8 +144,25 @@
       dailyUsers: "일일 사용자",
       classTop10: "클래스 TOP 10",
       fieldBoss: "필드보스",
+      optimization: "최적화",
       discord: "디스코드",
       download: "다운로드",
+      taiwanServer: "대만 서버",
+      enhancedBuff: "상위 버프",
+      peopleValue: "{value}명",
+      advertisement: "광고",
+      serviceLinksAria: "NotMeter 바로가기",
+      dailyUsersTitle: "최근 집계된 일일 사용자 수",
+      languageSwitchAria: "언어 전환",
+      advertisementAria: "광고",
+      fieldBossRegionsAria: "필드보스 지역",
+      classTabsAria: "클래스 선택",
+      statsFiltersAria: "통계 필터",
+      weeklyLegendAria: "주간 변화 기호",
+      footerLinksAria: "서비스 안내",
+      closeAria: "닫기",
+      partyTabsAria: "파티원",
+      sponsorOpenAria: "광고 페이지 열기",
       fieldBossPageTitle: "NotMeter 필드보스 현황",
       fieldBossPageSubtitle: "서버별 필드보스 출현 현황",
       fieldBossStatus: "필드보스 현황",
@@ -303,8 +338,25 @@
       dailyUsers: "Daily users",
       classTop10: "Class TOP 10",
       fieldBoss: "Field Boss",
+      optimization: "Optimization",
       discord: "Discord",
       download: "Download",
+      taiwanServer: "Taiwan server",
+      enhancedBuff: "Enhanced buff",
+      peopleValue: "{value}",
+      advertisement: "Ad",
+      serviceLinksAria: "NotMeter shortcuts",
+      dailyUsersTitle: "Recently counted daily users",
+      languageSwitchAria: "Switch language",
+      advertisementAria: "Advertisement",
+      fieldBossRegionsAria: "Field boss regions",
+      classTabsAria: "Select class",
+      statsFiltersAria: "Statistics filters",
+      weeklyLegendAria: "Weekly change symbols",
+      footerLinksAria: "Service information",
+      closeAria: "Close",
+      partyTabsAria: "Party members",
+      sponsorOpenAria: "Open advertisement page",
       fieldBossPageTitle: "NotMeter Field Boss Status",
       fieldBossPageSubtitle: "Field-boss spawn status by server",
       fieldBossStatus: "Field Boss Status",
@@ -475,6 +527,19 @@
       cacheUnavailable: "Please refresh again in a moment.",
     },
   };
+  COPY["zh-TW"] = globalThis.NotMeterStatsCopyZhTw || {};
+
+  function normalizeLocale(value) {
+    const candidate = String(value || "").trim();
+    if (SUPPORTED_LOCALES.includes(candidate)) {
+      return candidate;
+    }
+    const browserLocale = String(navigator.language || "").toLowerCase();
+    if (browserLocale.startsWith("zh")) {
+      return "zh-TW";
+    }
+    return browserLocale.startsWith("ko") ? "ko" : "en";
+  }
 
   const state = {
     data: null,
@@ -482,8 +547,7 @@
     customCpLoad: null,
     customCpRankData: new Map(),
     customCpRankLoads: new Map(),
-    locale: localStorage.getItem("notmeter-stats-locale") ||
-      (navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en"),
+    locale: normalizeLocale(localStorage.getItem("notmeter-stats-locale")),
     dungeonKey: "",
     bossIndex: 0,
     cpTierIndex: 0,
@@ -505,6 +569,8 @@
       skill: null,
       buff: null,
     },
+    zhTwGameData: null,
+    zhTwGameDataLoad: null,
     visibleMetrics: loadVisibleMetrics(),
     fieldBossData: null,
     fieldBossLoad: null,
@@ -526,6 +592,13 @@
     bindEvents();
     applyLocale();
     renderDetailSettings();
+    void ensureLocaleGameData().then(() => {
+      if (state.locale === "zh-TW") {
+        applyLocale();
+        populateFilters();
+        render();
+      }
+    });
     void loadIconAtlases();
     void loadCache();
     if (history.state?.notMeterStatsView === "field-boss") {
@@ -590,7 +663,8 @@
   function bindEvents() {
     elements["language-button"].addEventListener("click", () => {
       const openDetail = state.selectedDetail;
-      state.locale = state.locale === "ko" ? "en" : "ko";
+      const currentIndex = SUPPORTED_LOCALES.indexOf(state.locale);
+      state.locale = SUPPORTED_LOCALES[(currentIndex + 1) % SUPPORTED_LOCALES.length];
       localStorage.setItem("notmeter-stats-locale", state.locale);
       applyLocale();
       populateFilters();
@@ -598,6 +672,19 @@
       if (openDetail) {
         state.selectedDetail = openDetail;
         renderCombatDetail();
+      }
+      if (state.locale === "zh-TW" && !state.zhTwGameData) {
+        const requestedLocale = state.locale;
+        void ensureLocaleGameData().then(payload => {
+          if (!payload || state.locale !== requestedLocale) return;
+          applyLocale();
+          populateFilters();
+          render();
+          if (openDetail) {
+            state.selectedDetail = openDetail;
+            renderCombatDetail();
+          }
+        });
       }
     });
     elements["class-top10-button"].addEventListener("click", () => {
@@ -735,6 +822,85 @@
       }
     });
   }
+
+  async function ensureLocaleGameData() {
+    if (state.locale !== "zh-TW" || state.zhTwGameData) {
+      return state.zhTwGameData;
+    }
+    if (state.zhTwGameDataLoad) {
+      return state.zhTwGameDataLoad;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+    state.zhTwGameDataLoad = fetch(ZH_TW_GAME_DATA_URL, {
+      cache: "force-cache",
+      signal: controller.signal,
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Traditional Chinese game data HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(payload => {
+        if (payload?.locale !== "zh-TW" || !payload.names || !payload.skills ||
+            !payload.mobs || !payload.buffs) {
+          throw new Error("Traditional Chinese game data format is invalid");
+        }
+        state.zhTwGameData = payload;
+        return payload;
+      })
+      .catch(() => null)
+      .finally(() => {
+        window.clearTimeout(timeoutId);
+        state.zhTwGameDataLoad = null;
+      });
+    return state.zhTwGameDataLoad;
+  }
+
+  function localeTag() {
+    return state.locale === "ko" ? "ko-KR" : state.locale === "zh-TW" ? "zh-TW" : "en-US";
+  }
+
+  function localizeGameName(value, type = "", ...codes) {
+    const original = String(value || "").trim();
+    if (state.locale !== "zh-TW" || !state.zhTwGameData) {
+      return state.locale === "zh-TW"
+        ? GAME_NAME_OVERRIDES_ZH_TW[original] || original
+        : original;
+    }
+
+    const collection = type === "skill"
+      ? state.zhTwGameData.skills
+      : type === "mob"
+        ? state.zhTwGameData.mobs
+        : type === "buff"
+          ? state.zhTwGameData.buffs
+          : null;
+    for (const code of codes) {
+      let normalizedCode = Math.abs(Math.trunc(Number(code) || 0));
+      while (normalizedCode > 0) {
+        const byCode = String(collection?.[String(normalizedCode)] || "").trim();
+        if (byCode) {
+          return byCode;
+        }
+        if (normalizedCode <= 99_999_999) {
+          break;
+        }
+        normalizedCode = Math.trunc(normalizedCode / 10);
+      }
+    }
+    return String(
+      state.zhTwGameData.aliases?.[original] ||
+      GAME_NAME_OVERRIDES_ZH_TW[original] ||
+      state.zhTwGameData.names?.[original] ||
+      original);
+  }
+
+  globalThis.NotMeterStatsLocalization = Object.freeze({
+    gameName: localizeGameName,
+  });
 
   function applyDungeonSelection(dungeonKey) {
     state.dungeonKey = dungeonKey;
@@ -1138,12 +1304,12 @@
       ...SERVER_NAMES_ELYOS.map((name, index) => ({
         serverId: 1001 + index,
         name,
-        faction: state.locale === "ko" ? "천족" : "Elyos",
+        faction: state.locale === "ko" ? "천족" : state.locale === "zh-TW" ? "天族" : "Elyos",
       })),
       ...SERVER_NAMES_ASMODIAN.map((name, index) => ({
         serverId: 2001 + index,
         name,
-        faction: state.locale === "ko" ? "마족" : "Asmodian",
+        faction: state.locale === "ko" ? "마족" : state.locale === "zh-TW" ? "魔族" : "Asmodian",
       })),
     ];
   }
@@ -1354,7 +1520,8 @@
         button.setAttribute("aria-current", "true");
       }
       const label = document.createElement("span");
-      label.textContent = item.region.names?.[state.locale] || item.region.names?.ko || item.region.key;
+      label.textContent = item.region.names?.[state.locale] ||
+        localizeGameName(item.region.names?.ko || item.region.key);
       const count = document.createElement("span");
       count.className = "field-boss-tab-count";
       count.textContent = `${item.count}/${item.region.bosses.length}`;
@@ -1398,7 +1565,7 @@
       const copy = document.createElement("div");
       copy.className = "field-boss-row-copy";
       const name = document.createElement("strong");
-      name.textContent = boss.name;
+      name.textContent = localizeGameName(boss.name, "mob", boss.code);
       const target = document.createElement("span");
       target.textContent = boss.entry
         ? t("fieldBossExpected", { time: formatFieldBossTargetTime(boss.entry.targetAt) })
@@ -1475,7 +1642,7 @@
     if (!Number.isFinite(date.getTime())) {
       return "—";
     }
-    return new Intl.DateTimeFormat(state.locale === "ko" ? "ko-KR" : "en-US", {
+    return new Intl.DateTimeFormat(localeTag(), {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
@@ -1694,7 +1861,10 @@
 
     const dungeon = currentDungeon();
     const bosses = [{ index: 0, name: t("allBosses") }]
-      .concat((dungeon?.bossNames || []).map((name, index) => ({ index: index + 1, name })));
+      .concat((dungeon?.bossNames || []).map((name, index) => ({
+        index: index + 1,
+        name: localizeGameName(name),
+      })));
     if (!bosses.some(item => item.index === state.bossIndex)) {
       state.bossIndex = 0;
     }
@@ -1922,7 +2092,7 @@
     if (isTaiwanName(player.name)) {
       const badge = document.createElement("span");
       badge.className = "tw-badge";
-      badge.title = state.locale === "en" ? "Taiwan server" : "대만 서버";
+      badge.title = t("taiwanServer");
       character.append(badge);
     }
     const observedCombatPower = Math.max(
@@ -1967,7 +2137,7 @@
       const chip = document.createElement("span");
       chip.className = "class-top10-result";
       chip.title =
-        `${placement.dungeonName}\n` +
+        `${fullOverallDungeonName(placement.dungeonKey, placement.dungeonName)}\n` +
         `${t("rank")} ${placement.rank} · DPS ${formatInteger(placement.dps)}`;
       const label = document.createElement("span");
       label.textContent = fullOverallDungeonName(
@@ -1993,7 +2163,9 @@
           "abyss-horn-4": "Abyss Horn Cavern (Stage 4)",
           "nightmare-atheron-10": "Nightmare",
         }
-      : {
+      : state.locale === "zh-TW"
+        ? DUNGEON_NAMES_ZH_TW
+        : {
           "training-dummy-60s": "훈련용 허수아비 (1분)",
           "bakron-trial": "시련: 바크론의 공중섬",
           "musphel-hard": "무스펠의 성배(어려움)",
@@ -2001,7 +2173,7 @@
           "abyss-horn-4": "심연의 뿔 암굴(4단계)",
           "nightmare-atheron-10": "악몽",
         };
-    return names[dungeonKey] || displayName || dungeonKey;
+    return names[dungeonKey] || localizeGameName(displayName) || dungeonKey;
   }
 
   function renderSummary() {
@@ -2227,9 +2399,9 @@
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
     const boss = bossIndex > 0 ? dungeon?.bossNames?.[bossIndex - 1] : "";
     const targetName = String(player.T ?? player.targetName ?? "").trim();
-    const bossName = targetName || boss || (state.bossIndex > 0
+    const bossName = localizeGameName(targetName || boss || (state.bossIndex > 0
       ? dungeon?.bossNames?.[state.bossIndex - 1]
-      : t("allBosses"));
+      : t("allBosses")));
 
     const characterCell = document.createElement("td");
     characterCell.className = "character-cell";
@@ -2245,7 +2417,7 @@
     if (isTaiwanName(player.name)) {
       const badge = document.createElement("span");
       badge.className = "tw-badge";
-      badge.title = state.locale === "en" ? "Taiwan server" : "대만 서버";
+      badge.title = t("taiwanServer");
       badge.setAttribute("role", "img");
       badge.setAttribute("aria-label", badge.title);
       main.append(badge);
@@ -2359,9 +2531,9 @@
   function openLegacyCombatDetail(player, detail) {
     const dungeon = currentDungeon();
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
-    const bossName = bossIndex > 0
+    const bossName = localizeGameName(bossIndex > 0
       ? dungeon?.bossNames?.[bossIndex - 1]
-      : dungeon?.bossNames?.[0] || dungeonName(dungeon);
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon));
     state.selectedDetail = {
       player,
       actorId: Number(detail.actorId) || 0,
@@ -2380,9 +2552,9 @@
   function openUnavailableCombatDetail(player, reason) {
     const dungeon = currentDungeon();
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
-    const bossName = bossIndex > 0
+    const bossName = localizeGameName(bossIndex > 0
       ? dungeon?.bossNames?.[bossIndex - 1]
-      : dungeon?.bossNames?.[0] || dungeonName(dungeon);
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon));
     const actorId = 1;
     state.selectedDetail = {
       player,
@@ -2636,9 +2808,9 @@
       Number(record.durationSeconds) || Number(player.durationSeconds) || 60);
     const dungeon = currentDungeon();
     const bossIndex = Number(player.B ?? player.bossIndex ?? state.bossIndex);
-    const bossName = String(record.bossName || "") || (bossIndex > 0
+    const bossName = localizeGameName(String(record.bossName || "") || (bossIndex > 0
       ? dungeon?.bossNames?.[bossIndex - 1]
-      : dungeon?.bossNames?.[0] || dungeonName(dungeon));
+      : dungeon?.bossNames?.[0] || dungeonName(dungeon)));
 
     elements["detail-job-icon"].replaceChildren(createJobIcon(detailJob));
     elements["detail-title"].textContent = bossName || t("combatDetails");
@@ -2774,8 +2946,13 @@
   function buildDetailSkillRow(skill) {
     const row = document.createElement("article");
     row.className = "detail-skill-row";
-    const skillDisplayName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill, state.locale) ||
+    const recordedSkillName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill, state.locale) ||
       String(skill.skillName || "—");
+    const skillDisplayName = localizeGameName(
+      recordedSkillName,
+      "skill",
+      skill.rawSkillCode,
+      skill.skillCode);
     const totalDamage = Math.max(0, Number(skill.totalDamage) || 0);
     const healingAmount = Math.max(0, Number(skill.healingAmount) || 0);
     const useCount = Math.max(0, Number(skill.useCount) || 0);
@@ -2863,7 +3040,7 @@
     if (isDetailMetricVisible("periodic") &&
         (Number(skill.periodicDamage) > 0 || Number(skill.periodicHitCount) > 0)) {
       const periodic = Number(skill.periodicHitCount) > 0
-        ? `${formatCompact(skill.periodicDamage)} / ${formatInteger(skill.periodicHitCount)}${state.locale === "ko" ? "회" : "x"}`
+        ? `${formatCompact(skill.periodicDamage)} / ${formatInteger(skill.periodicHitCount)}${state.locale === "ko" ? "회" : state.locale === "zh-TW" ? "次" : "x"}`
         : formatCompact(skill.periodicDamage);
       chips.append(buildDetailChip(t("periodicDamage"), periodic, "perfect"));
     }
@@ -2904,7 +3081,7 @@
 
   function formatUseCount(value) {
     const count = formatInteger(Math.max(0, Number(value) || 0));
-    return state.locale === "ko" ? `${count}회` : `${count}x`;
+    return state.locale === "ko" ? `${count}회` : state.locale === "zh-TW" ? `${count}次` : `${count}x`;
   }
 
   function buildDetailChip(label, value, modifier = "") {
@@ -2967,8 +3144,9 @@
       title.append(levelBadge);
     }
     const uptime = document.createElement("span");
+    const appliedCount = Math.max(1, Number(buff.count) || 0);
     uptime.textContent =
-      `${formatPercent(ratio)} · ${formatDuration(seconds)} · x${Math.max(1, Number(buff.count) || 0)}`;
+      `${formatPercent(ratio)} · ${formatDuration(seconds)} · ${state.locale === "zh-TW" ? `${appliedCount}次` : `x${appliedCount}`}`;
     text.append(title, uptime);
 
     const gauge = document.createElement("span");
@@ -2978,7 +3156,7 @@
     gauge.append(fill);
 
     const enhancedDescription = enhanced
-      ? state.locale === "en" ? "\nEnhanced buff" : "\n상위 버프"
+      ? `\n${t("enhancedBuff")}`
       : "";
     item.title = `${name.textContent}\n${formatDuration(seconds)} / ${formatDuration(durationSeconds)} (${formatPercent(ratio)})${enhancedDescription}`;
     item.append(iconSlot, text, gauge);
@@ -2986,10 +3164,11 @@
   }
 
   function buffDisplayName(buff) {
-    return globalThis.NotMeterCombatDetailBuffs.displayName(
+    const recordedName = globalThis.NotMeterCombatDetailBuffs.displayName(
       buff,
       state.locale,
       state.iconAtlases.buff);
+    return localizeGameName(recordedName, "buff", buff.rawCode, buff.code);
   }
 
   function loadVisibleMetrics() {
@@ -3612,7 +3791,7 @@
     const dungeon = currentDungeon();
     const boss = state.bossIndex === 0
       ? t("allBosses")
-      : dungeon?.bossNames?.[state.bossIndex - 1] || t("allBosses");
+      : localizeGameName(dungeon?.bossNames?.[state.bossIndex - 1]) || t("allBosses");
     const cp = state.cpFilterMode === "custom"
       ? customCpRangeLabel()
       : state.cpTierIndex === 0
@@ -3628,7 +3807,7 @@
   function updateDailyUsers() {
     const view = state.data?.views?.find(item => item.dungeonKey === DAILY_USER_KEY);
     elements["daily-user-count"].textContent = view
-      ? `${formatInteger(view.recordCount)}${state.locale === "ko" ? "명" : ""}`
+      ? t("peopleValue", { value: formatInteger(view.recordCount) })
       : "—";
   }
 
@@ -3652,23 +3831,29 @@
 
   function applyLocale() {
     document.documentElement.lang = state.locale;
-    elements["language-button"].textContent = state.locale === "ko" ? "EN" : "KO";
+    elements["language-button"].textContent = LANGUAGE_BUTTON_LABELS[state.locale] || "EN";
     document.querySelectorAll("[data-i18n]").forEach(element => {
       const key = element.dataset.i18n;
-      if (COPY[state.locale][key]) {
+      if (COPY[state.locale]?.[key] || COPY.ko[key]) {
         element.textContent = t(key);
       }
     });
     document.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
       const key = element.dataset.i18nAriaLabel;
-      if (COPY[state.locale][key]) {
+      if (COPY[state.locale]?.[key] || COPY.ko[key]) {
         element.setAttribute("aria-label", t(key));
       }
     });
     document.querySelectorAll("[data-i18n-placeholder]").forEach(element => {
       const key = element.dataset.i18nPlaceholder;
-      if (COPY[state.locale][key]) {
+      if (COPY[state.locale]?.[key] || COPY.ko[key]) {
         element.setAttribute("placeholder", t(key));
+      }
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach(element => {
+      const key = element.dataset.i18nTitle;
+      if (COPY[state.locale]?.[key] || COPY.ko[key]) {
+        element.setAttribute("title", t(key));
       }
     });
     updatePageIdentity();
@@ -3748,13 +3933,20 @@
     if (!dungeon) {
       return "";
     }
-    return state.locale === "en"
-      ? DUNGEON_NAMES_EN[dungeon.key] || dungeon.displayName
-      : dungeon.displayName;
+    if (state.locale === "en") {
+      return DUNGEON_NAMES_EN[dungeon.key] || dungeon.displayName;
+    }
+    if (state.locale === "zh-TW") {
+      return DUNGEON_NAMES_ZH_TW[dungeon.key] || localizeGameName(dungeon.displayName);
+    }
+    return dungeon.displayName;
   }
 
   function jobName(job) {
-    return state.locale === "en" ? JOB_NAMES_EN[job] || job : job;
+    if (state.locale === "en") {
+      return JOB_NAMES_EN[job] || job;
+    }
+    return state.locale === "zh-TW" ? localizeGameName(job) : job;
   }
 
   function periodName(period) {
@@ -3790,7 +3982,7 @@
 
   function formatWeeklyRange(range) {
     const separator = state.locale === "ko" ? "~" : "–";
-    const suffix = state.locale === "ko" ? "한국시간" : "KST";
+    const suffix = state.locale === "ko" ? "한국시간" : state.locale === "zh-TW" ? "韓國時間" : "KST";
     return `${formatKoreaShort(range.start)}${separator}${formatKoreaShort(range.end)} ${suffix}`;
   }
 
@@ -3957,13 +4149,12 @@
 
   function formatSeconds(value) {
     const seconds = Math.max(0, Number(value) || 0);
-    return state.locale === "ko"
-      ? `${trimFixed(seconds, seconds < 10 ? 1 : 0)}초`
-      : `${trimFixed(seconds, seconds < 10 ? 1 : 0)}s`;
+    const amount = trimFixed(seconds, seconds < 10 ? 1 : 0);
+    return state.locale === "ko" ? `${amount}초` : state.locale === "zh-TW" ? `${amount}秒` : `${amount}s`;
   }
 
   function formatInteger(value) {
-    return new Intl.NumberFormat(state.locale === "ko" ? "ko-KR" : "en-US")
+    return new Intl.NumberFormat(localeTag())
       .format(Number(value) || 0);
   }
 
@@ -3975,7 +4166,7 @@
 
   function formatDateTime(value) {
     const date = new Date(value);
-    return new Intl.DateTimeFormat(state.locale === "ko" ? "ko-KR" : "en-US", {
+    return new Intl.DateTimeFormat(localeTag(), {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
