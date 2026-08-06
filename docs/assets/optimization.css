@@ -985,3 +985,26 @@ select {
     height: 300px;
   }
 }
+
+html.optimization-embed,
+html.optimization-embed body {
+  min-height: 0;
+  background: transparent;
+}
+
+html.optimization-embed body {
+  overflow: hidden;
+}
+
+html.optimization-embed .optimization-shell {
+  width: 100%;
+  margin: 0;
+}
+
+html.optimization-embed .optimization-topbar {
+  display: none;
+}
+
+html.optimization-embed .optimizer-page {
+  padding: 0 0 18px;
+}
