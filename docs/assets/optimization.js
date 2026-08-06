@@ -304,6 +304,7 @@ const el = {
   configOutput: document.querySelector("#configOutput"),
   copyButton: document.querySelector("#copyButton"),
   copyButtonSmall: document.querySelector("#copyButtonSmall"),
+  copyPathButton: document.querySelector("#copyPathButton"),
   resetButton: document.querySelector("#resetButton"),
   languageButton: document.querySelector("#optimizationLanguage"),
   safetyStatus: document.querySelector("#configSafetyStatus"),
@@ -822,6 +823,33 @@ const copyConfig = async (button) => {
   }
 };
 
+const copyEnginePath = async () => {
+  const path = "%LOCALAPPDATA%\\AION2\\Saved\\Config\\Windows\\engine.ini";
+  const original = el.copyPathButton.textContent;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(path);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = path;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      textarea.remove();
+    }
+    el.copyPathButton.textContent = translated("경로 복사됨");
+  } catch {
+    el.copyPathButton.textContent = translated("복사 실패");
+  } finally {
+    window.setTimeout(() => {
+      el.copyPathButton.textContent = original;
+    }, 1500);
+  }
+};
+
 el.gpuSelect.addEventListener("change", () => {
   activeProfileKey = PROFILES[el.gpuSelect.value] ? el.gpuSelect.value : "rtx5060ti";
   persistSettings();
@@ -855,6 +883,7 @@ document.querySelectorAll("[data-tune]").forEach((control) => {
 
 el.copyButton.addEventListener("click", () => void copyConfig(el.copyButton));
 el.copyButtonSmall.addEventListener("click", () => void copyConfig(el.copyButtonSmall));
+el.copyPathButton.addEventListener("click", () => void copyEnginePath());
 el.resetButton.addEventListener("click", () => {
   activeProfileKey = "rtx5060ti";
   activeGoalKey = "balanced";
