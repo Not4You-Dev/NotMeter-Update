@@ -16,8 +16,8 @@
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://notmeter.com/optimization.html" />
   <link rel="icon" href="./assets/notmeter-icon.png" type="image/png" />
-  <link rel="stylesheet" href="./assets/app.css?v=20260806-5" />
-  <link rel="stylesheet" href="./assets/optimization.css?v=20260806-5" />
+  <link rel="stylesheet" href="./assets/app.css?v=20260806-6" />
+  <link rel="stylesheet" href="./assets/optimization.css?v=20260806-6" />
 </head>
 <body>
   <div class="page-shell optimization-shell">
@@ -82,6 +82,57 @@
           <strong>복사 후 붙여넣기</strong>
           <p>생성된 마커 블록을 engine.ini 맨 아래에 붙여넣고 게임을 재실행합니다.</p>
         </article>
+      </section>
+
+      <section class="result-panel" aria-label="생성 결과와 적용 방법">
+        <div class="result-card">
+          <div class="result-head">
+            <span>RESULT</span>
+            <h2 id="resultTitle">RTX 5060 / 5070 균형</h2>
+            <p id="resultSummary">균형값으로 생성됩니다.</p>
+          </div>
+          <div class="result-actions">
+            <button class="copy-primary" id="copyButton" type="button">현재 설정 복사</button>
+            <button class="reset-button" id="resetButton" type="button">추천값으로 초기화</button>
+          </div>
+          <p class="config-safety-status" id="configSafetyStatus">검증된 설정 이름과 허용 범위만 생성합니다.</p>
+          <details class="result-help">
+            <summary>
+              <span>적용·정리·되돌리기 안내</span>
+              <small>처음 적용할 때만 펼쳐보세요.</small>
+            </summary>
+            <div class="result-help-content">
+              <div class="result-steps">
+                <h3>적용 방법</h3>
+                <ol>
+                  <li><b>윈도우키 + R</b>을 누르고 <code>%localappdata%</code> 입력</li>
+                  <li><code>AION2\Saved\Config\Windows\engine.ini</code> 열기</li>
+                  <li>기존 파일을 복사해 백업</li>
+                  <li>구버전의 무마커 NotMeter 설정은 아래 안내대로 먼저 정리</li>
+                  <li>기존 마커 블록이 있으면 시작/종료 마커 범위만 교체</li>
+                  <li>아래 생성값을 파일 맨 아래에 붙여넣고 게임 재실행</li>
+                </ol>
+              </div>
+              <div class="legacy-box">
+                <b>구버전 설정 정리</b>
+                <span>engine.ini에서 다음 구버전 제목을 먼저 찾으세요.</span>
+                <code>; ===== NOT METER AION2 그래픽 최적화 :</code>
+                <span>이 제목이 있으면 새 값을 바로 덧붙이지 마세요. 백업 후 바로 앞 [SystemSettings]부터 구버전의 마지막 r.CreateShadersOnLoad=... 줄까지만 제거하고, 그 범위 밖의 기존 설정은 유지한 뒤 새 마커 블록을 붙여넣으세요.</span>
+              </div>
+              <div class="rollback-box">
+                <b>되돌리기</b>
+                <span><code>; NOT METER OPTIMIZATION START</code>부터 <code>; NOT METER OPTIMIZATION END</code>까지만 삭제한 뒤 게임을 다시 실행하세요. engine.ini 전체를 삭제하지 마세요.</span>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div class="code-card">
+          <div class="code-head">
+            <span>ENGINE.INI</span>
+            <button id="copyButtonSmall" type="button">복사</button>
+          </div>
+          <pre><code id="configOutput"></code></pre>
+        </div>
       </section>
 
       <section class="optimizer-workspace">
@@ -299,53 +350,11 @@
           </div>
         </section>
 
-        <aside class="result-panel" aria-label="생성 결과와 적용 방법">
-          <div class="result-card">
-            <div class="result-head">
-              <span>RESULT</span>
-              <h2 id="resultTitle">RTX 5060 / 5070 균형</h2>
-              <p id="resultSummary">균형값으로 생성됩니다.</p>
-            </div>
-            <div class="result-actions">
-              <button class="copy-primary" id="copyButton" type="button">현재 설정 복사</button>
-              <button class="reset-button" id="resetButton" type="button">추천값으로 초기화</button>
-            </div>
-            <p class="config-safety-status" id="configSafetyStatus">검증된 설정 이름과 허용 범위만 생성합니다.</p>
-            <div class="result-steps">
-              <h3>적용 방법</h3>
-              <ol>
-                <li><b>윈도우키 + R</b>을 누르고 <code>%localappdata%</code> 입력</li>
-                <li><code>AION2\Saved\Config\Windows\engine.ini</code> 열기</li>
-                <li>기존 파일을 복사해 백업</li>
-                <li>구버전의 무마커 NotMeter 설정은 아래 안내대로 먼저 정리</li>
-                <li>기존 마커 블록이 있으면 시작/종료 마커 범위만 교체</li>
-                <li>아래 생성값을 파일 맨 아래에 붙여넣고 게임 재실행</li>
-              </ol>
-            </div>
-            <div class="legacy-box">
-              <b>구버전 설정 정리</b>
-              <span>engine.ini에서 다음 구버전 제목을 먼저 찾으세요.</span>
-              <code>; ===== NOT METER AION2 그래픽 최적화 :</code>
-              <span>이 제목이 있으면 새 값을 바로 덧붙이지 마세요. 백업 후 바로 앞 [SystemSettings]부터 구버전의 마지막 r.CreateShadersOnLoad=... 줄까지만 제거하고, 그 범위 밖의 기존 설정은 유지한 뒤 새 마커 블록을 붙여넣으세요.</span>
-            </div>
-            <div class="rollback-box">
-              <b>되돌리기</b>
-              <span><code>; NOT METER OPTIMIZATION START</code>부터 <code>; NOT METER OPTIMIZATION END</code>까지만 삭제한 뒤 게임을 다시 실행하세요. engine.ini 전체를 삭제하지 마세요.</span>
-            </div>
-          </div>
-          <div class="code-card">
-            <div class="code-head">
-              <span>ENGINE.INI</span>
-              <button id="copyButtonSmall" type="button">복사</button>
-            </div>
-            <pre><code id="configOutput"></code></pre>
-          </div>
-        </aside>
       </section>
     </main>
   </div>
 
-  <script src="./assets/optimization-copy.js?v=20260806-5"></script>
-  <script src="./assets/optimization.js?v=20260806-5"></script>
+  <script src="./assets/optimization-copy.js?v=20260806-6"></script>
+  <script src="./assets/optimization.js?v=20260806-6"></script>
 </body>
 </html>
