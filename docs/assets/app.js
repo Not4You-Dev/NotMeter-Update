@@ -2440,9 +2440,15 @@
     if (party.length > 1) {
       const partyLine = document.createElement("div");
       partyLine.className = "party-icons";
+      partyLine.setAttribute("role", "group");
+      partyLine.setAttribute("aria-label", `${t("partyMembers")} ${party.length}`);
       const label = document.createElement("span");
       label.className = "party-label";
-      label.textContent = t("party");
+      label.textContent = t("partyMembers");
+      const count = document.createElement("span");
+      count.className = "party-count";
+      count.textContent = formatInteger(party.length);
+      label.append(count);
       partyLine.append(label);
       party.forEach(job => partyLine.append(createJobIcon(job)));
       characterStack.append(partyLine);
