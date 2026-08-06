@@ -16,8 +16,13 @@
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href="https://notmeter.com/optimization.html" />
   <link rel="icon" href="./assets/notmeter-icon.png" type="image/png" />
-  <link rel="stylesheet" href="./assets/app.css?v=20260806-6" />
-  <link rel="stylesheet" href="./assets/optimization.css?v=20260807-1" />
+  <script>
+    if (new URLSearchParams(location.search).get("embed") === "1") {
+      document.documentElement.classList.add("optimization-embed");
+    }
+  </script>
+  <link rel="stylesheet" href="./assets/app.css?v=20260807-2" />
+  <link rel="stylesheet" href="./assets/optimization.css?v=20260807-2" />
 </head>
 <body>
   <div class="page-shell optimization-shell">
@@ -375,7 +380,7 @@
     </main>
   </div>
 
-  <script src="./assets/optimization-copy.js?v=20260807-1"></script>
-  <script src="./assets/optimization.js?v=20260807-1"></script>
+  <script src="./assets/optimization-copy.js?v=20260807-2"></script>
+  <script src="./assets/optimization.js?v=20260807-2"></script>
 </body>
 </html>
