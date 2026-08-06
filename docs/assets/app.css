@@ -294,8 +294,15 @@ p {
 
 .optimization-link-icon {
   color: var(--yellow);
-  font-size: 15px;
   line-height: 1;
+}
+
+.optimization-link-icon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
 }
 
 .optimization-link:hover,
@@ -435,11 +442,17 @@ p {
 }
 
 .ghost-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
   min-width: 42px;
   padding: 0 10px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 900;
+  white-space: nowrap;
+  word-break: keep-all;
   transition: border-color 120ms ease, background 120ms ease;
 }
 
@@ -3265,7 +3278,7 @@ tr:nth-child(3) .rank-badge {
   }
 
   .ghost-button {
-    min-width: 36px;
+    min-width: 56px;
     min-height: 32px;
     padding: 0 8px;
   }

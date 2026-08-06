@@ -2,7 +2,7 @@
   "use strict";
 
   const supported = ["ko", "en", "zh-TW"];
-  const labels = { ko: "EN", en: "繁中", "zh-TW": "한국어" };
+  const labels = { ko: "한국어", en: "English", "zh-TW": "繁中" };
   const copy = {
     ko: {
       title: "개인정보처리방침",

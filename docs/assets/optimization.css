@@ -301,8 +301,7 @@ code {
 
 .profile-panel,
 .result-panel {
-  position: sticky;
-  top: 88px;
+  position: static;
 }
 
 .panel-head,

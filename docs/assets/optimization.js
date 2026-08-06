@@ -295,7 +295,7 @@ let activeGoalKey = "balanced";
 let tune = { ...DEFAULT_TUNE };
 let locale = normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY));
 const OPTIMIZER_TEXT = globalThis.NotMeterOptimizerText || {};
-const LANGUAGE_LABELS = { ko: "EN", en: "繁中", "zh-TW": "한국어" };
+const LANGUAGE_LABELS = { ko: "한국어", en: "English", "zh-TW": "繁中" };
 
 const el = {
   gpuSelect: document.querySelector("#gpuSelect"),

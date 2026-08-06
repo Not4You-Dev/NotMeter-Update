@@ -35,9 +35,9 @@
   const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260806-2";
   const SUPPORTED_LOCALES = ["ko", "en", "zh-TW"];
   const LANGUAGE_BUTTON_LABELS = {
-    ko: "EN",
-    en: "繁中",
-    "zh-TW": "한국어",
+    ko: "한국어",
+    en: "English",
+    "zh-TW": "繁中",
   };
   const DETAIL_ENDPOINTS = [
     `${IWINV_RANKING_CACHE_ROOT}/details/`,
