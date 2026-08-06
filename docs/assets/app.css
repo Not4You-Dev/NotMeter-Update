@@ -3689,7 +3689,10 @@ tr:nth-child(3) .rank-badge {
   }
 
   .class-table .party-icons {
-    max-width: 100%;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    box-sizing: border-box;
     flex-wrap: wrap;
     margin-left: 0;
   }
