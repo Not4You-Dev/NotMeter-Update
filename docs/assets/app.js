@@ -145,6 +145,11 @@
       classTop10: "클래스 TOP 10",
       fieldBoss: "필드보스",
       optimization: "최적화",
+      optimizationPageTitle: "NotMeter 그래픽 최적화",
+      optimizationPageSubtitle: "아이온2 engine.ini 설정 생성기",
+      optimizationSurfaceTitle: "그래픽 최적화 설정",
+      optimizationSurfaceDescription: "현재 페이지에서 설정을 생성하며 상단 메뉴와 광고는 그대로 유지됩니다.",
+      optimizationFrameTitle: "아이온2 그래픽 최적화 설정 생성기",
       discord: "디스코드",
       download: "다운로드",
       taiwanServer: "대만 서버",
@@ -339,6 +344,11 @@
       classTop10: "Class TOP 10",
       fieldBoss: "Field Boss",
       optimization: "Optimization",
+      optimizationPageTitle: "NotMeter Optimizer",
+      optimizationPageSubtitle: "AION2 engine.ini settings generator",
+      optimizationSurfaceTitle: "Graphics Optimization Settings",
+      optimizationSurfaceDescription: "Generate settings here while keeping the header and advertisement visible.",
+      optimizationFrameTitle: "AION2 graphics optimization settings generator",
       discord: "Discord",
       download: "Download",
       taiwanServer: "Taiwan server",
@@ -601,7 +611,9 @@
     });
     void loadIconAtlases();
     void loadCache();
-    if (history.state?.notMeterStatsView === "field-boss") {
+    if (history.state?.notMeterStatsView === "optimization") {
+      openOptimizationView(false);
+    } else if (history.state?.notMeterStatsView === "field-boss") {
       openFieldBossView(false);
     } else if (history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
@@ -630,6 +642,8 @@
   function bindElements() {
     for (const id of [
       "page-title", "page-subtitle", "daily-user-count", "language-button",
+      "optimization-button", "optimization-surface", "optimization-back-button",
+      "optimization-frame",
       "class-top10-button", "class-top10-surface", "class-top10-back-button",
       "class-top10-tabs", "class-top10-pending", "class-top10-empty",
       "class-top10-view", "class-top10-rows",
@@ -693,6 +707,20 @@
       } else {
         openClassTop10View(true);
       }
+    });
+    elements["optimization-button"].addEventListener("click", () => {
+      if (state.surfaceMode === "optimization") {
+        returnToRankingFromOptimization();
+      } else {
+        openOptimizationView(true);
+      }
+    });
+    elements["optimization-back-button"].addEventListener(
+      "click",
+      returnToRankingFromOptimization);
+    elements["optimization-frame"].addEventListener("load", () => {
+      syncOptimizationFrameLocale();
+      requestOptimizationFrameHeight();
     });
     elements["class-top10-back-button"].addEventListener(
       "click",
@@ -784,6 +812,10 @@
       render();
     });
     window.addEventListener("popstate", event => {
+      if (event.state?.notMeterStatsView === "optimization") {
+        openOptimizationView(false);
+        return;
+      }
       if (event.state?.notMeterStatsView === "field-boss") {
         openFieldBossView(false);
         return;
@@ -794,6 +826,7 @@
       }
       closeFieldBossView();
       closeClassTop10View();
+      closeOptimizationView();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
         state.selectedJob = job;
@@ -804,6 +837,7 @@
       }
       render();
     });
+    window.addEventListener("message", handleOptimizationFrameMessage);
     elements["detail-close"].addEventListener("click", closeCombatDetail);
     elements["detail-settings-toggle"].addEventListener("click", () => {
       const options = elements["detail-settings-options"];
@@ -1008,8 +1042,87 @@
     await loadFieldBossCache(force);
   }
 
+  function openOptimizationView(pushHistory) {
+    closeFieldBossView();
+    closeClassTop10View();
+    closeCombatDetail();
+    state.surfaceMode = "optimization";
+    document.body.classList.add("optimization-view");
+    elements["optimization-surface"].hidden = false;
+    elements["optimization-button"].classList.add("active");
+    elements["optimization-button"].setAttribute("aria-pressed", "true");
+    ensureOptimizationFrame();
+    updatePageIdentity();
+    if (pushHistory) {
+      history.pushState({ notMeterStatsView: "optimization" }, "");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeOptimizationView() {
+    if (state.surfaceMode !== "optimization") {
+      return;
+    }
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("optimization-view");
+    elements["optimization-surface"].hidden = true;
+    elements["optimization-button"].classList.remove("active");
+    elements["optimization-button"].setAttribute("aria-pressed", "false");
+    updatePageIdentity();
+  }
+
+  function returnToRankingFromOptimization() {
+    if (history.state?.notMeterStatsView === "optimization") {
+      history.back();
+      return;
+    }
+    closeOptimizationView();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function ensureOptimizationFrame() {
+    const frame = elements["optimization-frame"];
+    if (!frame.getAttribute("src")) {
+      frame.setAttribute("src", frame.dataset.src);
+      return;
+    }
+    syncOptimizationFrameLocale();
+    requestOptimizationFrameHeight();
+  }
+
+  function syncOptimizationFrameLocale() {
+    const frame = elements["optimization-frame"];
+    frame?.contentWindow?.postMessage({
+      type: "notmeter-optimizer-locale",
+      locale: state.locale,
+    }, window.location.origin);
+  }
+
+  function requestOptimizationFrameHeight() {
+    const frame = elements["optimization-frame"];
+    frame?.contentWindow?.postMessage({
+      type: "notmeter-optimizer-request-height",
+    }, window.location.origin);
+  }
+
+  function handleOptimizationFrameMessage(event) {
+    const frame = elements["optimization-frame"];
+    if (!frame || event.origin !== window.location.origin ||
+        event.source !== frame.contentWindow ||
+        event.data?.type !== "notmeter-optimizer-height") {
+      return;
+    }
+    const height = Math.ceil(Number(event.data.height));
+    if (!Number.isFinite(height) || height < 320) {
+      return;
+    }
+    frame.style.height = `${Math.min(height, 20_000)}px`;
+  }
+
   function openClassTop10View(pushHistory) {
     closeFieldBossView();
+    closeOptimizationView();
     closeCombatDetail();
     state.surfaceMode = "classTop10";
     document.body.classList.add("class-top10-view");
@@ -1048,6 +1161,7 @@
 
   function openFieldBossView(pushHistory) {
     closeClassTop10View();
+    closeOptimizationView();
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
     document.body.classList.add("field-boss-view");
@@ -1996,6 +2110,10 @@
   }
 
   function render() {
+    if (state.surfaceMode === "optimization") {
+      ensureOptimizationFrame();
+      return;
+    }
     if (state.surfaceMode === "fieldBoss") {
       if (state.fieldBossData) {
         renderFieldBoss();
@@ -3865,6 +3983,7 @@
     updatePageIdentity();
     syncCustomCpControls();
     renderDetailSettings();
+    syncOptimizationFrameLocale();
     if (state.surfaceMode === "fieldBoss" && state.fieldBossData) {
       renderFieldBoss();
     }
@@ -3873,16 +3992,21 @@
   function updatePageIdentity() {
     const fieldBoss = state.surfaceMode === "fieldBoss";
     const classTop10 = state.surfaceMode === "classTop10";
-    const title = t(fieldBoss
-      ? "fieldBossPageTitle"
-      : classTop10
-        ? "classTop10PageTitle"
-        : "title");
-    const subtitle = t(fieldBoss
-      ? "fieldBossPageSubtitle"
-      : classTop10
-        ? "classTop10PageSubtitle"
-        : "subtitle");
+    const optimization = state.surfaceMode === "optimization";
+    const title = t(optimization
+      ? "optimizationPageTitle"
+      : fieldBoss
+        ? "fieldBossPageTitle"
+        : classTop10
+          ? "classTop10PageTitle"
+          : "title");
+    const subtitle = t(optimization
+      ? "optimizationPageSubtitle"
+      : fieldBoss
+        ? "fieldBossPageSubtitle"
+        : classTop10
+          ? "classTop10PageSubtitle"
+          : "subtitle");
     document.title = title;
     elements["page-title"].textContent = title;
     elements["page-subtitle"].textContent = subtitle;
