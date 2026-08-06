@@ -898,5 +898,51 @@ el.languageButton.addEventListener("click", () => {
   render();
 });
 
+const IS_EMBEDDED = typeof window !== "undefined" &&
+  typeof URLSearchParams !== "undefined" &&
+  new URLSearchParams(window.location.search).get("embed") === "1";
+let embedHeightFrame = 0;
+
+const postEmbedHeight = () => {
+  if (!IS_EMBEDDED || window.parent === window) return;
+  window.cancelAnimationFrame(embedHeightFrame);
+  embedHeightFrame = window.requestAnimationFrame(() => {
+    const height = Math.ceil(Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+    ));
+    window.parent.postMessage({
+      type: "notmeter-optimizer-height",
+      height,
+    }, window.location.origin);
+  });
+};
+
+if (IS_EMBEDDED) {
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin || event.source !== window.parent) return;
+    if (event.data?.type === "notmeter-optimizer-request-height") {
+      postEmbedHeight();
+      return;
+    }
+    if (event.data?.type !== "notmeter-optimizer-locale") return;
+    const nextLocale = normalizeLocale(event.data.locale);
+    if (nextLocale === locale) {
+      postEmbedHeight();
+      return;
+    }
+    locale = nextLocale;
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+    render();
+    postEmbedHeight();
+  });
+  if (typeof ResizeObserver !== "undefined") {
+    const resizeObserver = new ResizeObserver(postEmbedHeight);
+    resizeObserver.observe(document.body);
+  }
+  window.addEventListener("load", postEmbedHeight);
+  document.fonts?.ready?.then(postEmbedHeight);
+}
+
 restoreSavedSettings();
 render();
