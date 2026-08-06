@@ -104,6 +104,8 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   rankingEntryCalculation: "以最高 CP 減去最低 CP 計算，剛好相差 200K 也會排除。例如 900K 與 700K 的角色同場時，差距為 200K，因此不會登錄。",
   rankingEntryPurposeTitle: "套用目的",
   rankingEntryPurpose: "此條件用於避免帶打或戰鬥力差距過大的小隊紀錄扭曲各職業 DPS 統計。",
+  rankingEntryRankerDisplayTitle: "DPS 計量器排行標記",
+  rankingEntryRankerDisplay: "即時排行圖示只會在目前偵測到的 CP 與上榜紀錄屬於同一個 25K 區間時顯示。例如 900,000～924,999 區間的紀錄，在 CP 降至 899,999 以下時會隱藏；回到該區間後會自動恢復。暱稱特效的 TOP 3 使用權限會另外檢查角色曾上榜的所有區間。",
   rankingEntryNote: "無法確認 CP 的小隊員不納入差距計算。一般副本紀錄須符合已確認擊殺且小隊至少 5 人；單人內容「惡夢」只要至少有 1 人且確認擊殺，即納入統計。訓練用稻草人採用另外的規則。",
   weeklyCompare: "▲▼ 表示相同條件下，各職業前 25% DPS 相較上週的變化",
   weeklyTooltip: "相同條件下與上週比較",
