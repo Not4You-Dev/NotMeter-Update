@@ -13,6 +13,10 @@
     17400057,
     17400058,
   ]);
+  const NON_GAMEPLAY_DETAIL_SKILL_CODES = new Set([
+    190000003,
+    190000004,
+  ]);
   const SPIRIT_PACKET_SKILL_NAMES = new Map([
     [160014, { ko: "원혼 날리기", en: "Toss Revenant", "zh-TW": "飛擲冤魂" }],
     [160015, { ko: "강렬한 일격", en: "Fierce Strike", "zh-TW": "強烈一擊" }],
@@ -80,6 +84,12 @@
   }
 
   function shouldDisplay(buff) {
+    if (!shouldDisplaySkill({
+      skillCode: buff?.code,
+      rawSkillCode: buff?.rawCode,
+    })) {
+      return false;
+    }
     const rawCode = compactCode(buff?.rawCode);
     const identityCode = rawCode > 0 ? rawCode : compactCode(buff?.code);
     if (NON_GAMEPLAY_DETAIL_BUFF_CODES.has(identityCode)) {
@@ -93,6 +103,11 @@
       name !== "사라진 상승기류" &&
       name !== "消失的上升氣流" &&
       name !== "still air";
+  }
+
+  function shouldDisplaySkill(skill) {
+    return !NON_GAMEPLAY_DETAIL_SKILL_CODES.has(code(skill?.rawSkillCode)) &&
+      !NON_GAMEPLAY_DETAIL_SKILL_CODES.has(code(skill?.skillCode));
   }
 
   function iconSource(buff) {
@@ -198,6 +213,7 @@
     iconSource,
     isEnhanced,
     shouldDisplay,
+    shouldDisplaySkill,
     skillDisplayName,
     skillIconSource,
   });
