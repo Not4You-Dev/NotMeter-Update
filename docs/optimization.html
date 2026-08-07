@@ -254,13 +254,13 @@
                 <span>텍스처 안정성</span>
                 <b data-value-label="texture">기본</b>
                 <input type="range" min="-2" max="2" step="1" value="0" data-tune="texture" />
-                <small>텍스처 팝인을 줄입니다. VRAM 사용량이 늘 수 있습니다.</small>
+                <small>텍스처 팝인을 줄이고 VRAM에 맞춰 임시 스트리밍 메모리도 함께 조절합니다.</small>
               </label>
               <label class="range-control">
                 <span>순간 끊김 방지</span>
                 <b data-value-label="stutter">기본</b>
                 <input type="range" min="-2" max="2" step="1" value="0" data-tune="stutter" />
-                <small>마을/성역 입장 직후 끊김이 있으면 올립니다.</small>
+                <small>맵 이동 직후 멈춤이 있으면 +1 이상으로 올립니다. 메모리가 부족한 PC는 -1을 사용합니다.</small>
               </label>
               <label class="range-control">
                 <span>수풀/필드 오브젝트</span>
@@ -373,6 +373,7 @@
               <article><b>화면이 흐릿함</b><span>선명도 +1, 원거리 시야 +1, 화면 분위기 `선명하고 깨끗하게`</span></article>
               <article><b>프레임이 떨어짐</b><span>그림자/반사 -1, 스킬 이펙트 -1, 원거리 시야 -1</span></article>
               <article><b>텍스처가 늦게 뜸</b><span>텍스처 안정성 +1, VRAM 기준을 실제 VRAM으로 선택</span></article>
+              <article><b>맵 이동 직후 화면이 멈춤</b><span>순간 끊김 방지 +1, VRAM 기준을 실제 VRAM으로 선택</span></article>
               <article><b>배경 깨짐이 거슬림</b><span>안개를 `일부 유지` 또는 `기본 유지`로 변경</span></article>
               <article><b>필드에서 렉이 심함</b><span>수풀/필드 오브젝트 -1, 후처리 깊이 -1, 스킬 이펙트 -1</span></article>
               <article><b>물가/성역에서 렉</b><span>물/반사를 `끄기` 또는 `낮게`, 그림자/반사 -1</span></article>
@@ -388,6 +389,6 @@
   </div>
 
   <script src="./assets/optimization-copy.js?v=20260807-3"></script>
-  <script src="./assets/optimization.js?v=20260807-3"></script>
+  <script src="./assets/optimization.js?v=20260807-4"></script>
 </body>
 </html>
