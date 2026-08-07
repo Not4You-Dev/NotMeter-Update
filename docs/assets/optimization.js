@@ -10,7 +10,7 @@ const PROFILES = {
       viewDistance: 1.85, staticLod: 0.58, skeletalBias: -2, nanitePixels: 1.9, naniteBias: 0,
       lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 24, lumenMeshSdf: 1,
       poolSize: 6144, limitPoolToVram: 1, streamingPerFrame: 64, streamingBoost: 1.18,
-      emitterScale: 0.85, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 1,
+      emitterScale: 0.85, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 0,
       shadowQuality: 4, cascades: 4, shadowDistance: 1.2, radiusThreshold: 0.035,
       ssr: 3, contactShadows: 1, bloom: 3, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.25, createShadersOnLoad: 1,
@@ -44,7 +44,7 @@ const PROFILES = {
       viewDistance: 1.85, staticLod: 0.58, skeletalBias: -2, nanitePixels: 1.9, naniteBias: 0,
       lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 24, lumenMeshSdf: 1,
       poolSize: 6144, limitPoolToVram: 1, streamingPerFrame: 64, streamingBoost: 1.18,
-      emitterScale: 0.85, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 1,
+      emitterScale: 0.85, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 0,
       shadowQuality: 4, cascades: 4, shadowDistance: 1.2, radiusThreshold: 0.035,
       ssr: 3, contactShadows: 1, bloom: 3, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.25, createShadersOnLoad: 1,
@@ -61,7 +61,7 @@ const PROFILES = {
       viewDistance: 1.65, staticLod: 0.68, skeletalBias: -2, nanitePixels: 2.15, naniteBias: 0.05,
       lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 16, lumenMeshSdf: 1,
       poolSize: 4608, limitPoolToVram: 1, streamingPerFrame: 54, streamingBoost: 1.1,
-      emitterScale: 0.8, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 1,
+      emitterScale: 0.8, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
       shadowQuality: 3, cascades: 3, shadowDistance: 1.05, radiusThreshold: 0.045,
       ssr: 2, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.18, createShadersOnLoad: 1,
@@ -95,7 +95,7 @@ const PROFILES = {
       viewDistance: 1.55, staticLod: 0.7, skeletalBias: -2, nanitePixels: 2.3, naniteBias: 0.05,
       lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 16, lumenMeshSdf: 1,
       poolSize: 5000, limitPoolToVram: 0, streamingPerFrame: 50, streamingBoost: 1.08,
-      emitterScale: 0.78, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 1,
+      emitterScale: 0.78, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
       shadowQuality: 3, cascades: 3, shadowDistance: 1.05, radiusThreshold: 0.045,
       ssr: 2, contactShadows: 1, bloom: 3, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.2, createShadersOnLoad: 1,
@@ -197,7 +197,7 @@ const PROFILES = {
       viewDistance: 1.55, staticLod: 0.72, skeletalBias: -2, nanitePixels: 2.35, naniteBias: 0.08,
       lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 12, lumenMeshSdf: 1,
       poolSize: 4608, limitPoolToVram: 1, streamingPerFrame: 50, streamingBoost: 1.05,
-      emitterScale: 0.75, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 1,
+      emitterScale: 0.75, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
       shadowQuality: 3, cascades: 3, shadowDistance: 1, radiusThreshold: 0.05,
       ssr: 2, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.15, createShadersOnLoad: 1,
@@ -245,7 +245,7 @@ const GOALS = {
   clarity: { title: "선명도", desc: "흐릿함과 번짐을 줄이고 또렷하게 만듭니다.", tag: "시인성", tune: { sharpness: 2, resolution: 1, distance: 1, characterDistance: 1, texture: 1, foliage: 0, postprocess: -1, latency: "smooth", water: "low", fog: "off", mood: "clean" } },
   pvp: { title: "쟁/PVP", desc: "시야 확보와 전투 안정성을 우선합니다.", tag: "전투", tune: { sharpness: 1, distance: 1, characterDistance: 1, lighting: -1, effects: -1, foliage: -1, postprocess: -1, stutter: 1, latency: "responsive", water: "off", frameLimit: "120", fog: "off", mood: "clean" } },
   fps: { title: "프레임", desc: "프레임 방어와 렉 감소를 우선합니다.", tag: "성능", tune: { resolution: -1, distance: -1, lighting: -2, effects: -2, texture: -1, foliage: -2, postprocess: -2, stutter: 1, latency: "responsive", water: "off", frameLimit: "90", fog: "off" } },
-  low: { title: "저사양", desc: "발열과 끊김을 최대한 줄입니다.", tag: "가벼움", tune: { sharpness: -1, resolution: -2, distance: -2, characterDistance: -1, lighting: -2, effects: -2, texture: -2, foliage: -2, postprocess: -2, stutter: 2, latency: "responsive", vram: "4", water: "off", frameLimit: "60", fog: "soft", mood: "natural" } },
+  low: { title: "저사양", desc: "발열과 끊김을 최대한 줄입니다.", tag: "가벼움", tune: { sharpness: -1, resolution: -2, distance: -2, characterDistance: -1, lighting: -2, effects: -2, texture: -2, foliage: -2, postprocess: -2, stutter: -1, latency: "responsive", vram: "4", water: "off", frameLimit: "60", fog: "soft", mood: "natural" } },
 };
 
 const CUSTOM_GOAL = { title: "커스텀", desc: "사용자가 직접 조절한 설정입니다.", tag: "직접 조절", tune: {} };
@@ -511,7 +511,7 @@ const buildValues = () => {
   v.boostPlayerTextures = round(clamp((Number(v.boostPlayerTextures) || 1) + texture * 0.08, 0.55, 1.45), 2);
   v.streamingPerFrame = Math.round(clamp((Number(v.streamingPerFrame) || 40) - stutter * 6, 18, 72));
   v.gcPurge = Math.round(clamp((Number(v.gcPurge) || 120) + stutter * 30, 60, 240));
-  v.forceGc = stutter >= 2 ? 0 : 1;
+  v.forceGc = stutter >= 1 ? 0 : stutter <= -1 ? 1 : Number(v.forceGc) ? 1 : 0;
   v.createShadersOnLoad = stutter >= 1 ? 1 : Number(v.createShadersOnLoad) || 0;
   v.mipBias = round(clamp(0 - texture * 0.18, 0, 2), 2);
 
@@ -535,6 +535,7 @@ const buildValues = () => {
   if (tune.vram !== "auto" && VRAM_CAPS[tune.vram]) {
     v.poolSize = Math.min(v.poolSize, VRAM_CAPS[tune.vram]);
   }
+  v.maxTempMemory = Math.round(clamp(v.poolSize * 0.125, 256, 1024) / 64) * 64;
 
   if (tune.fog === "on") {
     v.fog = 1;
@@ -630,8 +631,12 @@ r.Lumen.DiffuseIndirect.Allow=${optimizationValue(v.lumenDiffuse)}
 r.Lumen.ScreenProbeGather.RadianceCache.ProbeResolution=${optimizationValue(v.lumenProbe)}
 
 ; ===== 4. ${translated("텍스처 스트리밍 / 끊김 완화")} =====
+r.TextureStreaming=1
 r.Streaming.PoolSize=${optimizationValue(v.poolSize)}
+r.Streaming.MaxTempMemoryAllowed=${optimizationValue(v.maxTempMemory)}
+r.Streaming.FullyLoadUsedTextures=0
 r.Streaming.LimitPoolSizeToVRAM=${optimizationValue(v.limitPoolToVram)}
+r.Streaming.MinMipForSplitRequest=1
 r.Streaming.Boost=${optimizationValue(v.streamingBoost)}
 r.Streaming.MipBias=${optimizationValue(v.mipBias)}
 r.Streaming.NumStaticComponentsProcessedPerFrame=${optimizationValue(v.streamingPerFrame)}
@@ -672,8 +677,10 @@ const ALLOWED_CONFIG_KEYS = new Set([
   "r.ViewDistanceScale", "r.StaticMeshLODDistanceScale", "r.SkeletalMeshLODBias",
   "r.Nanite.MaxPixelsPerEdge", "foliage.DensityScale", "foliage.LODDistanceScale",
   "grass.DensityScale", "r.Lumen.Reflections.Allow", "r.Lumen.DiffuseIndirect.Allow",
-  "r.Lumen.ScreenProbeGather.RadianceCache.ProbeResolution", "r.Streaming.PoolSize",
-  "r.Streaming.LimitPoolSizeToVRAM", "r.Streaming.Boost", "r.Streaming.MipBias",
+  "r.Lumen.ScreenProbeGather.RadianceCache.ProbeResolution", "r.TextureStreaming",
+  "r.Streaming.PoolSize", "r.Streaming.MaxTempMemoryAllowed", "r.Streaming.FullyLoadUsedTextures",
+  "r.Streaming.LimitPoolSizeToVRAM", "r.Streaming.MinMipForSplitRequest",
+  "r.Streaming.Boost", "r.Streaming.MipBias",
   "r.Streaming.NumStaticComponentsProcessedPerFrame", "gc.TimeBetweenPurgingPendingKillObjects",
   "s.ForceGCAfterLevelStreamedOut", "r.EmitterSpawnRateScale", "r.ParticleLightQuality",
   "r.ShadowQuality", "r.Shadow.CSM.MaxCascades", "r.Shadow.DistanceScale",
