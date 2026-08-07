@@ -2976,10 +2976,11 @@
     const skills = Array.isArray(detail.skills)
       ? [...detail.skills]
           .filter(skill =>
-            Number(skill.totalDamage) > 0 ||
-            Number(skill.healingAmount) > 0 ||
-            Number(skill.drainHealingAmount) > 0 ||
-            Number(skill.useCount) > 0)
+            globalThis.NotMeterCombatDetailBuffs.shouldDisplaySkill(skill) &&
+            (Number(skill.totalDamage) > 0 ||
+             Number(skill.healingAmount) > 0 ||
+             Number(skill.drainHealingAmount) > 0 ||
+             Number(skill.useCount) > 0))
           .sort((left, right) =>
             Number(right.totalDamage) - Number(left.totalDamage) ||
             Number(right.healingAmount) - Number(left.healingAmount) ||
