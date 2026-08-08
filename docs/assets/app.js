@@ -123,7 +123,7 @@
     ["specialization", "specialization"],
     ["hits", "hits"],
     ["parry", "parry"],
-    ["avoidance", "avoidance"],
+    ["avoidance", "avoidanceBlock"],
     ["multiHit", "multiHit"],
     ["critical", "critical"],
     ["front", "front"],
@@ -286,8 +286,10 @@
       weeklyGuideRanking: "직업 순서는 이번 주 상위 25% DPS로 정렬됩니다. 딜미터기·처치 기록의 랭커 표시, 상위 %, 구간 1~20위는 표본 확보를 위해 전체 기간 동일 조건을 기준으로 계산합니다.",
       weeklyGuideNote: "직전 주에 같은 조건의 기록이 없으면 화살표가 표시되지 않습니다. 화살표에 마우스를 올리면 이전·현재 DPS와 표본 수를 확인할 수 있습니다.",
       classDps: "{job} DPS 1~{count}위",
+      classCombatTime: "{job} 전투 시간 1~{count}위",
       top20: "TOP {count}",
       uniqueRankers: "표시 캐릭터 {count}명 · 동일 캐릭터는 선택 조건에서 가장 높은 DPS 기록만 표시",
+      uniqueCombatTimeRankers: "표시 캐릭터 {count}명 · 동일 캐릭터는 선택 조건에서 가장 빠른 전투 기록만 표시",
       backToJobs: "직업 목록으로",
       party: "파티",
       viewDetails: "보기",
@@ -320,6 +322,8 @@
       specialization: "특성",
       parry: "페리",
       avoidance: "회피",
+      avoidanceBlock: "회피/막기",
+      block: "막기",
       multiHit: "다단 히트",
       critical: "크리",
       front: "전방",
@@ -487,8 +491,10 @@
       weeklyGuideRanking: "Classes are sorted by this week's top-25% DPS. Ranker indicators, Combat Record Top %, and ranks 1–20 use all-time matching data to maintain sufficient samples.",
       weeklyGuideNote: "No arrow is shown when the previous week has no records under the same filters. Hover over an arrow to see the previous and current DPS and sample counts.",
       classDps: "{job} DPS — Top {count}",
+      classCombatTime: "{job} Combat Time — Top {count}",
       top20: "TOP {count}",
       uniqueRankers: "{count} characters shown · only each character's highest DPS under these filters is shown",
+      uniqueCombatTimeRankers: "{count} characters shown · only each character's fastest combat record under these filters is shown",
       backToJobs: "Back to classes",
       party: "PARTY",
       viewDetails: "View",
@@ -521,6 +527,8 @@
       specialization: "Specialization",
       parry: "Parry",
       avoidance: "Evade",
+      avoidanceBlock: "Evade / Block",
+      block: "Block",
       multiHit: "Multi-hit",
       critical: "Critical",
       front: "Front",
@@ -669,7 +677,8 @@
       "detail-character", "detail-duration", "detail-cp", "detail-total-damage",
       "detail-dps", "detail-share", "detail-summary-duration", "detail-death-count", "detail-hits",
       "detail-parry-rate", "detail-critical-rate", "detail-front-rate", "detail-back-rate",
-      "detail-perfect-rate", "detail-double-rate", "detail-evade-rate", "detail-cp-row",
+      "detail-perfect-rate", "detail-double-rate", "detail-evade-rate", "detail-block-row",
+      "detail-block-rate", "detail-cp-row",
       "detail-visible-count", "detail-settings-toggle", "detail-settings-options",
       "detail-skill-rows", "detail-buffs-section", "detail-buffs", "detail-buff-count",
       "detail-party-tabs",
@@ -2410,6 +2419,41 @@
     return tr;
   }
 
+  function usesCombatTimeRanking(dungeonKey = state.dungeonKey) {
+    return dungeonKey === "nightmare-atheron-10";
+  }
+
+  function rankingDuration(player) {
+    const duration = Number(player?.U ?? player?.durationSeconds);
+    return Number.isFinite(duration) && duration > 0
+      ? duration
+      : Number.POSITIVE_INFINITY;
+  }
+
+  function rankingDps(player) {
+    return Number(player?.X ?? player?.dps) || 0;
+  }
+
+  function compareClassRankingPlayers(left, right) {
+    if (usesCombatTimeRanking()) {
+      const durationDifference = rankingDuration(left) - rankingDuration(right);
+      if (durationDifference !== 0) {
+        return durationDifference;
+      }
+    }
+    const dpsDifference = rankingDps(right) - rankingDps(left);
+    if (dpsDifference !== 0) {
+      return dpsDifference;
+    }
+    const rankDifference = Number(left?.rank || 0) - Number(right?.rank || 0);
+    if (rankDifference !== 0) {
+      return rankDifference;
+    }
+    const serverDifference = Number(left?.S ?? left?.serverId) - Number(right?.S ?? right?.serverId);
+    return serverDifference || String(left?.N ?? left?.name ?? "")
+      .localeCompare(String(right?.N ?? right?.name ?? ""));
+  }
+
   function renderClassRanking() {
     if (state.cpFilterMode === "custom" &&
         !state.customCpRankData.has(state.dungeonKey)) {
@@ -2433,17 +2477,21 @@
       ?.find(item => item.jobName === state.selectedJob)
       ?.players || [];
     const sorted = [...players]
-      .sort((left, right) => Number(left.rank) - Number(right.rank))
-      .slice(0, 20);
+      .sort(compareClassRankingPlayers)
+      .slice(0, 20)
+      .map((player, index) => ({ ...player, rank: index + 1 }));
 
     elements["class-heading"].hidden = false;
-    elements["class-title"].textContent = t("classDps", {
+    elements["class-title"].textContent = t(
+      usesCombatTimeRanking() ? "classCombatTime" : "classDps", {
       job: jobName(state.selectedJob),
       count: sorted.length,
     });
     elements["class-badge"].textContent = t("top20", { count: sorted.length });
     elements["class-caption"].textContent = state.cpFilterMode === "custom"
-      ? `${filterDescription()} · ${t("uniqueRankers", { count: sorted.length })}`
+      ? `${filterDescription()} · ${t(
+          usesCombatTimeRanking() ? "uniqueCombatTimeRankers" : "uniqueRankers",
+          { count: sorted.length })}`
       : filterDescription();
     elements["summary-view"].hidden = true;
     updateSnapshot(findSummaryView());
@@ -2971,7 +3019,13 @@
     elements["detail-perfect-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.perfectRate);
     elements["detail-double-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.doubleDamageRate);
     elements["detail-evade-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.evadeRate);
+    const blockDataReliable = Boolean(detail.blockDataReliable);
+    elements["detail-block-rate"].textContent = unavailableReason || !blockDataReliable
+      ? "—"
+      : `${formatInteger(Math.max(0, Number(detail.blockHits) || 0))} / ${formatPercent(detail.blockRate)}`;
     applyDetailMetricVisibility();
+    elements["detail-block-row"].hidden =
+      !blockDataReliable || !isDetailMetricVisible("avoidance");
 
     const skills = Array.isArray(detail.skills)
       ? [...detail.skills]
@@ -2998,7 +3052,7 @@
       skillRows.append(unavailable);
     } else {
       for (const skill of skills) {
-        skillRows.append(buildDetailSkillRow(skill));
+        skillRows.append(buildDetailSkillRow(skill, blockDataReliable));
       }
     }
     elements["detail-skill-rows"].replaceChildren(skillRows);
@@ -3072,7 +3126,7 @@
     host.hidden = false;
   }
 
-  function buildDetailSkillRow(skill) {
+  function buildDetailSkillRow(skill, blockDataReliable = false) {
     const row = document.createElement("article");
     row.className = "detail-skill-row";
     const recordedSkillName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill, state.locale) ||
@@ -3145,6 +3199,13 @@
       chips.append(buildDetailChip(
         t("avoidance"),
         `${formatInteger(skill.evadeCount)} / ${formatPercent(skill.evadeRate)}`));
+    }
+    if (blockDataReliable &&
+        isDetailMetricVisible("avoidance") &&
+        Number(skill.blockHits) > 0) {
+      chips.append(buildDetailChip(
+        t("block"),
+        `${formatInteger(skill.blockHits)} / ${formatPercent(skill.blockRate)}`));
     }
     if (isDetailMetricVisible("multiHit") && Number(skill.hitCount) > 0) {
       const hits = Math.max(0, Number(skill.hitCount) || 0);
@@ -3608,7 +3669,7 @@
         const participant = String(player.G || `${serverId}:${name}`);
         const key = `${jobName}\u0000${participant}`;
         const current = bestByCharacter.get(key);
-        if (!current || Number(player.X) > Number(current.player.X)) {
+        if (!current || compareClassRankingPlayers(player, current.player) < 0) {
           bestByCharacter.set(key, { jobName, player, bossIndex: Number(bucket.B) || 0 });
         }
       }
@@ -3616,10 +3677,7 @@
     const rows = JOB_ORDER.map(jobName => {
       const players = [...bestByCharacter.values()]
         .filter(item => item.jobName === jobName)
-        .sort((left, right) =>
-          Number(right.player.X) - Number(left.player.X) ||
-          Number(left.player.S) - Number(right.player.S) ||
-          String(left.player.N).localeCompare(String(right.player.N)))
+        .sort((left, right) => compareClassRankingPlayers(left.player, right.player))
         .slice(0, 20)
         .map((item, index) => ({
           rank: index + 1,
