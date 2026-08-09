@@ -500,7 +500,6 @@ const LANGUAGE_LABELS = { ko: "한국어", en: "English", "zh-TW": "繁中" };
 
 const el = {
   gpuSelect: document.querySelector("#gpuSelect"),
-  profileGrid: document.querySelector("#profileGrid"),
   goalGrid: document.querySelector("#goalGrid"),
   issueGrid: document.querySelector("#issueGrid"),
   configOutput: document.querySelector("#configOutput"),
@@ -959,7 +958,6 @@ const validateConfig = (text) => {
 
 const renderProfiles = () => {
   el.gpuSelect.textContent = "";
-  el.profileGrid.textContent = "";
   PROFILE_GROUPS.forEach((group) => {
     const optionGroup = document.createElement("optgroup");
     optionGroup.label = translated(group.label);
@@ -971,19 +969,6 @@ const renderProfiles = () => {
       optionGroup.appendChild(option);
     });
     el.gpuSelect.appendChild(optionGroup);
-  });
-  profileKeys.forEach((key) => {
-    const profile = PROFILES[key];
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = `profile-button${key === activeProfileKey ? " is-active" : ""}`;
-    button.dataset.profile = key;
-    const title = document.createElement("strong");
-    title.textContent = translated(profile.short);
-    const caption = document.createElement("span");
-    caption.textContent = `${translated(profile.hint)} · ${translated(profile.vram)}`;
-    button.append(title, caption);
-    el.profileGrid.appendChild(button);
   });
   el.gpuSelect.value = activeProfileKey;
 };
@@ -1158,14 +1143,6 @@ const copyEnginePath = async () => {
 
 el.gpuSelect.addEventListener("change", () => {
   activeProfileKey = PROFILES[el.gpuSelect.value] ? el.gpuSelect.value : "rtx5060ti";
-  persistSettings();
-  render();
-});
-
-el.profileGrid.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-profile]");
-  if (!button) return;
-  activeProfileKey = button.dataset.profile;
   persistSettings();
   render();
 });
