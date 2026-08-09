@@ -492,7 +492,7 @@ const LEGACY_PROFILE_ALIASES = Object.freeze({
 });
 let activeProfileKey = "rtx5060ti";
 let activeGoalKey = "balanced";
-let activeIssueKey = "none";
+let activeIssueKeys = [];
 let tune = { ...DEFAULT_TUNE };
 let locale = normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY));
 const OPTIMIZER_TEXT = globalThis.NotMeterOptimizerText || {};
@@ -517,8 +517,16 @@ const el = {
   metricLoad: document.querySelector("#metricLoad"),
   quickGuideStatus: document.querySelector("#quickGuideStatus"),
   scrollToResultButton: document.querySelector("#scrollToResultButton"),
+  openAdvancedButton: document.querySelector("#openAdvancedButton"),
+  advancedButtonLabel: document.querySelector("#advancedButtonLabel"),
+  advancedSettings: document.querySelector("#advancedSettings"),
+  advancedSettingsMount: document.querySelector("#advancedSettingsMount"),
   resultPanel: document.querySelector(".result-panel"),
 };
+
+if (el.advancedSettingsMount && el.advancedSettings) {
+  el.advancedSettingsMount.appendChild(el.advancedSettings);
+}
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value) || 0));
 const round = (value, digits = 2) => Math.round((Number(value) || 0) * 10 ** digits) / 10 ** digits;
@@ -598,7 +606,11 @@ function restoreSavedSettings() {
     const savedProfile = LEGACY_PROFILE_ALIASES[saved.profile] || saved.profile;
     if (PROFILES[savedProfile]) activeProfileKey = savedProfile;
     if (GOALS[saved.goal] || saved.goal === "custom") activeGoalKey = saved.goal;
-    if (ISSUES[saved.issue]) activeIssueKey = saved.issue;
+    if (Array.isArray(saved.issues)) {
+      activeIssueKeys = [...new Set(saved.issues.filter(key => key !== "none" && ISSUES[key]))];
+    } else if (saved.issue && saved.issue !== "none" && ISSUES[saved.issue]) {
+      activeIssueKeys = [saved.issue];
+    }
     tune = sanitizeTune(saved.tune);
   } catch {
   }
@@ -609,7 +621,7 @@ function persistSettings() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       profile: activeProfileKey,
       goal: activeGoalKey,
-      issue: activeIssueKey,
+      issues: activeIssueKeys,
       tune: sanitizeTune(tune),
     }));
   } catch {
@@ -997,10 +1009,12 @@ const renderGoals = () => {
 const renderIssues = () => {
   el.issueGrid.textContent = "";
   Object.entries(ISSUES).forEach(([key, issue]) => {
+    const isActive = key === "none" ? activeIssueKeys.length === 0 : activeIssueKeys.includes(key);
     const button = document.createElement("button");
     button.type = "button";
-    button.className = `issue-button${key === activeIssueKey ? " is-active" : ""}`;
+    button.className = `issue-button${isActive ? " is-active" : ""}`;
     button.dataset.issue = key;
+    button.setAttribute("aria-pressed", String(isActive));
     const title = document.createElement("strong");
     title.textContent = translated(issue.title);
     const caption = document.createElement("span");
@@ -1021,6 +1035,12 @@ const syncControls = () => {
   });
 };
 
+const syncAdvancedButton = () => {
+  const isOpen = Boolean(el.advancedSettings.open);
+  el.openAdvancedButton.setAttribute("aria-expanded", String(isOpen));
+  el.advancedButtonLabel.textContent = translated(isOpen ? "정밀 조절 닫기" : "정밀 조절 열기");
+};
+
 const render = () => {
   const profile = PROFILES[activeProfileKey];
   const goal = GOALS[activeGoalKey] || CUSTOM_GOAL;
@@ -1033,8 +1053,10 @@ const render = () => {
   el.metricQuality.textContent = metrics.quality;
   el.metricLoad.textContent = metrics.load;
   el.resultTitle.textContent = `${translated(profile.short)} · ${translated(goal.title)}`;
-  const issue = ISSUES[activeIssueKey] || ISSUES.none;
-  el.quickGuideStatus.textContent = `${translated(profile.short)} · ${translated(goal.title)} · ${translated(issue.title)}`;
+  const issueSummary = activeIssueKeys.length > 0
+    ? activeIssueKeys.map(key => translated(ISSUES[key].title)).join(" + ")
+    : translated(ISSUES.none.title);
+  el.quickGuideStatus.textContent = `${translated(profile.short)} · ${translated(goal.title)} · ${issueSummary}`;
   el.resultSummary.textContent = buildSummary();
   const config = buildConfig();
   const valid = validateConfig(config);
@@ -1046,25 +1068,35 @@ const render = () => {
     : translated("생성값 검증에 실패했습니다. 추천값으로 초기화해 주세요.");
   el.safetyStatus.classList.toggle("error", !valid);
   translateStaticPage();
+  syncAdvancedButton();
 };
 
 const setGoal = (key) => {
   activeGoalKey = GOALS[key] ? key : "balanced";
-  activeIssueKey = "none";
-  tune = { ...DEFAULT_TUNE, ...(GOALS[activeGoalKey].tune || {}) };
+  tune = buildQuickTune(activeGoalKey, activeIssueKeys);
   persistSettings();
   render();
 };
 
+const buildQuickTune = (goalKey, issueKeys) => {
+  const nextTune = { ...DEFAULT_TUNE, ...(GOALS[goalKey]?.tune || {}) };
+  Object.keys(ISSUES).forEach(key => {
+    if (issueKeys.includes(key)) Object.assign(nextTune, ISSUES[key].tune || {});
+  });
+  return nextTune;
+};
+
 const setIssue = (key) => {
-  activeIssueKey = ISSUES[key] ? key : "none";
+  if (!ISSUES[key] || key === "none") {
+    activeIssueKeys = [];
+  } else if (activeIssueKeys.includes(key)) {
+    activeIssueKeys = activeIssueKeys.filter(issueKey => issueKey !== key);
+  } else {
+    activeIssueKeys = [...activeIssueKeys, key];
+  }
   const baseGoalKey = GOALS[activeGoalKey] ? activeGoalKey : "balanced";
   activeGoalKey = baseGoalKey;
-  tune = {
-    ...DEFAULT_TUNE,
-    ...(GOALS[baseGoalKey].tune || {}),
-    ...(ISSUES[activeIssueKey].tune || {}),
-  };
+  tune = buildQuickTune(baseGoalKey, activeIssueKeys);
   persistSettings();
   render();
 };
@@ -1156,7 +1188,7 @@ document.querySelectorAll("[data-tune]").forEach((control) => {
     const key = control.dataset.tune;
     tune = { ...tune, [key]: control.type === "range" ? Number(control.value) : control.value };
     activeGoalKey = "custom";
-    activeIssueKey = "none";
+    activeIssueKeys = [];
     persistSettings();
     render();
   });
@@ -1169,10 +1201,17 @@ el.scrollToResultButton.addEventListener("click", () => {
   el.resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
   window.setTimeout(() => el.copyButton.focus({ preventScroll: true }), 350);
 });
+el.openAdvancedButton.addEventListener("click", () => {
+  el.advancedSettings.open = !el.advancedSettings.open;
+  syncAdvancedButton();
+  if (el.advancedSettings.open) {
+    el.advancedSettingsMount.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+});
 el.resetButton.addEventListener("click", () => {
   activeProfileKey = "rtx5060ti";
   activeGoalKey = "balanced";
-  activeIssueKey = "none";
+  activeIssueKeys = [];
   tune = { ...DEFAULT_TUNE };
   persistSettings();
   render();
