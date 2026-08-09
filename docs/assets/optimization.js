@@ -84,6 +84,23 @@ const PROFILES = {
       boostPlayerTextures: 1.15, createShadersOnLoad: 1,
     },
   },
+  rtx4050mobile: {
+    label: "RTX 4050 Laptop",
+    short: "RTX 4050 Laptop",
+    hint: "노트북 균형",
+    gpu: "RTX 4050 Laptop",
+    vram: "6GB",
+    values: {
+      dlss: 1, dlssPreset: 2, screen: 100, gamma: 2.05, skylight: 1.18, sharpen: 0.52,
+      viewDistance: 1.3, staticLod: 0.9, skeletalBias: -1, nanitePixels: 2.85, naniteBias: 0.18,
+      lumenReflections: 0, lumenDiffuse: 1, lumenProbe: 8, lumenMeshSdf: 0,
+      poolSize: 2600, limitPoolToVram: 1, streamingPerFrame: 36, streamingBoost: 1,
+      emitterScale: 0.6, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 1,
+      shadowQuality: 2, cascades: 2, shadowDistance: 0.8, radiusThreshold: 0.07,
+      ssr: 1, contactShadows: 0, bloom: 1, fog: 0, waterReflection: 0,
+      boostPlayerTextures: 1, createShadersOnLoad: 0,
+    },
+  },
   rtx30high: {
     label: "RTX 3070 / 3070 Ti / 3080 / 3090",
     short: "RTX 3070+",
@@ -133,6 +150,23 @@ const PROFILES = {
       shadowQuality: 3, cascades: 2, shadowDistance: 0.95, radiusThreshold: 0.055,
       ssr: 1, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.1, createShadersOnLoad: 1,
+    },
+  },
+  rtx3060mobile: {
+    label: "RTX 3060 8GB / RTX 3060 Laptop",
+    short: "RTX 3060 8GB",
+    hint: "8GB 안정성",
+    gpu: "RTX 3060 8GB / RTX 3060 Laptop",
+    vram: "6GB~8GB",
+    values: {
+      dlss: 1, dlssPreset: 2, screen: 100, gamma: 2.05, skylight: 1.2, sharpen: 0.53,
+      viewDistance: 1.4, staticLod: 0.86, skeletalBias: -1, nanitePixels: 2.65, naniteBias: 0.12,
+      lumenReflections: 0, lumenDiffuse: 1, lumenProbe: 8, lumenMeshSdf: 0,
+      poolSize: 3200, limitPoolToVram: 1, streamingPerFrame: 40, streamingBoost: 1,
+      emitterScale: 0.66, particleLight: 0, meshLight: 0, gcPurge: 135, forceGc: 1,
+      shadowQuality: 2, cascades: 2, shadowDistance: 0.88, radiusThreshold: 0.065,
+      ssr: 1, contactShadows: 0, bloom: 1, fog: 0, waterReflection: 0,
+      boostPlayerTextures: 1.05, createShadersOnLoad: 0,
     },
   },
   rtx3050: {
@@ -186,28 +220,113 @@ const PROFILES = {
       boostPlayerTextures: 1, createShadersOnLoad: 0,
     },
   },
-  amdHigh: {
-    label: "AMD RX 6700 XT 이상 / RX 7000",
-    short: "AMD RX 상급",
-    hint: "VRAM 활용",
-    gpu: "RX 6700 XT 이상 / RX 7000",
-    vram: "10GB 이상",
+  amd90high: {
+    label: "Radeon RX 9070 / 9070 XT",
+    short: "Radeon RX 9070",
+    hint: "RDNA 4 고화질",
+    gpu: "Radeon RX 9070 / 9070 XT",
+    vram: "16GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.35, sharpen: 0.58,
+      viewDistance: 1.8, staticLod: 0.6, skeletalBias: -2, nanitePixels: 1.95, naniteBias: 0,
+      lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 24, lumenMeshSdf: 1,
+      poolSize: 6144, limitPoolToVram: 1, streamingPerFrame: 60, streamingBoost: 1.16,
+      emitterScale: 0.84, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 0,
+      shadowQuality: 4, cascades: 4, shadowDistance: 1.18, radiusThreshold: 0.038,
+      ssr: 3, contactShadows: 1, bloom: 3, fog: 0, waterReflection: 1,
+      boostPlayerTextures: 1.23, createShadersOnLoad: 1,
+    },
+  },
+  amd90mid: {
+    label: "Radeon RX 9060 XT",
+    short: "Radeon RX 9060 XT",
+    hint: "RDNA 4 균형",
+    gpu: "Radeon RX 9060 XT",
+    vram: "8GB~16GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.3, sharpen: 0.56,
+      viewDistance: 1.6, staticLod: 0.7, skeletalBias: -2, nanitePixels: 2.2, naniteBias: 0.06,
+      lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 16, lumenMeshSdf: 1,
+      poolSize: 4096, limitPoolToVram: 1, streamingPerFrame: 52, streamingBoost: 1.08,
+      emitterScale: 0.78, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
+      shadowQuality: 3, cascades: 3, shadowDistance: 1.02, radiusThreshold: 0.05,
+      ssr: 2, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
+      boostPlayerTextures: 1.16, createShadersOnLoad: 1,
+    },
+  },
+  amd7900: {
+    label: "Radeon RX 7900 GRE / XT / XTX",
+    short: "Radeon RX 7900",
+    hint: "최상급 고화질",
+    gpu: "Radeon RX 7900 GRE / XT / XTX",
+    vram: "16GB~24GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.35, sharpen: 0.58,
+      viewDistance: 1.78, staticLod: 0.62, skeletalBias: -2, nanitePixels: 2, naniteBias: 0,
+      lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 24, lumenMeshSdf: 1,
+      poolSize: 6144, limitPoolToVram: 1, streamingPerFrame: 60, streamingBoost: 1.15,
+      emitterScale: 0.84, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 0,
+      shadowQuality: 4, cascades: 4, shadowDistance: 1.16, radiusThreshold: 0.04,
+      ssr: 3, contactShadows: 1, bloom: 3, fog: 0, waterReflection: 1,
+      boostPlayerTextures: 1.22, createShadersOnLoad: 1,
+    },
+  },
+  amd7800: {
+    label: "Radeon RX 7700 XT / 7800 XT",
+    short: "Radeon RX 7700/7800",
+    hint: "1440p 고화질",
+    gpu: "Radeon RX 7700 XT / 7800 XT",
+    vram: "12GB~16GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.3, sharpen: 0.56,
+      viewDistance: 1.65, staticLod: 0.68, skeletalBias: -2, nanitePixels: 2.15, naniteBias: 0.05,
+      lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 16, lumenMeshSdf: 1,
+      poolSize: 4608, limitPoolToVram: 1, streamingPerFrame: 54, streamingBoost: 1.1,
+      emitterScale: 0.8, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
+      shadowQuality: 3, cascades: 3, shadowDistance: 1.05, radiusThreshold: 0.045,
+      ssr: 2, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
+      boostPlayerTextures: 1.18, createShadersOnLoad: 1,
+    },
+  },
+  amd6800: {
+    label: "Radeon RX 6800 / 6900 / 6950 XT",
+    short: "Radeon RX 6800/6900",
+    hint: "16GB 품질 균형",
+    gpu: "Radeon RX 6800 / 6900 / 6950 XT",
+    vram: "16GB",
     values: {
       dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.3, sharpen: 0.55,
-      viewDistance: 1.55, staticLod: 0.72, skeletalBias: -2, nanitePixels: 2.35, naniteBias: 0.08,
+      viewDistance: 1.58, staticLod: 0.71, skeletalBias: -2, nanitePixels: 2.3, naniteBias: 0.07,
       lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 12, lumenMeshSdf: 1,
-      poolSize: 4608, limitPoolToVram: 1, streamingPerFrame: 50, streamingBoost: 1.05,
-      emitterScale: 0.75, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
+      poolSize: 5120, limitPoolToVram: 1, streamingPerFrame: 50, streamingBoost: 1.06,
+      emitterScale: 0.76, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
       shadowQuality: 3, cascades: 3, shadowDistance: 1, radiusThreshold: 0.05,
       ssr: 2, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
       boostPlayerTextures: 1.15, createShadersOnLoad: 1,
     },
   },
+  amd6700: {
+    label: "Radeon RX 6700 XT / 6750 XT",
+    short: "Radeon RX 6700/6750",
+    hint: "12GB 균형",
+    gpu: "Radeon RX 6700 XT / 6750 XT",
+    vram: "12GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.27, sharpen: 0.54,
+      viewDistance: 1.5, staticLod: 0.76, skeletalBias: -2, nanitePixels: 2.45, naniteBias: 0.09,
+      lumenReflections: 1, lumenDiffuse: 1, lumenProbe: 12, lumenMeshSdf: 1,
+      poolSize: 4096, limitPoolToVram: 1, streamingPerFrame: 46, streamingBoost: 1.04,
+      emitterScale: 0.72, particleLight: 0, meshLight: 0, gcPurge: 120, forceGc: 0,
+      shadowQuality: 3, cascades: 2, shadowDistance: 0.95, radiusThreshold: 0.055,
+      ssr: 1, contactShadows: 1, bloom: 2, fog: 0, waterReflection: 1,
+      boostPlayerTextures: 1.1, createShadersOnLoad: 1,
+    },
+  },
   amdMid: {
-    label: "AMD RX 6600 / 7600",
-    short: "AMD RX 중급",
-    hint: "안정성",
-    gpu: "RX 6600 / 7600",
+    label: "Radeon RX 6600 / 6650 XT / 7600 / 7600 XT",
+    short: "Radeon RX 6600/7600",
+    hint: "8GB 안정성",
+    gpu: "Radeon RX 6600 / 6650 XT / 7600 / 7600 XT",
     vram: "8GB~16GB",
     values: {
       dlss: 0, dlssPreset: 0, screen: 100, gamma: 2.05, skylight: 1.2, sharpen: 0.52,
@@ -218,6 +337,40 @@ const PROFILES = {
       shadowQuality: 2, cascades: 2, shadowDistance: 0.8, radiusThreshold: 0.07,
       ssr: 1, contactShadows: 0, bloom: 1, fog: 0, waterReflection: 0,
       boostPlayerTextures: 1, createShadersOnLoad: 0,
+    },
+  },
+  amd5000: {
+    label: "Radeon RX 5600 XT / 5700 / 5700 XT",
+    short: "Radeon RX 5600/5700",
+    hint: "구형 Radeon 안정성",
+    gpu: "Radeon RX 5600 XT / 5700 / 5700 XT",
+    vram: "6GB~8GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2, skylight: 1.18, sharpen: 0.5,
+      viewDistance: 1.25, staticLod: 0.94, skeletalBias: -1, nanitePixels: 3, naniteBias: 0.22,
+      lumenReflections: 0, lumenDiffuse: 0, lumenProbe: 8, lumenMeshSdf: 0,
+      poolSize: 2800, limitPoolToVram: 1, streamingPerFrame: 34, streamingBoost: 0.97,
+      emitterScale: 0.58, particleLight: 0, meshLight: 0, gcPurge: 150, forceGc: 1,
+      shadowQuality: 2, cascades: 1, shadowDistance: 0.72, radiusThreshold: 0.08,
+      ssr: 0, contactShadows: 0, bloom: 1, fog: 0, waterReflection: 0,
+      boostPlayerTextures: 0.95, createShadersOnLoad: 0,
+    },
+  },
+  amdLegacy: {
+    label: "Radeon RX 580 / 590 / Vega",
+    short: "Radeon RX 580/Vega",
+    hint: "레거시 안정성",
+    gpu: "Radeon RX 580 / 590 / Vega",
+    vram: "4GB~8GB",
+    values: {
+      dlss: 0, dlssPreset: 0, screen: 100, gamma: 2, skylight: 1.12, sharpen: 0.48,
+      viewDistance: 1.08, staticLod: 1.05, skeletalBias: -1, nanitePixels: 3.3, naniteBias: 0.3,
+      lumenReflections: 0, lumenDiffuse: 0, lumenProbe: 8, lumenMeshSdf: 0,
+      poolSize: 2200, limitPoolToVram: 1, streamingPerFrame: 30, streamingBoost: 0.92,
+      emitterScale: 0.5, particleLight: 0, meshLight: 0, gcPurge: 165, forceGc: 1,
+      shadowQuality: 1, cascades: 1, shadowDistance: 0.62, radiusThreshold: 0.09,
+      ssr: 0, contactShadows: 0, bloom: 1, fog: 0, waterReflection: 0,
+      boostPlayerTextures: 0.9, createShadersOnLoad: 0,
     },
   },
   low: {
@@ -291,6 +444,14 @@ const STORAGE_KEY = "notmeter-optimizer-settings-v2";
 const LOCALE_STORAGE_KEY = "notmeter-stats-locale";
 const SUPPORTED_LOCALES = ["ko", "en", "zh-TW"];
 const profileKeys = Object.keys(PROFILES);
+const PROFILE_GROUPS = [
+  { label: "NVIDIA RTX 시리즈", keys: profileKeys.filter(key => key.startsWith("rtx")) },
+  { label: "AMD Radeon 시리즈", keys: profileKeys.filter(key => key.startsWith("amd")) },
+  { label: "기타 그래픽", keys: profileKeys.filter(key => !key.startsWith("rtx") && !key.startsWith("amd")) },
+];
+const LEGACY_PROFILE_ALIASES = Object.freeze({
+  amdHigh: "amd6700",
+});
 let activeProfileKey = "rtx5060ti";
 let activeGoalKey = "balanced";
 let tune = { ...DEFAULT_TUNE };
@@ -391,7 +552,8 @@ function restoreSavedSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
     if (!saved || typeof saved !== "object") return;
-    if (PROFILES[saved.profile]) activeProfileKey = saved.profile;
+    const savedProfile = LEGACY_PROFILE_ALIASES[saved.profile] || saved.profile;
+    if (PROFILES[savedProfile]) activeProfileKey = savedProfile;
     if (GOALS[saved.goal] || saved.goal === "custom") activeGoalKey = saved.goal;
     tune = sanitizeTune(saved.tune);
   } catch {
@@ -741,13 +903,20 @@ const validateConfig = (text) => {
 const renderProfiles = () => {
   el.gpuSelect.textContent = "";
   el.profileGrid.textContent = "";
+  PROFILE_GROUPS.forEach((group) => {
+    const optionGroup = document.createElement("optgroup");
+    optionGroup.label = translated(group.label);
+    group.keys.forEach((key) => {
+      const profile = PROFILES[key];
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = translated(profile.label);
+      optionGroup.appendChild(option);
+    });
+    el.gpuSelect.appendChild(optionGroup);
+  });
   profileKeys.forEach((key) => {
     const profile = PROFILES[key];
-    const option = document.createElement("option");
-    option.value = key;
-    option.textContent = translated(profile.label);
-    el.gpuSelect.appendChild(option);
-
     const button = document.createElement("button");
     button.type = "button";
     button.className = `profile-button${key === activeProfileKey ? " is-active" : ""}`;
