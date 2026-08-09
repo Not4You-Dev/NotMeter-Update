@@ -1791,6 +1791,7 @@ button:focus-visible,
   font-size: 12px;
   font-weight: 850;
   line-height: 1;
+  text-decoration: none;
   white-space: nowrap;
   transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
 }

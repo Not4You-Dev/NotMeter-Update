@@ -626,11 +626,13 @@
     });
     void loadIconAtlases();
     void loadCache();
-    if (history.state?.notMeterStatsView === "optimization") {
-      openOptimizationView(false);
-    } else if (history.state?.notMeterStatsView === "field-boss") {
-      openFieldBossView(false);
-    } else if (history.state?.notMeterStatsView === "class-top10") {
+    const pageView = initialPageView();
+    if (pageView === "optimization") {
+      openOptimizationView();
+    } else if (pageView === "field-boss") {
+      openFieldBossView();
+    } else if (window.location.hash === "#class-top10" ||
+        history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
     }
     window.setInterval(updateCacheAge, 60_000);
@@ -718,22 +720,18 @@
       }
     });
     elements["class-top10-button"].addEventListener("click", () => {
+      if (initialPageView() !== "ranking") {
+        const target = new URL("./", window.location.href);
+        target.hash = "class-top10";
+        window.location.assign(target.href);
+        return;
+      }
       if (state.surfaceMode === "classTop10") {
         returnToRankingFromClassTop10();
       } else {
         openClassTop10View(true);
       }
     });
-    elements["optimization-button"].addEventListener("click", () => {
-      if (state.surfaceMode === "optimization") {
-        returnToRankingFromOptimization();
-      } else {
-        openOptimizationView(true);
-      }
-    });
-    elements["optimization-back-button"].addEventListener(
-      "click",
-      returnToRankingFromOptimization);
     elements["optimization-frame"].addEventListener("load", () => {
       syncOptimizationFrameLocale();
       requestOptimizationFrameHeight();
@@ -741,14 +739,6 @@
     elements["class-top10-back-button"].addEventListener(
       "click",
       returnToRankingFromClassTop10);
-    elements["field-boss-button"].addEventListener("click", () => {
-      if (state.surfaceMode === "fieldBoss") {
-        returnToRanking();
-      } else {
-        openFieldBossView(true);
-      }
-    });
-    elements["field-boss-back-button"].addEventListener("click", returnToRanking);
     elements["field-boss-server"].addEventListener("focus", event => {
       event.target.select();
       openFieldBossServerSearch();
@@ -828,14 +818,6 @@
       render();
     });
     window.addEventListener("popstate", event => {
-      if (event.state?.notMeterStatsView === "optimization") {
-        openOptimizationView(false);
-        return;
-      }
-      if (event.state?.notMeterStatsView === "field-boss") {
-        openFieldBossView(false);
-        return;
-      }
       if (event.state?.notMeterStatsView === "class-top10") {
         openClassTop10View(false);
         return;
@@ -1058,7 +1040,12 @@
     await loadFieldBossCache(force);
   }
 
-  function openOptimizationView(pushHistory) {
+  function initialPageView() {
+    const view = new URLSearchParams(window.location.search).get("view");
+    return view === "field-boss" || view === "optimization" ? view : "ranking";
+  }
+
+  function openOptimizationView() {
     closeFieldBossView();
     closeClassTop10View();
     closeCombatDetail();
@@ -1066,12 +1053,9 @@
     document.body.classList.add("optimization-view");
     elements["optimization-surface"].hidden = false;
     elements["optimization-button"].classList.add("active");
-    elements["optimization-button"].setAttribute("aria-pressed", "true");
+    elements["optimization-button"].setAttribute("aria-current", "page");
     ensureOptimizationFrame();
     updatePageIdentity();
-    if (pushHistory) {
-      history.pushState({ notMeterStatsView: "optimization" }, "");
-    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -1083,18 +1067,8 @@
     document.body.classList.remove("optimization-view");
     elements["optimization-surface"].hidden = true;
     elements["optimization-button"].classList.remove("active");
-    elements["optimization-button"].setAttribute("aria-pressed", "false");
+    elements["optimization-button"].setAttribute("aria-current", "false");
     updatePageIdentity();
-  }
-
-  function returnToRankingFromOptimization() {
-    if (history.state?.notMeterStatsView === "optimization") {
-      history.back();
-      return;
-    }
-    closeOptimizationView();
-    render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function ensureOptimizationFrame() {
@@ -1175,7 +1149,7 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function openFieldBossView(pushHistory) {
+  function openFieldBossView() {
     closeClassTop10View();
     closeOptimizationView();
     closeCombatDetail();
@@ -1183,12 +1157,9 @@
     document.body.classList.add("field-boss-view");
     elements["field-boss-surface"].hidden = false;
     elements["field-boss-button"].classList.add("active");
-    elements["field-boss-button"].setAttribute("aria-pressed", "true");
+    elements["field-boss-button"].setAttribute("aria-current", "page");
     updatePageIdentity();
     startFieldBossClock();
-    if (pushHistory) {
-      history.pushState({ notMeterStatsView: "field-boss" }, "");
-    }
     if (state.fieldBossData) {
       renderFieldBoss();
       void syncLatestFieldBossCache();
@@ -1207,20 +1178,10 @@
     document.body.classList.remove("field-boss-view");
     elements["field-boss-surface"].hidden = true;
     elements["field-boss-button"].classList.remove("active");
-    elements["field-boss-button"].setAttribute("aria-pressed", "false");
+    elements["field-boss-button"].setAttribute("aria-current", "false");
     closeFieldBossServerSearch(true);
     stopFieldBossClock();
     updatePageIdentity();
-  }
-
-  function returnToRanking() {
-    if (history.state?.notMeterStatsView === "field-boss") {
-      history.back();
-      return;
-    }
-    closeFieldBossView();
-    render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function startFieldBossClock() {
