@@ -919,7 +919,7 @@ p {
 }
 
 .field-boss-row-copy strong,
-.field-boss-row-copy span {
+.field-boss-row-copy > span {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -927,15 +927,42 @@ p {
 }
 
 .field-boss-row-copy strong {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
   color: #eff6fa;
   font-size: 12px;
   font-weight: 900;
 }
 
-.field-boss-row-copy span {
+.field-boss-row-copy > span {
   margin-top: 4px;
   color: #7e97a8;
   font-size: 9.5px;
+}
+
+.field-boss-row-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.field-boss-kibelisk {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: #72c9cf;
+  font-size: 10px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.field-boss-row.no-time .field-boss-kibelisk {
+  color: #617e89;
 }
 
 .field-boss-row.no-time .field-boss-row-copy strong {
