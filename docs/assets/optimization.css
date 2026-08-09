@@ -656,6 +656,21 @@ select {
   grid-column: 1 / -1;
 }
 
+.compatibility-control {
+  border-color: rgba(255, 225, 163, 0.3);
+  background:
+    linear-gradient(135deg, rgba(255, 225, 163, 0.085), rgba(120, 242, 251, 0.045)),
+    rgba(2, 8, 16, 0.58);
+}
+
+.compatibility-control > span {
+  color: var(--gold);
+}
+
+.compatibility-control small {
+  color: rgba(255, 245, 220, 0.78);
+}
+
 .range-control {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px 10px;

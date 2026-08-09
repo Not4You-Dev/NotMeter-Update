@@ -22,7 +22,7 @@
     }
   </script>
   <link rel="stylesheet" href="./assets/app.css?v=20260807-2" />
-  <link rel="stylesheet" href="./assets/optimization.css?v=20260807-3" />
+  <link rel="stylesheet" href="./assets/optimization.css?v=20260810-1" />
 </head>
 <body>
   <div class="page-shell optimization-shell">
@@ -337,6 +337,14 @@
                 </select>
                 <small>프레임보다 보기 좋은 화면이 중요하면 고화질 질감이나 화사한 색감을 선택합니다.</small>
               </label>
+              <label class="select-control is-wide compatibility-control">
+                <span>비행 가속 화면 효과</span>
+                <select data-tune="flightEffects">
+                  <option value="compatible">게임 효과 우선 (추천)</option>
+                  <option value="aggressive">최대 최적화</option>
+                </select>
+                <small>비행 가속 중 화면 테두리 잘림·검은 그림자 잔상이 보이면 게임 효과 우선을 사용하세요. 이 모드는 내부 해상도와 반투명 후처리를 게임 기본값으로 유지합니다.</small>
+              </label>
               <label class="select-control">
                 <span>모션 블러</span>
                 <select data-tune="motionBlur">
@@ -380,6 +388,7 @@
               <article><b>발열과 팬소음</b><span>프레임 제한 60~90 FPS, 해상도 스케일 -1</span></article>
               <article><b>캐릭터가 늦게 선명해짐</b><span>캐릭터/NPC 거리 +1, 텍스처 안정성 +1</span></article>
               <article><b>스킬 입력이 둔함</b><span>입력 반응을 `반응속도 우선`으로 변경</span></article>
+              <article><b>비행 가속 중 테두리 잘림·그림자 잔상</b><span>비행 가속 화면 효과를 `게임 효과 우선 (추천)`으로 변경하고, 계속 보이면 모션 블러를 `게임 기본값 유지`로 변경</span></article>
             </div>
           </div>
         </section>
@@ -388,7 +397,7 @@
     </main>
   </div>
 
-  <script src="./assets/optimization-copy.js?v=20260807-3"></script>
-  <script src="./assets/optimization.js?v=20260807-4"></script>
+  <script src="./assets/optimization-copy.js?v=20260810-1"></script>
+  <script src="./assets/optimization.js?v=20260810-1"></script>
 </body>
 </html>

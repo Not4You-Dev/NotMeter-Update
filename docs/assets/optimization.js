@@ -267,6 +267,7 @@ const DEFAULT_TUNE = {
   frameLimit: "auto",
   fog: "off",
   mood: "neutral",
+  flightEffects: "compatible",
   motionBlur: "off",
   depthOfField: "off",
   lensFlare: "off",
@@ -374,6 +375,7 @@ function sanitizeTune(value) {
     frameLimit: ["auto", "60", "90", "120", "144", "165", "240"],
     fog: ["off", "soft", "on"],
     mood: ["neutral", "clean", "vivid", "cinematic", "natural"],
+    flightEffects: ["compatible", "aggressive"],
     motionBlur: ["off", "low", "game"],
     depthOfField: ["off", "on", "game"],
     lensFlare: ["off", "on", "game"],
@@ -438,6 +440,8 @@ const buildSummary = () => {
   if (tune.mood === "cinematic") parts.push("고화질 질감과 화면 분위기를 우선합니다.");
   if (tune.mood === "vivid") parts.push("밝고 화사한 색감을 우선합니다.");
   if (tune.mood === "clean") parts.push("번짐을 줄이고 깨끗한 화면을 우선합니다.");
+  if (tune.flightEffects === "compatible") parts.push("비행 가속 효과와 충돌할 수 있는 내부 해상도·반투명 후처리는 게임 기본값을 유지합니다.");
+  if (tune.flightEffects === "aggressive") parts.push("내부 해상도와 반투명 후처리까지 직접 조절합니다. 비행 중 테두리 잘림이나 그림자 잔상이 생기면 게임 효과 우선으로 바꾸세요.");
   return parts.map(translated).join(" ") ||
     translated("균형값으로 생성됩니다. 처음 쓰는 사용자는 그대로 복사해도 됩니다.");
 };
@@ -602,13 +606,30 @@ const buildConfig = () => {
   const frameLimitLine = v.maxFps === null
     ? ""
     : `t.MaxFPS=${optimizationValue(v.maxFps)}`;
-  const resolutionLine = tuneNumber("resolution") === 0
+  const preserveFlightEffects = tune.flightEffects !== "aggressive";
+  const resolutionLine = preserveFlightEffects || tuneNumber("resolution") === 0
     ? ""
     : `r.ScreenPercentage=${optimizationValue(v.screen)}`;
+  const halfResolutionSsrLine = preserveFlightEffects
+    ? ""
+    : "r.SSR.HalfResSceneColor=1";
+  const translucencyLines = preserveFlightEffects
+    ? ""
+    : [
+      `r.TranslucencyLightingVolumeDim=${optimizationValue(v.translucencyDim)}`,
+      `r.SeparateTranslucencyScreenPercentage=${optimizationValue(v.separateTranslucencyScreen)}`,
+    ].join("\n");
+  const compatibilityComment = preserveFlightEffects
+    ? translated("비행 가속 화면 효과 호환을 위해 내부 해상도와 반투명 후처리는 게임 기본값을 유지합니다.")
+    : translated("최대 최적화 선택으로 내부 해상도와 반투명 후처리까지 직접 조절합니다.");
+  const upscalerComment = preserveFlightEffects
+    ? translated("게임 내 업스케일러와 내부 해상도는 강제하지 않습니다.")
+    : translated("게임 내 업스케일러는 강제하지 않고, 해상도 세부 조절을 바꾼 경우에만 화면 비율을 적용합니다.");
   return `; NOT METER OPTIMIZATION START
 [SystemSettings]
 ; ===== NOT METER AION2 : ${translated(profile.short)} / ${translated(goal.title)} =====
-; ${translated("게임 내 업스케일러는 강제하지 않고, 해상도 세부 조절을 바꾼 경우에만 화면 비율을 적용합니다.")}
+; ${upscalerComment}
+; ${compatibilityComment}
 
 ; ===== 1. ${translated("프레임 / 해상도 / 선명도")} =====
 ${frameLimitLine}
@@ -653,7 +674,7 @@ r.Shadow.CSM.MaxCascades=${optimizationValue(v.cascades)}
 r.Shadow.DistanceScale=${optimizationValue(v.shadowDistance)}
 r.Shadow.RadiusThreshold=${optimizationValue(v.radiusThreshold)}
 r.SSR.Quality=${optimizationValue(v.ssr)}
-r.SSR.HalfResSceneColor=1
+${halfResolutionSsrLine}
 r.ContactShadows=${optimizationValue(v.contactShadows)}
 
 ; ===== 7. ${translated("후처리 / 안개 / 물")} =====
@@ -662,8 +683,7 @@ r.SceneColorFringeQuality=0
 r.AmbientOcclusionLevels=${optimizationValue(v.ambientOcclusion)}
 r.AmbientOcclusionRadiusScale=${optimizationValue(v.ambientOcclusionRadius)}
 r.LightShaftQuality=${optimizationValue(v.lightShaft)}
-r.TranslucencyLightingVolumeDim=${optimizationValue(v.translucencyDim)}
-r.SeparateTranslucencyScreenPercentage=${optimizationValue(v.separateTranslucencyScreen)}
+${translucencyLines}
 r.BloomQuality=${optimizationValue(v.bloom)}
 r.Fog=${optimizationValue(v.fog)}
 r.VolumetricFog=${optimizationValue(v.volumetricFog)}
