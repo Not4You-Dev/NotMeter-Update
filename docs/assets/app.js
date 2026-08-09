@@ -51,6 +51,7 @@
   const CACHE_SYNC_THROTTLE_MS = 60 * 1000;
   const FIELD_BOSS_CACHE_SYNC_INTERVAL_MS = 90 * 1000;
   const FIELD_BOSS_CACHE_RESUME_THROTTLE_MS = 15 * 1000;
+  const FIELD_BOSS_TARGET_HOLD_THRESHOLD_MS = 10 * 60 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
   const INTERNAL_REPLAY_PERIOD_LABEL = "__notmeter_replay_top20_v1__";
@@ -1219,7 +1220,6 @@
         const previousData = state.fieldBossData;
         const previousRevision = state.fieldBossRevision;
         state.fieldBossLastSyncAt = Date.now();
-        state.fieldBossRevision = revision || previousRevision;
         if (!shouldApplyFieldBossCache(
           cache,
           previousData,
@@ -1230,7 +1230,8 @@
           }
           return previousData;
         }
-        state.fieldBossData = cache;
+        state.fieldBossRevision = revision || previousRevision;
+        state.fieldBossData = stabilizeFieldBossCache(cache, previousData, Date.now());
         populateFieldBossServers();
         state.fieldBossRegion = resolveDefaultFieldBossRegion(
           state.fieldBossServerId,
@@ -1334,6 +1335,44 @@
       return nextGeneration > currentGeneration;
     }
     return Boolean(revision && revision !== currentRevision);
+  }
+
+  function stabilizeFieldBossCache(cache, current, now = Date.now()) {
+    if (!current || !Array.isArray(current.servers) || !Array.isArray(cache?.servers)) {
+      return cache;
+    }
+
+    const currentTargets = new Map();
+    for (const server of current.servers) {
+      for (const region of server?.regions || []) {
+        for (const entry of region?.entries || []) {
+          currentTargets.set(
+            `${Number(server?.serverId)}:${Number(region?.region)}:${Number(entry?.bossCode)}`,
+            Number(entry?.targetAt));
+        }
+      }
+    }
+
+    let held = false;
+    const servers = cache.servers.map(server => ({
+      ...server,
+      regions: (server?.regions || []).map(region => ({
+        ...region,
+        entries: (region?.entries || []).map(entry => {
+          const key = `${Number(server?.serverId)}:${Number(region?.region)}:${Number(entry?.bossCode)}`;
+          const currentTarget = currentTargets.get(key);
+          const candidateTarget = Number(entry?.targetAt);
+          if (!Number.isSafeInteger(currentTarget) ||
+              currentTarget <= now ||
+              Math.abs(candidateTarget - currentTarget) < FIELD_BOSS_TARGET_HOLD_THRESHOLD_MS) {
+            return entry;
+          }
+          held = true;
+          return { ...entry, targetAt: currentTarget };
+        }),
+      })),
+    }));
+    return held ? { ...cache, servers } : cache;
   }
 
   function validateFieldBossCache(cache) {
