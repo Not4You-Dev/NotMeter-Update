@@ -401,6 +401,44 @@ const GOALS = {
   low: { title: "저사양", desc: "발열과 끊김을 최대한 줄입니다.", tag: "가벼움", tune: { sharpness: -1, resolution: -2, distance: -2, characterDistance: -1, lighting: -2, effects: -2, texture: -2, foliage: -2, postprocess: -2, stutter: -1, latency: "responsive", vram: "4", water: "off", frameLimit: "60", fog: "soft", mood: "natural" } },
 };
 
+const ISSUES = {
+  none: {
+    title: "문제 없음",
+    desc: "선택한 목적의 추천값만 사용합니다.",
+    tune: {},
+  },
+  blurry: {
+    title: "화면이 흐릿함",
+    desc: "선명도와 원거리 식별을 보정합니다.",
+    tune: { sharpness: 1, distance: 1, mood: "clean" },
+  },
+  fps: {
+    title: "전투 중 프레임 저하",
+    desc: "그림자·이펙트·수풀 부담을 낮춥니다.",
+    tune: { lighting: -1, effects: -1, foliage: -1, postprocess: -1 },
+  },
+  stutter: {
+    title: "맵 이동 후 순간 멈춤",
+    desc: "로딩과 메모리 정리 간격을 안정화합니다.",
+    tune: { stutter: 1, texture: 1 },
+  },
+  texture: {
+    title: "텍스처가 늦게 뜸",
+    desc: "텍스처 스트리밍 안정성을 높입니다.",
+    tune: { texture: 1, stutter: 1 },
+  },
+  flight: {
+    title: "비행 중 잔상·테두리 잘림",
+    desc: "충돌 가능 설정을 게임 기본값으로 돌립니다.",
+    tune: { flightEffects: "compatible", motionBlur: "game" },
+  },
+  heat: {
+    title: "발열·팬 소음이 큼",
+    desc: "프레임을 90으로 제한해 순간 부하를 줄입니다.",
+    tune: { frameLimit: "90", resolution: -1 },
+  },
+};
+
 const CUSTOM_GOAL = { title: "커스텀", desc: "사용자가 직접 조절한 설정입니다.", tag: "직접 조절", tune: {} };
 
 const DEFAULT_TUNE = {
@@ -454,6 +492,7 @@ const LEGACY_PROFILE_ALIASES = Object.freeze({
 });
 let activeProfileKey = "rtx5060ti";
 let activeGoalKey = "balanced";
+let activeIssueKey = "none";
 let tune = { ...DEFAULT_TUNE };
 let locale = normalizeLocale(localStorage.getItem(LOCALE_STORAGE_KEY));
 const OPTIMIZER_TEXT = globalThis.NotMeterOptimizerText || {};
@@ -463,6 +502,7 @@ const el = {
   gpuSelect: document.querySelector("#gpuSelect"),
   profileGrid: document.querySelector("#profileGrid"),
   goalGrid: document.querySelector("#goalGrid"),
+  issueGrid: document.querySelector("#issueGrid"),
   configOutput: document.querySelector("#configOutput"),
   copyButton: document.querySelector("#copyButton"),
   copyButtonSmall: document.querySelector("#copyButtonSmall"),
@@ -475,6 +515,9 @@ const el = {
   metricClarity: document.querySelector("#metricClarity"),
   metricQuality: document.querySelector("#metricQuality"),
   metricLoad: document.querySelector("#metricLoad"),
+  quickGuideStatus: document.querySelector("#quickGuideStatus"),
+  scrollToResultButton: document.querySelector("#scrollToResultButton"),
+  resultPanel: document.querySelector(".result-panel"),
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value) || 0));
@@ -555,6 +598,7 @@ function restoreSavedSettings() {
     const savedProfile = LEGACY_PROFILE_ALIASES[saved.profile] || saved.profile;
     if (PROFILES[savedProfile]) activeProfileKey = savedProfile;
     if (GOALS[saved.goal] || saved.goal === "custom") activeGoalKey = saved.goal;
+    if (ISSUES[saved.issue]) activeIssueKey = saved.issue;
     tune = sanitizeTune(saved.tune);
   } catch {
   }
@@ -565,6 +609,7 @@ function persistSettings() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       profile: activeProfileKey,
       goal: activeGoalKey,
+      issue: activeIssueKey,
       tune: sanitizeTune(tune),
     }));
   } catch {
@@ -949,6 +994,22 @@ const renderGoals = () => {
   });
 };
 
+const renderIssues = () => {
+  el.issueGrid.textContent = "";
+  Object.entries(ISSUES).forEach(([key, issue]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `issue-button${key === activeIssueKey ? " is-active" : ""}`;
+    button.dataset.issue = key;
+    const title = document.createElement("strong");
+    title.textContent = translated(issue.title);
+    const caption = document.createElement("span");
+    caption.textContent = translated(issue.desc);
+    button.append(title, caption);
+    el.issueGrid.appendChild(button);
+  });
+};
+
 const syncControls = () => {
   document.querySelectorAll("[data-tune]").forEach((control) => {
     const key = control.dataset.tune;
@@ -966,11 +1027,14 @@ const render = () => {
   const metrics = buildMetrics();
   renderProfiles();
   renderGoals();
+  renderIssues();
   syncControls();
   el.metricClarity.textContent = metrics.clarity;
   el.metricQuality.textContent = metrics.quality;
   el.metricLoad.textContent = metrics.load;
   el.resultTitle.textContent = `${translated(profile.short)} · ${translated(goal.title)}`;
+  const issue = ISSUES[activeIssueKey] || ISSUES.none;
+  el.quickGuideStatus.textContent = `${translated(profile.short)} · ${translated(goal.title)} · ${translated(issue.title)}`;
   el.resultSummary.textContent = buildSummary();
   const config = buildConfig();
   const valid = validateConfig(config);
@@ -986,7 +1050,21 @@ const render = () => {
 
 const setGoal = (key) => {
   activeGoalKey = GOALS[key] ? key : "balanced";
+  activeIssueKey = "none";
   tune = { ...DEFAULT_TUNE, ...(GOALS[activeGoalKey].tune || {}) };
+  persistSettings();
+  render();
+};
+
+const setIssue = (key) => {
+  activeIssueKey = ISSUES[key] ? key : "none";
+  const baseGoalKey = GOALS[activeGoalKey] ? activeGoalKey : "balanced";
+  activeGoalKey = baseGoalKey;
+  tune = {
+    ...DEFAULT_TUNE,
+    ...(GOALS[baseGoalKey].tune || {}),
+    ...(ISSUES[activeIssueKey].tune || {}),
+  };
   persistSettings();
   render();
 };
@@ -1066,12 +1144,19 @@ el.goalGrid.addEventListener("click", (event) => {
   setGoal(button.dataset.goal);
 });
 
+el.issueGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-issue]");
+  if (!button) return;
+  setIssue(button.dataset.issue);
+});
+
 document.querySelectorAll("[data-tune]").forEach((control) => {
   const eventName = control.type === "range" ? "input" : "change";
   control.addEventListener(eventName, () => {
     const key = control.dataset.tune;
     tune = { ...tune, [key]: control.type === "range" ? Number(control.value) : control.value };
     activeGoalKey = "custom";
+    activeIssueKey = "none";
     persistSettings();
     render();
   });
@@ -1080,9 +1165,14 @@ document.querySelectorAll("[data-tune]").forEach((control) => {
 el.copyButton.addEventListener("click", () => void copyConfig(el.copyButton));
 el.copyButtonSmall.addEventListener("click", () => void copyConfig(el.copyButtonSmall));
 el.copyPathButton.addEventListener("click", () => void copyEnginePath());
+el.scrollToResultButton.addEventListener("click", () => {
+  el.resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(() => el.copyButton.focus({ preventScroll: true }), 350);
+});
 el.resetButton.addEventListener("click", () => {
   activeProfileKey = "rtx5060ti";
   activeGoalKey = "balanced";
+  activeIssueKey = "none";
   tune = { ...DEFAULT_TUNE };
   persistSettings();
   render();

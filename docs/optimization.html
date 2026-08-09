@@ -22,7 +22,7 @@
     }
   </script>
   <link rel="stylesheet" href="./assets/app.css?v=20260807-2" />
-  <link rel="stylesheet" href="./assets/optimization.css?v=20260810-1" />
+  <link rel="stylesheet" href="./assets/optimization.css?v=20260810-3" />
 </head>
 <body>
   <div class="page-shell optimization-shell">
@@ -71,22 +71,59 @@
         </div>
       </section>
 
-      <section class="quick-steps" aria-label="빠른 적용 순서">
-        <article>
-          <b>1</b>
-          <strong>그래픽카드 선택</strong>
-          <p>정확한 모델이 없으면 같은 세대와 VRAM이 비슷한 항목을 선택합니다.</p>
-        </article>
-        <article>
-          <b>2</b>
-          <strong>목적 선택</strong>
-          <p>대부분은 균형, 화면이 흐리면 선명도, 고사양은 고화질을 선택합니다.</p>
-        </article>
-        <article>
-          <b>3</b>
-          <strong>복사 후 붙여넣기</strong>
-          <p>생성된 마커 블록을 engine.ini 맨 아래에 붙여넣고 게임을 재실행합니다.</p>
-        </article>
+      <section class="quick-setup" aria-label="빠른 최적화 설정">
+        <div class="quick-setup-head">
+          <div>
+            <span>QUICK SETUP</span>
+            <h2>세 가지만 선택하면 추천 설정이 완성됩니다</h2>
+            <p>실제 게임 화면을 부정확하게 흉내 내지 않고, 그래픽카드·사용 목적·현재 증상을 기준으로 안전한 값만 생성합니다.</p>
+          </div>
+          <span class="quick-setup-badge">초보자 추천</span>
+        </div>
+
+        <div class="quick-setup-step">
+          <div class="quick-step-title">
+            <b>1</b>
+            <div>
+              <strong>내 그래픽카드</strong>
+              <span>정확한 모델이 없으면 같은 세대와 VRAM이 비슷한 항목을 선택하세요.</span>
+            </div>
+          </div>
+          <label class="profile-select-label quick-gpu-select">
+            <span>그래픽카드 빠른 선택</span>
+            <select id="gpuSelect"></select>
+          </label>
+        </div>
+
+        <div class="quick-setup-step">
+          <div class="quick-step-title">
+            <b>2</b>
+            <div>
+              <strong>가장 중요한 사용 목적</strong>
+              <span>잘 모르겠다면 균형을 선택하면 됩니다.</span>
+            </div>
+          </div>
+          <div class="goal-grid" id="goalGrid" aria-label="추천 목적 선택"></div>
+        </div>
+
+        <div class="quick-setup-step">
+          <div class="quick-step-title">
+            <b>3</b>
+            <div>
+              <strong>현재 겪는 문제</strong>
+              <span>문제가 없다면 `문제 없음`을 선택하세요. 선택한 증상에 필요한 값만 안전하게 보정합니다.</span>
+            </div>
+          </div>
+          <div class="issue-grid" id="issueGrid" aria-label="현재 문제 선택"></div>
+        </div>
+
+        <div class="quick-setup-footer">
+          <div>
+            <span>현재 추천</span>
+            <strong id="quickGuideStatus">RTX 5060/5070 · 균형 · 문제 없음</strong>
+          </div>
+          <button id="scrollToResultButton" type="button">생성 결과 바로 보기</button>
+        </div>
       </section>
 
       <section class="engine-location-card" aria-label="engine.ini 위치와 적용 방법">
@@ -169,27 +206,30 @@
       </section>
 
       <section class="optimizer-workspace">
+        <details class="advanced-settings">
+          <summary>
+            <div>
+              <span>ADVANCED SETTINGS</span>
+              <strong>세부 설정 직접 조절</strong>
+              <small>그래픽카드 전체 목록과 선명도·거리·그림자·이펙트 등을 직접 바꿀 때만 여세요.</small>
+            </div>
+          </summary>
+          <div class="advanced-settings-layout">
         <aside class="profile-panel" aria-label="그래픽카드 선택">
           <div class="panel-head">
             <span>STEP 1</span>
-            <h2>내 그래픽카드</h2>
-            <p>먼저 기준값을 정합니다. 이후 목적과 세부 옵션을 바꾸면 이 값이 자동으로 조정됩니다.</p>
+            <h2>그래픽카드 전체 목록</h2>
+            <p>빠른 선택에 없는 모델을 세대와 VRAM 기준으로 비교할 때 사용합니다.</p>
           </div>
-          <label class="profile-select-label">
-            <span>그래픽카드 빠른 선택</span>
-            <select id="gpuSelect"></select>
-          </label>
           <div class="profile-grid" id="profileGrid" aria-label="그래픽카드 프리셋 목록"></div>
         </aside>
 
         <section class="builder-panel" aria-label="최적화 설정 조정">
           <div class="panel-head">
             <span>STEP 2</span>
-            <h2>원하는 방향 선택</h2>
-            <p>프레임 방어, 선명도, 고화질 중 무엇을 우선할지 고릅니다. 세부 조절은 아래에서 한 단계씩만 바꾸는 것이 안전합니다.</p>
+            <h2>현재 설정 영향</h2>
+            <p>빠른 설정에서 선택한 값을 확인하거나 필요한 항목만 한 단계씩 조절하세요.</p>
           </div>
-
-          <div class="goal-grid" id="goalGrid" aria-label="추천 목적 선택"></div>
 
           <div class="tuning-summary" aria-label="현재 선택 요약">
             <article>
@@ -392,12 +432,13 @@
             </div>
           </div>
         </section>
-
+          </div>
+        </details>
       </section>
     </main>
   </div>
 
-  <script src="./assets/optimization-copy.js?v=20260810-2"></script>
-  <script src="./assets/optimization.js?v=20260810-2"></script>
+  <script src="./assets/optimization-copy.js?v=20260810-3"></script>
+  <script src="./assets/optimization.js?v=20260810-3"></script>
 </body>
 </html>
