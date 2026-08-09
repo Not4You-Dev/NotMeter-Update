@@ -119,6 +119,7 @@
   const FIELD_BOSS_REGIONS = Array.isArray(globalThis.NotMeterFieldBossCatalog)
     ? globalThis.NotMeterFieldBossCatalog
     : [];
+  const FIELD_BOSS_KIBELISKS = globalThis.NotMeterFieldBossKibeliskCatalog || {};
   const DETAIL_METRICS = [
     ["specialization", "specialization"],
     ["hits", "hits"],
@@ -322,8 +323,9 @@
       specialization: "특성",
       parry: "페리",
       avoidance: "회피",
-      avoidanceBlock: "회피/막기",
-      block: "막기",
+      avoidanceBlock: "회피/받은 공격 막기",
+      block: "받은 공격 막기",
+      blockDescription: "내 공격이 막힌 횟수가 아니라, 보스의 공격을 해당 캐릭터가 막아낸 횟수와 받은 직접 공격 대비 비율입니다.",
       multiHit: "다단 히트",
       critical: "크리",
       front: "전방",
@@ -527,8 +529,9 @@
       specialization: "Specialization",
       parry: "Parry",
       avoidance: "Evade",
-      avoidanceBlock: "Evade / Block",
-      block: "Block",
+      avoidanceBlock: "Evade / Incoming Block",
+      block: "Incoming Block",
+      blockDescription: "This is not your attacks being blocked. It shows how many boss attacks this character blocked and the percentage of incoming direct attacks blocked.",
       multiHit: "Multi-hit",
       critical: "Critical",
       front: "Front",
@@ -1671,6 +1674,7 @@
     const orderedBosses = catalog.bosses.map((boss, index) => ({
       code: Number(boss[0]),
       name: String(boss[1]),
+      kibelisk: FIELD_BOSS_KIBELISKS[Number(boss[0])] || null,
       index,
       entry: entries.get(Number(boss[0])) || null,
     })).sort((left, right) =>
@@ -1692,7 +1696,20 @@
       const copy = document.createElement("div");
       copy.className = "field-boss-row-copy";
       const name = document.createElement("strong");
-      name.textContent = localizeGameName(boss.name, "mob", boss.code);
+      const bossName = document.createElement("span");
+      bossName.className = "field-boss-row-name";
+      bossName.textContent = localizeGameName(boss.name, "mob", boss.code);
+      name.append(bossName);
+      if (boss.kibelisk) {
+        const kibeliskName = boss.kibelisk.names?.[state.locale] ||
+          boss.kibelisk.names?.ko || "";
+        if (kibeliskName) {
+          const kibelisk = document.createElement("span");
+          kibelisk.className = "field-boss-kibelisk";
+          kibelisk.textContent = `- (${boss.kibelisk.order}) ${kibeliskName}`;
+          name.append(kibelisk);
+        }
+      }
       const target = document.createElement("span");
       target.textContent = boss.entry
         ? t("fieldBossExpected", { time: formatFieldBossTargetTime(boss.entry.targetAt) })
@@ -3020,6 +3037,8 @@
     elements["detail-double-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.doubleDamageRate);
     elements["detail-evade-rate"].textContent = unavailableReason ? "—" : formatPercent(detail.evadeRate);
     const blockDataReliable = Boolean(detail.blockDataReliable);
+    elements["detail-block-row"].title = t("blockDescription");
+    elements["detail-block-row"].setAttribute("aria-label", t("blockDescription"));
     elements["detail-block-rate"].textContent = unavailableReason || !blockDataReliable
       ? "—"
       : `${formatInteger(Math.max(0, Number(detail.blockHits) || 0))} / ${formatPercent(detail.blockRate)}`;
@@ -3052,7 +3071,7 @@
       skillRows.append(unavailable);
     } else {
       for (const skill of skills) {
-        skillRows.append(buildDetailSkillRow(skill, blockDataReliable));
+        skillRows.append(buildDetailSkillRow(skill));
       }
     }
     elements["detail-skill-rows"].replaceChildren(skillRows);
@@ -3126,7 +3145,7 @@
     host.hidden = false;
   }
 
-  function buildDetailSkillRow(skill, blockDataReliable = false) {
+  function buildDetailSkillRow(skill) {
     const row = document.createElement("article");
     row.className = "detail-skill-row";
     const recordedSkillName = globalThis.NotMeterCombatDetailBuffs?.skillDisplayName?.(skill, state.locale) ||
@@ -3199,13 +3218,6 @@
       chips.append(buildDetailChip(
         t("avoidance"),
         `${formatInteger(skill.evadeCount)} / ${formatPercent(skill.evadeRate)}`));
-    }
-    if (blockDataReliable &&
-        isDetailMetricVisible("avoidance") &&
-        Number(skill.blockHits) > 0) {
-      chips.append(buildDetailChip(
-        t("block"),
-        `${formatInteger(skill.blockHits)} / ${formatPercent(skill.blockRate)}`));
     }
     if (isDetailMetricVisible("multiHit") && Number(skill.hitCount) > 0) {
       const hits = Math.max(0, Number(skill.hitCount) || 0);
