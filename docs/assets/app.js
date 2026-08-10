@@ -156,6 +156,7 @@
       subtitle: "직업별 상위 25% DPS 기준으로 정렬합니다",
       dailyUsers: "일일 사용자",
       classPerformance: "직업 성능",
+      newFeature: "새로 추가된 기능",
       classTop10: "클래스 TOP 10",
       fieldBoss: "필드보스",
       optimization: "최적화",
@@ -423,6 +424,7 @@
       subtitle: "Classes are ranked by top-quartile DPS",
       dailyUsers: "Daily users",
       classPerformance: "Class Performance",
+      newFeature: "Newly added feature",
       classTop10: "Class TOP 10",
       fieldBoss: "Field Boss",
       optimization: "Optimization",
@@ -750,6 +752,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     bindElements();
+    syncTimedFeatureBadges();
     bindEvents();
     applyLocale();
     renderDetailSettings();
@@ -836,6 +839,24 @@
       "detail-party-tabs",
     ]) {
       elements[id] = document.getElementById(id);
+    }
+  }
+
+  function syncTimedFeatureBadges() {
+    const now = Date.now();
+    let nextExpiration = Number.POSITIVE_INFINITY;
+    document.querySelectorAll("[data-feature-new-until]").forEach(badge => {
+      const expiration = Date.parse(badge.dataset.featureNewUntil || "");
+      const visible = Number.isFinite(expiration) && now < expiration;
+      badge.hidden = !visible;
+      if (visible) {
+        nextExpiration = Math.min(nextExpiration, expiration);
+      }
+    });
+    if (Number.isFinite(nextExpiration)) {
+      window.setTimeout(
+        syncTimedFeatureBadges,
+        Math.max(1_000, Math.min(2_147_000_000, nextExpiration - now + 250)));
     }
   }
 

@@ -3,6 +3,7 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   subtitle: "依各職業前 25% DPS 排序",
   dailyUsers: "每日使用者",
   classPerformance: "職業實戰",
+  newFeature: "新功能",
   classTop10: "職業 TOP 10",
   fieldBoss: "野外首領",
   discord: "Discord",

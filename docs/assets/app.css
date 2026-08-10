@@ -297,6 +297,7 @@ p {
 }
 
 .service-link {
+  position: relative;
   display: inline-flex;
   height: 38px;
   align-items: center;
@@ -315,6 +316,30 @@ p {
   white-space: nowrap;
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
   transition: border-color 120ms ease, background 120ms ease, color 120ms ease;
+}
+
+.feature-new-badge {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  z-index: 2;
+  min-width: 27px;
+  padding: 3px 5px 2px;
+  border: 1px solid #ffe493;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe88c, #eeb53d);
+  box-shadow: 0 2px 5px rgba(5, 17, 25, 0.48);
+  color: #2a1b02;
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.045em;
+  line-height: 1;
+  pointer-events: none;
+  text-align: center;
+}
+
+.feature-new-badge[hidden] {
+  display: none;
 }
 
 .optimization-link-icon {
