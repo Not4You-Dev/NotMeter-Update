@@ -215,6 +215,17 @@
       classPerformanceGradeCText: "고유 40명+ · 콘텐츠 최소 3개 · 95% 오차 ±12% 이하",
       classPerformanceGradeOffText: "C 기준 미달은 표본 부족으로 표시하고 순위에서 제외",
       classPerformanceConfidenceNote: "95% 신뢰구간은 콘텐츠를 하나씩 제외했을 때의 점수 변화와 고유 캐릭터 수를 함께 반영한 추정 범위입니다. 집계 가능한 전체 콘텐츠가 기준 개수보다 적으면 전체 콘텐츠 수를 기준으로 판정합니다.",
+      classPerformanceCompositionKicker: "파티 조합 필터",
+      classPerformanceCompositionTitle: "같은 직업 조합끼리 비교",
+      classPerformanceCompositionText: "직업별 인원수를 선택하면 정확히 같은 구성으로 전투한 기록만 다시 집계합니다. 선택하지 않으면 전체 조합을 표시합니다.",
+      classPerformanceCompositionReset: "전체 조합",
+      classPerformanceCompositionAria: "파티 직업 조합 선택",
+      classPerformanceCompositionIncrease: "{job} 인원 추가",
+      classPerformanceCompositionDecrease: "{job} 인원 감소",
+      classPerformanceCompositionAll: "전체 파티 조합 집계",
+      classPerformanceCompositionSelected: "{partySize}인 조합 · 대표 기록 {samples}개 · 고유 캐릭터 {characters}명",
+      classPerformanceCompositionUnavailable: "이 직업 구성은 신뢰도 기준을 충족한 캐시가 아직 없습니다.",
+      classPerformanceCompositionCacheNote: "원본 전투기록은 캐시에 넣지 않고, 집계 결과만 최대 128개 조합으로 제한해 제공합니다.",
       classPerformanceMetricsAria: "직업 성능 백분위 선택",
       classPerformanceP50Title: "P50 · 중앙값",
       classPerformanceP50Text: "전체 기록을 낮은 순으로 정렬했을 때 정확히 가운데인 지점으로, 일반적인 실전 성능을 비교합니다.",
@@ -471,6 +482,17 @@
       classPerformanceGradeCText: "40+ unique characters · 3+ encounters · 95% error within ±12%",
       classPerformanceGradeOffText: "Below C is shown as a small sample and excluded from ranking",
       classPerformanceConfidenceNote: "The 95% interval estimates score variation by removing encounters one at a time and accounting for unique-character count. If fewer encounters are eligible than a grade requires, all eligible encounters become the requirement.",
+      classPerformanceCompositionKicker: "PARTY COMPOSITION",
+      classPerformanceCompositionTitle: "Compare the same class composition",
+      classPerformanceCompositionText: "Choose the number of each class to recalculate from runs with that exact party composition. Leave every count at zero to show all parties.",
+      classPerformanceCompositionReset: "All parties",
+      classPerformanceCompositionAria: "Select party class composition",
+      classPerformanceCompositionIncrease: "Add one {job}",
+      classPerformanceCompositionDecrease: "Remove one {job}",
+      classPerformanceCompositionAll: "Aggregating every party composition",
+      classPerformanceCompositionSelected: "{partySize}-player composition · {samples} representative runs · {characters} unique characters",
+      classPerformanceCompositionUnavailable: "This exact class composition does not yet have a cache that passes the reliability threshold.",
+      classPerformanceCompositionCacheNote: "Raw combat records are not included; only aggregated results for up to 128 compositions are cached.",
       classPerformanceMetricsAria: "Select class-performance percentile",
       classPerformanceP50Title: "P50 · Median",
       classPerformanceP50Text: "The midpoint after sorting all runs from low to high, representing typical real-world performance.",
@@ -695,6 +717,8 @@
     selectedJob: "",
     selectedOverallJob: "",
     performanceMetric: localStorage.getItem("notmeter-class-performance-metric") || "p75Score",
+    performanceCompositionCounts: decodeClassPerformanceComposition(
+      Number(localStorage.getItem("notmeter-class-performance-composition")) || 0),
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -782,6 +806,8 @@
       "class-performance-button", "class-performance-surface",
       "class-performance-back-button", "class-performance-summary",
       "class-performance-metric-title", "class-performance-metric-description",
+      "class-performance-composition-jobs", "class-performance-composition-reset",
+      "class-performance-composition-status",
       "class-performance-pending", "class-performance-empty", "class-performance-chart",
       "class-top10-button", "class-top10-surface", "class-top10-back-button",
       "class-top10-tabs", "class-top10-pending", "class-top10-empty",
@@ -864,6 +890,32 @@
     elements["class-performance-back-button"].addEventListener(
       "click",
       returnToRankingFromClassPerformance);
+    elements["class-performance-composition-reset"].addEventListener("click", () => {
+      state.performanceCompositionCounts = Array(JOB_ORDER.length).fill(0);
+      saveClassPerformanceComposition();
+      renderClassPerformance();
+    });
+    elements["class-performance-composition-jobs"].addEventListener("click", event => {
+      const button = event.target.closest("[data-composition-job]");
+      if (!button) {
+        return;
+      }
+      const index = Number(button.dataset.compositionJob);
+      const delta = Number(button.dataset.compositionDelta);
+      if (!Number.isInteger(index) || index < 0 || index >= JOB_ORDER.length ||
+          (delta !== -1 && delta !== 1)) {
+        return;
+      }
+      const counts = [...state.performanceCompositionCounts];
+      const total = counts.reduce((sum, value) => sum + value, 0);
+      if (delta > 0 && total >= 10) {
+        return;
+      }
+      counts[index] = Math.max(0, Math.min(10, counts[index] + delta));
+      state.performanceCompositionCounts = counts;
+      saveClassPerformanceComposition();
+      renderClassPerformance();
+    });
     document.querySelectorAll("[data-performance-metric]").forEach(button => {
       button.addEventListener("click", () => {
         state.performanceMetric = button.dataset.performanceMetric;
@@ -2353,6 +2405,92 @@
     state.mode === "class" ? renderClassRanking() : renderSummary();
   }
 
+  function decodeClassPerformanceComposition(code) {
+    const counts = Array(JOB_ORDER.length).fill(0);
+    let remaining = Number.isSafeInteger(code) && code > 0 ? code : 0;
+    for (let index = 0; index < counts.length; index++) {
+      counts[index] = remaining % 16;
+      remaining = Math.floor(remaining / 16);
+    }
+    const total = counts.reduce((sum, value) => sum + value, 0);
+    return remaining === 0 && total <= 10 ? counts : Array(JOB_ORDER.length).fill(0);
+  }
+
+  function encodeClassPerformanceComposition(counts) {
+    return counts.reduce(
+      (code, count, index) => code + Math.max(0, Math.min(10, Number(count) || 0)) * (16 ** index),
+      0);
+  }
+
+  function saveClassPerformanceComposition() {
+    const code = encodeClassPerformanceComposition(state.performanceCompositionCounts);
+    if (code > 0) {
+      localStorage.setItem("notmeter-class-performance-composition", String(code));
+    } else {
+      localStorage.removeItem("notmeter-class-performance-composition");
+    }
+  }
+
+  function renderClassPerformanceComposition(snapshot) {
+    const fragment = document.createDocumentFragment();
+    const total = state.performanceCompositionCounts.reduce((sum, value) => sum + value, 0);
+    JOB_ORDER.forEach((job, index) => {
+      const count = state.performanceCompositionCounts[index];
+      const tile = document.createElement("article");
+      tile.className = `class-performance-composition-job${count > 0 ? " active" : ""}`;
+      tile.style.setProperty("--job-color", PERFORMANCE_JOB_COLORS[job] || "#46e0d5");
+
+      const identity = document.createElement("div");
+      identity.className = "class-performance-composition-identity";
+      identity.append(createJobIcon(job));
+      const name = document.createElement("strong");
+      name.textContent = jobName(job);
+      identity.append(name);
+
+      const controls = document.createElement("div");
+      controls.className = "class-performance-composition-count";
+      const decrease = document.createElement("button");
+      decrease.type = "button";
+      decrease.dataset.compositionJob = String(index);
+      decrease.dataset.compositionDelta = "-1";
+      decrease.textContent = "−";
+      decrease.disabled = count <= 0;
+      decrease.setAttribute("aria-label", t("classPerformanceCompositionDecrease", { job: jobName(job) }));
+      const value = document.createElement("b");
+      value.textContent = String(count);
+      const increase = document.createElement("button");
+      increase.type = "button";
+      increase.dataset.compositionJob = String(index);
+      increase.dataset.compositionDelta = "1";
+      increase.textContent = "+";
+      increase.disabled = total >= 10;
+      increase.setAttribute("aria-label", t("classPerformanceCompositionIncrease", { job: jobName(job) }));
+      controls.append(decrease, value, increase);
+      tile.append(identity, controls);
+      fragment.append(tile);
+    });
+    elements["class-performance-composition-jobs"].replaceChildren(fragment);
+    elements["class-performance-composition-reset"].disabled = total === 0;
+
+    const code = encodeClassPerformanceComposition(state.performanceCompositionCounts);
+    const composition = code > 0
+      ? (snapshot?.partyCompositions || []).find(item => Number(item.code) === code)
+      : null;
+    elements["class-performance-composition-status"].classList.toggle(
+      "unavailable",
+      code > 0 && !composition);
+    elements["class-performance-composition-status"].textContent = code === 0
+      ? t("classPerformanceCompositionAll")
+      : composition
+        ? t("classPerformanceCompositionSelected", {
+            partySize: Number(composition.partySize) || total,
+            samples: formatInteger(Number(composition.sampleCount) || 0),
+            characters: formatInteger(Number(composition.uniqueCharacters) || 0),
+          })
+        : t("classPerformanceCompositionUnavailable");
+    return { code, composition };
+  }
+
   function renderClassPerformance() {
     const snapshot = state.data?.classPerformance;
     const available = snapshot && Array.isArray(snapshot.rows);
@@ -2361,6 +2499,17 @@
     elements["class-performance-chart"].hidden = true;
     if (!available) {
       elements["class-performance-summary"].textContent = "—";
+      elements["class-performance-chart"].replaceChildren();
+      return;
+    }
+
+    const compositionSelection = renderClassPerformanceComposition(snapshot);
+    const selectedSnapshot = compositionSelection.code > 0
+      ? compositionSelection.composition
+      : snapshot;
+    if (!selectedSnapshot || !Array.isArray(selectedSnapshot.rows)) {
+      elements["class-performance-summary"].textContent = "—";
+      elements["class-performance-empty"].hidden = false;
       elements["class-performance-chart"].replaceChildren();
       return;
     }
@@ -2382,11 +2531,11 @@
     elements["class-performance-metric-title"].textContent = t(metricCopy[0]);
     elements["class-performance-metric-description"].textContent = t(metricCopy[1]);
 
-    const ranked = snapshot.rows
+    const ranked = selectedSnapshot.rows
       .filter(row => Number(row.rank) > 0 && row.confidenceGrade !== "insufficient")
       .sort((left, right) =>
         Number(right[state.performanceMetric] || 0) - Number(left[state.performanceMetric] || 0));
-    const insufficient = snapshot.rows
+    const insufficient = selectedSnapshot.rows
       .filter(row => Number(row.rank) <= 0 || row.confidenceGrade === "insufficient")
       .sort((left, right) => Number(right.uniqueCharacters) - Number(left.uniqueCharacters));
     const weeklyRange = parseWeeklyRange(snapshot.periodLabel);
@@ -2395,9 +2544,9 @@
       jobs: ranked.length,
       characters: formatInteger(ranked.reduce(
         (sum, row) => sum + Number(row.uniqueCharacters || 0), 0)),
-      contents: Number(snapshot.totalContentCount || 0),
+      contents: Number(selectedSnapshot.totalContentCount || 0),
     });
-    if (snapshot.rows.length === 0) {
+    if (selectedSnapshot.rows.length === 0) {
       elements["class-performance-empty"].hidden = false;
       elements["class-performance-chart"].replaceChildren();
       return;
