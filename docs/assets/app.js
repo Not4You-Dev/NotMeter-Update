@@ -1152,7 +1152,7 @@
     }
 
     try {
-      const [cache, classOverallCache] = await Promise.all([
+      const [cache, initialClassOverallCache] = await Promise.all([
         fetchRankingCache(force),
         fetchClassOverallCache(force).catch(error => {
           console.warn("class overall cache unavailable", error);
@@ -1160,18 +1160,22 @@
         }),
       ]);
       validateCache(cache);
-      if (classOverallCache) {
-        validateClassOverallCache(classOverallCache);
-        if (String(classOverallCache.generatedAt) === String(cache.generatedAt)) {
-          cache.classOverall = classOverallCache.classOverall;
-          cache.classPerformance = classOverallCache.classPerformance || null;
-          cache.classOverallGeneratedAt = classOverallCache.generatedAt;
-        } else {
-          console.warn("class overall cache generation mismatch", {
-            rankingGeneratedAt: cache.generatedAt,
-            classOverallGeneratedAt: classOverallCache.generatedAt,
+      let classOverallCache = initialClassOverallCache;
+      if (!isMatchingClassOverallCache(classOverallCache, cache.generatedAt)) {
+        console.warn("class overall cache generation mismatch; retrying matching cache", {
+          rankingGeneratedAt: cache.generatedAt,
+          classOverallGeneratedAt: classOverallCache?.generatedAt || null,
+        });
+        classOverallCache = await fetchClassOverallCache(force, cache.generatedAt)
+          .catch(error => {
+            console.warn("matching class overall cache unavailable", error);
+            return null;
           });
-        }
+      }
+      if (isMatchingClassOverallCache(classOverallCache, cache.generatedAt)) {
+        cache.classOverall = classOverallCache.classOverall;
+        cache.classPerformance = classOverallCache.classPerformance;
+        cache.classOverallGeneratedAt = classOverallCache.generatedAt;
       }
       if (cache.classOverall && !cache.classOverallGeneratedAt) {
         cache.classOverallGeneratedAt = cache.generatedAt;
@@ -2089,15 +2093,31 @@
     return fetchCompressedJson(CACHE_URLS, force);
   }
 
-  async function fetchClassOverallCache(force) {
-    return fetchCompressedJson(CLASS_OVERALL_CACHE_URLS, force);
+  async function fetchClassOverallCache(force, expectedGeneratedAt = "") {
+    const normalizedExpected = String(expectedGeneratedAt || "");
+    return fetchCompressedJson(
+      CLASS_OVERALL_CACHE_URLS,
+      force,
+      normalizedExpected
+        ? cache => isMatchingClassOverallCache(cache, normalizedExpected)
+        : null,
+      normalizedExpected);
   }
 
-  async function fetchCompressedJson(urls, force) {
+  async function fetchCompressedJson(urls, force, accept = null, revision = "") {
     const errors = [];
     for (const baseUrl of urls) {
+      const query = [];
+      if (force) {
+        query.push(`v=${Date.now()}`);
+      }
+      if (revision) {
+        query.push(`generation=${encodeURIComponent(revision)}`);
+      }
       const separator = baseUrl.includes("?") ? "&" : "?";
-      const url = force ? `${baseUrl}${separator}v=${Date.now()}` : baseUrl;
+      const url = query.length > 0
+        ? `${baseUrl}${separator}${query.join("&")}`
+        : baseUrl;
       const controller = typeof AbortController === "function" ? new AbortController() : null;
       const timeoutId = controller
         ? window.setTimeout(() => controller.abort(), CACHE_REQUEST_TIMEOUT_MS)
@@ -2113,7 +2133,11 @@
         }
         const bytes = new Uint8Array(await response.arrayBuffer());
         const text = await decodeCacheBytes(bytes);
-        return JSON.parse(text);
+        const cache = JSON.parse(text);
+        if (accept && !accept(cache)) {
+          throw new Error("cache generation mismatch");
+        }
+        return cache;
       } catch (error) {
         errors.push(`${baseUrl}: ${error instanceof Error ? error.message : String(error)}`);
       } finally {
@@ -2153,8 +2177,18 @@
         !cache.classOverall ||
         !Array.isArray(cache.classOverall.contents) ||
         !Array.isArray(cache.classOverall.jobs) ||
-        (cache.classPerformance && !Array.isArray(cache.classPerformance.rows))) {
+        !cache.classPerformance ||
+        !Array.isArray(cache.classPerformance.rows)) {
       throw new Error(t("cacheInvalid"));
+    }
+  }
+
+  function isMatchingClassOverallCache(cache, expectedGeneratedAt) {
+    try {
+      validateClassOverallCache(cache);
+      return String(cache.generatedAt) === String(expectedGeneratedAt || "");
+    } catch {
+      return false;
     }
   }
 
