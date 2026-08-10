@@ -58,6 +58,17 @@
   const WEEKLY_LABEL_PREFIX = "weekly-wed05|";
   const PERIODS = ["Weekly", "Today", "Recent14Days", "All"];
   const JOB_ORDER = ["검성", "수호성", "살성", "궁성", "마도성", "정령성", "치유성", "호법성", "권성"];
+  const PERFORMANCE_JOB_COLORS = {
+    "검성": "#69bcd0",
+    "수호성": "#84aef0",
+    "살성": "#9ccc63",
+    "궁성": "#5dc79a",
+    "마도성": "#b392e8",
+    "정령성": "#d17acb",
+    "치유성": "#e2c56d",
+    "호법성": "#d9a95f",
+    "권성": "#e48870",
+  };
   const JOB_CODES = {
     "0": "검성",
     "1": "수호성",
@@ -144,6 +155,7 @@
       title: "NotMeter 던전 통계",
       subtitle: "직업별 상위 25% DPS 기준으로 정렬합니다",
       dailyUsers: "일일 사용자",
+      classPerformance: "직업 성능",
       classTop10: "클래스 TOP 10",
       fieldBoss: "필드보스",
       optimization: "최적화",
@@ -174,6 +186,30 @@
       fieldBossPageSubtitle: "서버별 필드보스 출현 현황",
       fieldBossStatus: "필드보스 현황",
       backToRanking: "랭킹으로 돌아가기",
+      classPerformancePageTitle: "NotMeter CP 보정 직업 DPS 통계",
+      classPerformancePageSubtitle: "이번 주 동일 보스·동일 CP 기준 실전 성능 지표",
+      classPerformanceTitle: "CP 보정 직업 DPS 통계",
+      classPerformanceDescription: "같은 보스·같은 10K CP의 고유 캐릭터끼리 비교한 이번 주 실전 지표입니다.",
+      classPerformanceCpTitle: "동일 CP 비교",
+      classPerformanceCpText: "기록 당시 전투력을 10K 단위로 나눠 같은 보스·같은 CP끼리만 비교합니다.",
+      classPerformanceDedupeTitle: "캐릭터 균등 반영",
+      classPerformanceDedupeText: "캐릭터별 보스 대표 기록 하나만 사용하며 상위 3회 중 두 번째 기록으로 단발성 고점을 줄입니다.",
+      classPerformanceTrustTitle: "신뢰도 공개",
+      classPerformanceTrustText: "고유 캐릭터·콘텐츠 범위·95% 신뢰구간을 함께 표시하고 표본이 부족하면 순위를 매기지 않습니다.",
+      classPerformanceMetricsAria: "직업 성능 백분위 선택",
+      classPerformancePending: "이번 주 신뢰도 통계 캐시 갱신을 기다리는 중입니다.",
+      classPerformanceEmpty: "신뢰도 기준을 충족한 직업 표본이 아직 없습니다.",
+      classPerformanceNoticeTitle: "지표 해석과 제한사항",
+      classPerformanceNoticeText: "100은 동일 보스·동일 CP에서 각 직업을 같은 비중으로 반영한 중앙 기준입니다. 105는 기준보다 약 5% 높은 실전 DPS를 뜻합니다. 파티 버프·공략 역할·숙련도 차이까지 완전히 제거할 수 없으므로 직업의 이론상 최대 성능이 아닌 실제 수집 기록의 경향으로 봐주세요.",
+      classPerformanceSummary: "{period} · 순위 {jobs}개 직업 · 고유 캐릭터 {characters}명 · 콘텐츠 {contents}개",
+      classPerformanceInsufficient: "표본 부족",
+      classPerformanceGrade: "신뢰도 {grade}",
+      classPerformanceBaseline: "기준 100",
+      classPerformanceInsufficientHint: "순위 제외",
+      classPerformanceCi: "95% 신뢰구간 {low}~{high}",
+      classPerformanceCharacters: "캐릭터 {value}명",
+      classPerformanceSamples: "대표 기록 {value}개",
+      classPerformanceCoverage: "콘텐츠 {value}/{total}",
       classTop10PageTitle: "NotMeter 클래스별 종합 TOP 10",
       classTop10PageSubtitle: "모든 CP·모든 콘텐츠 TOP 20 성적을 합산한 클래스별 종합 랭킹",
       classTop10Title: "클래스별 종합 TOP 10",
@@ -350,6 +386,7 @@
       title: "NotMeter Dungeon Statistics",
       subtitle: "Classes are ranked by top-quartile DPS",
       dailyUsers: "Daily users",
+      classPerformance: "Class Performance",
       classTop10: "Class TOP 10",
       fieldBoss: "Field Boss",
       optimization: "Optimization",
@@ -380,6 +417,30 @@
       fieldBossPageSubtitle: "Field-boss spawn status by server",
       fieldBossStatus: "Field Boss Status",
       backToRanking: "Back to rankings",
+      classPerformancePageTitle: "NotMeter CP-Normalized Class DPS",
+      classPerformancePageSubtitle: "This week's real-world performance at the same boss and CP",
+      classPerformanceTitle: "CP-Normalized Class DPS",
+      classPerformanceDescription: "This week's real-world index compares unique characters against the same boss and the same 10K CP bracket.",
+      classPerformanceCpTitle: "Same-CP comparison",
+      classPerformanceCpText: "Record-time CP is split into 10K brackets, then compared only within the same boss and bracket.",
+      classPerformanceDedupeTitle: "Equal character weight",
+      classPerformanceDedupeText: "Only one representative run per character and boss is used; the second-best of up to three top runs reduces one-off peaks.",
+      classPerformanceTrustTitle: "Visible confidence",
+      classPerformanceTrustText: "Unique characters, content coverage, and a 95% confidence interval are shown. Small samples receive no rank.",
+      classPerformanceMetricsAria: "Select class-performance percentile",
+      classPerformancePending: "Waiting for this week's confidence cache to refresh.",
+      classPerformanceEmpty: "No class sample meets the confidence threshold yet.",
+      classPerformanceNoticeTitle: "How to read this index",
+      classPerformanceNoticeText: "100 is the same-boss, same-CP median with every class weighted equally. 105 means roughly 5% higher observed DPS. Party buffs, encounter roles, and player skill cannot be removed completely, so this is a trend in collected real runs rather than a theoretical class maximum.",
+      classPerformanceSummary: "{period} · {jobs} ranked classes · {characters} unique characters · {contents} encounters",
+      classPerformanceInsufficient: "Small sample",
+      classPerformanceGrade: "Confidence {grade}",
+      classPerformanceBaseline: "Baseline 100",
+      classPerformanceInsufficientHint: "Not ranked",
+      classPerformanceCi: "95% CI {low}–{high}",
+      classPerformanceCharacters: "{value} characters",
+      classPerformanceSamples: "{value} representative runs",
+      classPerformanceCoverage: "{value}/{total} encounters",
       classTop10PageTitle: "NotMeter Class Overall TOP 10",
       classTop10PageSubtitle: "Class rankings combining all-CP Top 20 results across all content",
       classTop10Title: "Class Overall TOP 10",
@@ -583,6 +644,7 @@
     period: "Weekly",
     selectedJob: "",
     selectedOverallJob: "",
+    performanceMetric: localStorage.getItem("notmeter-class-performance-metric") || "p75Score",
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -635,6 +697,9 @@
     } else if (window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
+    } else if (window.location.hash === "#class-performance" ||
+        history.state?.notMeterStatsView === "class-performance") {
+      openClassPerformanceView(false);
     }
     window.setInterval(updateCacheAge, 60_000);
     window.setInterval(() => {
@@ -662,6 +727,9 @@
       "page-title", "page-subtitle", "daily-user-count", "language-button",
       "optimization-button", "optimization-surface", "optimization-back-button",
       "optimization-frame",
+      "class-performance-button", "class-performance-surface",
+      "class-performance-back-button", "class-performance-summary",
+      "class-performance-pending", "class-performance-empty", "class-performance-chart",
       "class-top10-button", "class-top10-surface", "class-top10-back-button",
       "class-top10-tabs", "class-top10-pending", "class-top10-empty",
       "class-top10-view", "class-top10-rows",
@@ -733,6 +801,19 @@
         openClassTop10View(true);
       }
     });
+    elements["class-performance-button"].addEventListener("click", () => {
+      if (initialPageView() !== "ranking") {
+        const target = new URL("./", window.location.href);
+        target.hash = "class-performance";
+        window.location.assign(target.href);
+        return;
+      }
+      if (state.surfaceMode === "classPerformance") {
+        returnToRankingFromClassPerformance();
+      } else {
+        openClassPerformanceView(true);
+      }
+    });
     elements["optimization-frame"].addEventListener("load", () => {
       syncOptimizationFrameLocale();
       requestOptimizationFrameHeight();
@@ -740,6 +821,16 @@
     elements["class-top10-back-button"].addEventListener(
       "click",
       returnToRankingFromClassTop10);
+    elements["class-performance-back-button"].addEventListener(
+      "click",
+      returnToRankingFromClassPerformance);
+    document.querySelectorAll("[data-performance-metric]").forEach(button => {
+      button.addEventListener("click", () => {
+        state.performanceMetric = button.dataset.performanceMetric;
+        localStorage.setItem("notmeter-class-performance-metric", state.performanceMetric);
+        renderClassPerformance();
+      });
+    });
     elements["field-boss-server"].addEventListener("focus", event => {
       event.target.select();
       openFieldBossServerSearch();
@@ -819,12 +910,17 @@
       render();
     });
     window.addEventListener("popstate", event => {
+      if (event.state?.notMeterStatsView === "class-performance") {
+        openClassPerformanceView(false);
+        return;
+      }
       if (event.state?.notMeterStatsView === "class-top10") {
         openClassTop10View(false);
         return;
       }
       closeFieldBossView();
       closeClassTop10View();
+      closeClassPerformanceView();
       closeOptimizationView();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
@@ -964,6 +1060,7 @@
         validateClassOverallCache(classOverallCache);
         if (String(classOverallCache.generatedAt) === String(cache.generatedAt)) {
           cache.classOverall = classOverallCache.classOverall;
+          cache.classPerformance = classOverallCache.classPerformance || null;
           cache.classOverallGeneratedAt = classOverallCache.generatedAt;
         } else {
           console.warn("class overall cache generation mismatch", {
@@ -1049,6 +1146,7 @@
   function openOptimizationView() {
     closeFieldBossView();
     closeClassTop10View();
+    closeClassPerformanceView();
     closeCombatDetail();
     state.surfaceMode = "optimization";
     document.body.classList.add("optimization-view");
@@ -1114,6 +1212,7 @@
   function openClassTop10View(pushHistory) {
     closeFieldBossView();
     closeOptimizationView();
+    closeClassPerformanceView();
     closeCombatDetail();
     state.surfaceMode = "classTop10";
     document.body.classList.add("class-top10-view");
@@ -1150,8 +1249,49 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function openClassPerformanceView(pushHistory) {
+    closeFieldBossView();
+    closeOptimizationView();
+    closeClassTop10View();
+    closeCombatDetail();
+    state.surfaceMode = "classPerformance";
+    document.body.classList.add("class-performance-view");
+    elements["class-performance-surface"].hidden = false;
+    elements["class-performance-button"].classList.add("active");
+    elements["class-performance-button"].setAttribute("aria-pressed", "true");
+    updatePageIdentity();
+    renderClassPerformance();
+    if (pushHistory) {
+      history.pushState({ notMeterStatsView: "class-performance" }, "");
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeClassPerformanceView() {
+    if (state.surfaceMode !== "classPerformance") {
+      return;
+    }
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("class-performance-view");
+    elements["class-performance-surface"].hidden = true;
+    elements["class-performance-button"].classList.remove("active");
+    elements["class-performance-button"].setAttribute("aria-pressed", "false");
+    updatePageIdentity();
+  }
+
+  function returnToRankingFromClassPerformance() {
+    if (history.state?.notMeterStatsView === "class-performance") {
+      history.back();
+      return;
+    }
+    closeClassPerformanceView();
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function openFieldBossView() {
     closeClassTop10View();
+    closeClassPerformanceView();
     closeOptimizationView();
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
@@ -1903,7 +2043,8 @@
         !cache.generatedAt ||
         !cache.classOverall ||
         !Array.isArray(cache.classOverall.contents) ||
-        !Array.isArray(cache.classOverall.jobs)) {
+        !Array.isArray(cache.classOverall.jobs) ||
+        (cache.classPerformance && !Array.isArray(cache.classPerformance.rows))) {
       throw new Error(t("cacheInvalid"));
     }
   }
@@ -2154,6 +2295,10 @@
       renderClassTop10();
       return;
     }
+    if (state.surfaceMode === "classPerformance") {
+      renderClassPerformance();
+      return;
+    }
     if (!state.data) {
       return;
     }
@@ -2161,6 +2306,130 @@
     updateDailyUsers();
     updateCacheAge();
     state.mode === "class" ? renderClassRanking() : renderSummary();
+  }
+
+  function renderClassPerformance() {
+    const snapshot = state.data?.classPerformance;
+    const available = snapshot && Array.isArray(snapshot.rows);
+    elements["class-performance-pending"].hidden = available;
+    elements["class-performance-empty"].hidden = true;
+    elements["class-performance-chart"].hidden = true;
+    if (!available) {
+      elements["class-performance-summary"].textContent = "—";
+      elements["class-performance-chart"].replaceChildren();
+      return;
+    }
+
+    const metrics = ["p50Score", "p75Score", "p90Score"];
+    if (!metrics.includes(state.performanceMetric)) {
+      state.performanceMetric = "p75Score";
+    }
+    document.querySelectorAll("[data-performance-metric]").forEach(button => {
+      const active = button.dataset.performanceMetric === state.performanceMetric;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+
+    const ranked = snapshot.rows
+      .filter(row => Number(row.rank) > 0 && row.confidenceGrade !== "insufficient")
+      .sort((left, right) =>
+        Number(right[state.performanceMetric] || 0) - Number(left[state.performanceMetric] || 0));
+    const insufficient = snapshot.rows
+      .filter(row => Number(row.rank) <= 0 || row.confidenceGrade === "insufficient")
+      .sort((left, right) => Number(right.uniqueCharacters) - Number(left.uniqueCharacters));
+    const weeklyRange = parseWeeklyRange(snapshot.periodLabel);
+    elements["class-performance-summary"].textContent = t("classPerformanceSummary", {
+      period: weeklyRange ? formatWeeklyRange(weeklyRange) : t("thisWeek"),
+      jobs: ranked.length,
+      characters: formatInteger(ranked.reduce(
+        (sum, row) => sum + Number(row.uniqueCharacters || 0), 0)),
+      contents: Number(snapshot.totalContentCount || 0),
+    });
+    if (snapshot.rows.length === 0) {
+      elements["class-performance-empty"].hidden = false;
+      elements["class-performance-chart"].replaceChildren();
+      return;
+    }
+
+    elements["class-performance-empty"].hidden = ranked.length > 0;
+    const maximum = Math.max(110, ...ranked.map(row => Number(row[state.performanceMetric]) || 0));
+    const scaleMaximum = Math.ceil(maximum / 5) * 5;
+    const fragment = document.createDocumentFragment();
+    ranked.forEach((row, index) => fragment.append(
+      buildClassPerformanceRow(row, index + 1, scaleMaximum, false)));
+    insufficient.forEach(row => fragment.append(
+      buildClassPerformanceRow(row, 0, scaleMaximum, true)));
+    elements["class-performance-chart"].replaceChildren(fragment);
+    elements["class-performance-chart"].hidden = false;
+  }
+
+  function buildClassPerformanceRow(row, displayRank, scaleMaximum, insufficient) {
+    const article = document.createElement("article");
+    article.className = `class-performance-row${insufficient ? " insufficient" : ""}`;
+    article.style.setProperty("--job-color", PERFORMANCE_JOB_COLORS[row.jobName] || "#46e0d5");
+
+    const rank = document.createElement("span");
+    rank.className = "class-performance-rank";
+    rank.textContent = displayRank > 0 ? String(displayRank) : "—";
+
+    const identity = document.createElement("div");
+    identity.className = "class-performance-identity";
+    identity.append(createJobIcon(row.jobName));
+    const identityText = document.createElement("span");
+    const job = document.createElement("strong");
+    job.textContent = jobName(row.jobName);
+    const grade = document.createElement("b");
+    grade.className = `class-performance-grade grade-${String(row.confidenceGrade).toLowerCase()}`;
+    grade.textContent = row.confidenceGrade === "insufficient"
+      ? t("classPerformanceInsufficient")
+      : t("classPerformanceGrade", { grade: row.confidenceGrade });
+    identityText.append(job, grade);
+    identity.append(identityText);
+
+    const scoreValue = Number(row[state.performanceMetric]) || 0;
+    const graph = document.createElement("div");
+    graph.className = "class-performance-graph";
+    const track = document.createElement("span");
+    track.className = "class-performance-track";
+    const fill = document.createElement("span");
+    fill.className = "class-performance-fill";
+    fill.style.width = `${Math.max(0, Math.min(100, scoreValue / scaleMaximum * 100))}%`;
+    const baseline = document.createElement("span");
+    baseline.className = "class-performance-baseline";
+    baseline.style.left = `${100 / scaleMaximum * 100}%`;
+    track.append(fill, baseline);
+    const scale = document.createElement("span");
+    scale.className = "class-performance-scale";
+    scale.innerHTML = `<i>0</i><i>${t("classPerformanceBaseline")}</i><i>${formatDecimal(scaleMaximum, 0)}</i>`;
+    graph.append(track, scale);
+
+    const score = document.createElement("div");
+    score.className = "class-performance-score";
+    if (insufficient) {
+      score.innerHTML = `<strong>—</strong><span>${t("classPerformanceInsufficientHint")}</span>`;
+    } else {
+      const delta = scoreValue - 100;
+      const deltaText = `${delta >= 0 ? "+" : ""}${formatDecimal(delta, 1)}%`;
+      score.innerHTML = `<strong>${formatDecimal(scoreValue, 1)}</strong><span>${deltaText}</span>`;
+    }
+
+    const evidence = document.createElement("div");
+    evidence.className = "class-performance-evidence";
+    const ciText = t("classPerformanceCi", {
+      low: formatDecimal(row.confidenceLow, 1),
+      high: formatDecimal(row.confidenceHigh, 1),
+    });
+    evidence.innerHTML = `
+      <span>${t("classPerformanceCharacters", { value: formatInteger(row.uniqueCharacters) })}</span>
+      <span>${t("classPerformanceSamples", { value: formatInteger(row.sampleCount) })}</span>
+      <span>${t("classPerformanceCoverage", {
+        value: row.contentCoverage,
+        total: state.data?.classPerformance?.totalContentCount || 0,
+      })}</span>
+      <span>${ciText}</span>`;
+
+    article.append(rank, identity, graph, score, evidence);
+    return article;
   }
 
   function renderClassTop10() {
@@ -4067,6 +4336,7 @@
   function updatePageIdentity() {
     const fieldBoss = state.surfaceMode === "fieldBoss";
     const classTop10 = state.surfaceMode === "classTop10";
+    const classPerformance = state.surfaceMode === "classPerformance";
     const optimization = state.surfaceMode === "optimization";
     const title = t(optimization
       ? "optimizationPageTitle"
@@ -4074,6 +4344,8 @@
         ? "fieldBossPageTitle"
         : classTop10
           ? "classTop10PageTitle"
+          : classPerformance
+            ? "classPerformancePageTitle"
           : "title");
     const subtitle = t(optimization
       ? "optimizationPageSubtitle"
@@ -4081,6 +4353,8 @@
         ? "fieldBossPageSubtitle"
         : classTop10
           ? "classTop10PageSubtitle"
+          : classPerformance
+            ? "classPerformancePageSubtitle"
           : "subtitle");
     document.title = title;
     elements["page-title"].textContent = title;
@@ -4361,6 +4635,13 @@
   function formatInteger(value) {
     return new Intl.NumberFormat(localeTag())
       .format(Number(value) || 0);
+  }
+
+  function formatDecimal(value, digits = 1) {
+    return new Intl.NumberFormat(localeTag(), {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(Number(value) || 0);
   }
 
   function formatDuration(seconds) {
