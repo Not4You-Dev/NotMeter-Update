@@ -51,7 +51,7 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   classPerformanceCompositionExcludeJob: "只看沒有{job}的隊伍",
   classPerformanceCompositionAll: "統計所有隊伍組合",
   classPerformanceCompositionSelected: "{partySize} 人組合 · 代表紀錄 {samples} 筆 · 不重複角色 {characters} 名",
-  classPerformanceCompositionExcluded: "沒有{job}的隊伍 · 代表紀錄 {samples} 筆 · 不重複角色 {characters} 名",
+  classPerformanceCompositionExcluded: "排除{jobs}的隊伍 · 代表紀錄 {samples} 筆 · 不重複角色 {characters} 名",
   classPerformanceCompositionUnavailable: "此職業組合目前尚無通過可信度門檻的快取。",
   classPerformanceMetricsAria: "選擇職業表現百分位",
   classPerformanceP50Title: "P50 · 中位數",

@@ -226,7 +226,7 @@
       classPerformanceCompositionExcludeJob: "{job} 없는 파티만 보기",
       classPerformanceCompositionAll: "전체 파티 조합 집계",
       classPerformanceCompositionSelected: "{partySize}인 조합 · 대표 기록 {samples}개 · 고유 캐릭터 {characters}명",
-      classPerformanceCompositionExcluded: "{job} 없는 파티 · 대표 기록 {samples}개 · 고유 캐릭터 {characters}명",
+      classPerformanceCompositionExcluded: "{jobs} 제외 파티 · 대표 기록 {samples}개 · 고유 캐릭터 {characters}명",
       classPerformanceCompositionUnavailable: "이 직업 구성은 신뢰도 기준을 충족한 캐시가 아직 없습니다.",
       classPerformanceMetricsAria: "직업 성능 백분위 선택",
       classPerformanceP50Title: "P50 · 중앙값",
@@ -495,7 +495,7 @@
       classPerformanceCompositionExcludeJob: "Show parties without {job}",
       classPerformanceCompositionAll: "Aggregating every party composition",
       classPerformanceCompositionSelected: "{partySize}-player composition · {samples} representative runs · {characters} unique characters",
-      classPerformanceCompositionExcluded: "Parties without {job} · {samples} representative runs · {characters} unique characters",
+      classPerformanceCompositionExcluded: "Parties excluding {jobs} · {samples} representative runs · {characters} unique characters",
       classPerformanceCompositionUnavailable: "This exact class composition does not yet have a cache that passes the reliability threshold.",
       classPerformanceMetricsAria: "Select class-performance percentile",
       classPerformanceP50Title: "P50 · Median",
@@ -723,7 +723,7 @@
     performanceMetric: localStorage.getItem("notmeter-class-performance-metric") || "p75Score",
     performanceCompositionCounts: decodeClassPerformanceComposition(
       Number(localStorage.getItem("notmeter-class-performance-composition")) || 0),
-    performanceExcludedJob: localStorage.getItem("notmeter-class-performance-excluded-job") || "",
+    performanceExclusionMask: decodeClassPerformanceExclusionMask(),
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -897,7 +897,7 @@
       returnToRankingFromClassPerformance);
     elements["class-performance-composition-reset"].addEventListener("click", () => {
       state.performanceCompositionCounts = Array(JOB_ORDER.length).fill(0);
-      state.performanceExcludedJob = "";
+      state.performanceExclusionMask = 0;
       saveClassPerformanceComposition();
       renderClassPerformance();
     });
@@ -913,9 +913,8 @@
         return;
       }
       if (action === "exclude") {
-        const jobName = JOB_ORDER[index];
         state.performanceCompositionCounts = Array(JOB_ORDER.length).fill(0);
-        state.performanceExcludedJob = state.performanceExcludedJob === jobName ? "" : jobName;
+        state.performanceExclusionMask ^= 1 << index;
         saveClassPerformanceComposition();
         renderClassPerformance();
         return;
@@ -930,7 +929,7 @@
       }
       counts[index] = Math.max(0, Math.min(10, counts[index] + delta));
       state.performanceCompositionCounts = counts;
-      state.performanceExcludedJob = "";
+      state.performanceExclusionMask = 0;
       saveClassPerformanceComposition();
       renderClassPerformance();
     });
@@ -2440,6 +2439,17 @@
       0);
   }
 
+  function decodeClassPerformanceExclusionMask() {
+    const maximumMask = (1 << JOB_ORDER.length) - 1;
+    const stored = Number(localStorage.getItem("notmeter-class-performance-exclusion-mask"));
+    if (Number.isInteger(stored) && stored > 0 && stored <= maximumMask) {
+      return stored;
+    }
+    const legacyJob = localStorage.getItem("notmeter-class-performance-excluded-job") || "";
+    const legacyIndex = JOB_ORDER.indexOf(legacyJob);
+    return legacyIndex >= 0 ? 1 << legacyIndex : 0;
+  }
+
   function saveClassPerformanceComposition() {
     const code = encodeClassPerformanceComposition(state.performanceCompositionCounts);
     if (code > 0) {
@@ -2447,13 +2457,14 @@
     } else {
       localStorage.removeItem("notmeter-class-performance-composition");
     }
-    if (JOB_ORDER.includes(state.performanceExcludedJob)) {
+    if (state.performanceExclusionMask > 0) {
       localStorage.setItem(
-        "notmeter-class-performance-excluded-job",
-        state.performanceExcludedJob);
+        "notmeter-class-performance-exclusion-mask",
+        String(state.performanceExclusionMask));
     } else {
-      localStorage.removeItem("notmeter-class-performance-excluded-job");
+      localStorage.removeItem("notmeter-class-performance-exclusion-mask");
     }
+    localStorage.removeItem("notmeter-class-performance-excluded-job");
   }
 
   function renderClassPerformanceComposition(snapshot) {
@@ -2461,7 +2472,7 @@
     const total = state.performanceCompositionCounts.reduce((sum, value) => sum + value, 0);
     JOB_ORDER.forEach((job, index) => {
       const count = state.performanceCompositionCounts[index];
-      const excluded = state.performanceExcludedJob === job;
+      const excluded = (state.performanceExclusionMask & (1 << index)) !== 0;
       const tile = document.createElement("article");
       tile.className = `class-performance-composition-job${count > 0 ? " active" : ""}${excluded ? " excluded" : ""}`;
       tile.style.setProperty("--job-color", PERFORMANCE_JOB_COLORS[job] || "#46e0d5");
@@ -2507,25 +2518,27 @@
     });
     elements["class-performance-composition-jobs"].replaceChildren(fragment);
     elements["class-performance-composition-reset"].disabled =
-      total === 0 && !state.performanceExcludedJob;
+      total === 0 && state.performanceExclusionMask === 0;
 
     const code = encodeClassPerformanceComposition(state.performanceCompositionCounts);
     const composition = code > 0
       ? (snapshot?.partyCompositions || []).find(item => Number(item.code) === code)
       : null;
-    const excludedJob = JOB_ORDER.includes(state.performanceExcludedJob)
-      ? state.performanceExcludedJob
-      : "";
-    const exclusion = excludedJob
-      ? (snapshot?.excludedJobs || []).find(item => item.jobName === excludedJob)
+    const maximumExclusionMask = (1 << JOB_ORDER.length) - 1;
+    const exclusionMask = state.performanceExclusionMask & maximumExclusionMask;
+    const exclusion = exclusionMask > 0
+      ? (snapshot?.exclusions || []).find(item => Number(item.mask) === exclusionMask)
       : null;
+    const excludedJobNames = JOB_ORDER
+      .filter((_, index) => (exclusionMask & (1 << index)) !== 0)
+      .map(jobName);
     elements["class-performance-composition-status"].classList.toggle(
       "unavailable",
-      (code > 0 && !composition) || (excludedJob && !exclusion));
-    elements["class-performance-composition-status"].textContent = excludedJob
+      (code > 0 && !composition) || (exclusionMask > 0 && !exclusion));
+    elements["class-performance-composition-status"].textContent = exclusionMask > 0
       ? exclusion
         ? t("classPerformanceCompositionExcluded", {
-            job: jobName(excludedJob),
+            jobs: excludedJobNames.join(" · "),
             samples: formatInteger(Number(exclusion.sampleCount) || 0),
             characters: formatInteger(Number(exclusion.uniqueCharacters) || 0),
           })
@@ -2539,7 +2552,7 @@
             characters: formatInteger(Number(composition.uniqueCharacters) || 0),
           })
         : t("classPerformanceCompositionUnavailable");
-    return { code, composition, excludedJob, exclusion };
+    return { code, composition, exclusionMask, exclusion };
   }
 
   function renderClassPerformance() {
@@ -2555,7 +2568,7 @@
     }
 
     const compositionSelection = renderClassPerformanceComposition(snapshot);
-    const selectedSnapshot = compositionSelection.excludedJob
+    const selectedSnapshot = compositionSelection.exclusionMask > 0
       ? compositionSelection.exclusion
       : compositionSelection.code > 0
         ? compositionSelection.composition
