@@ -708,7 +708,7 @@ p {
   background: #0b1925;
   color: #f3f8fb;
   font: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -1883,14 +1883,14 @@ button:focus-visible,
 .class-performance-method strong {
   display: block;
   color: #dceaf1;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
 }
 
 .class-performance-method p {
   margin-top: 3px;
   color: #7895a7;
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 650;
   line-height: 1.55;
 }
@@ -1942,7 +1942,7 @@ button:focus-visible,
 .class-performance-proof-heading h3 {
   margin-top: 3px;
   color: #e4f4f7;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 950;
 }
 
@@ -1971,7 +1971,7 @@ button:focus-visible,
   background: rgba(5, 17, 25, 0.84);
   color: #baf7f1;
   font-family: "Cascadia Mono", "Consolas", monospace;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 850;
   text-align: center;
 }
@@ -1979,7 +1979,7 @@ button:focus-visible,
 .class-performance-formula + p {
   margin-top: 7px;
   color: #8aa7b6;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 650;
   line-height: 1.5;
 }
@@ -1995,13 +1995,13 @@ button:focus-visible,
 
 .class-performance-proof-rule strong {
   color: #b6d2da;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 900;
 }
 
 .class-performance-proof-rule span {
   color: #708f9f;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 650;
   line-height: 1.45;
 }
@@ -2039,7 +2039,7 @@ button:focus-visible,
 
 .class-performance-grade-list span {
   color: #829fad;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -2063,7 +2063,7 @@ button:focus-visible,
 .class-performance-confidence-note {
   margin-top: 7px;
   color: #668595;
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 650;
   line-height: 1.5;
 }
@@ -2123,21 +2123,21 @@ button:focus-visible,
 .class-performance-metric-guide strong {
   display: block;
   color: #bffcf7;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
 .class-performance-metric-guide p {
   margin-top: 3px;
   color: #7897a8;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 650;
   line-height: 1.4;
 }
 
 .class-performance-summary {
   color: #86a7b8;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 750;
   text-align: right;
 }
@@ -2340,7 +2340,7 @@ button:focus-visible,
 .class-performance-notice p {
   padding: 0 11px 11px;
   color: #7794a5;
-  font-size: 11px;
+  font-size: 12.5px;
   line-height: 1.55;
 }
 
