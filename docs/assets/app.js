@@ -222,10 +222,12 @@
       classPerformanceCompositionAria: "파티 직업 조합 선택",
       classPerformanceCompositionIncrease: "{job} 인원 추가",
       classPerformanceCompositionDecrease: "{job} 인원 감소",
+      classPerformanceCompositionExclude: "제외",
+      classPerformanceCompositionExcludeJob: "{job} 없는 파티만 보기",
       classPerformanceCompositionAll: "전체 파티 조합 집계",
       classPerformanceCompositionSelected: "{partySize}인 조합 · 대표 기록 {samples}개 · 고유 캐릭터 {characters}명",
+      classPerformanceCompositionExcluded: "{job} 없는 파티 · 대표 기록 {samples}개 · 고유 캐릭터 {characters}명",
       classPerformanceCompositionUnavailable: "이 직업 구성은 신뢰도 기준을 충족한 캐시가 아직 없습니다.",
-      classPerformanceCompositionCacheNote: "원본 전투기록은 캐시에 넣지 않고, 집계 결과만 최대 128개 조합으로 제한해 제공합니다.",
       classPerformanceMetricsAria: "직업 성능 백분위 선택",
       classPerformanceP50Title: "P50 · 중앙값",
       classPerformanceP50Text: "전체 기록을 낮은 순으로 정렬했을 때 정확히 가운데인 지점으로, 일반적인 실전 성능을 비교합니다.",
@@ -489,10 +491,12 @@
       classPerformanceCompositionAria: "Select party class composition",
       classPerformanceCompositionIncrease: "Add one {job}",
       classPerformanceCompositionDecrease: "Remove one {job}",
+      classPerformanceCompositionExclude: "Exclude",
+      classPerformanceCompositionExcludeJob: "Show parties without {job}",
       classPerformanceCompositionAll: "Aggregating every party composition",
       classPerformanceCompositionSelected: "{partySize}-player composition · {samples} representative runs · {characters} unique characters",
+      classPerformanceCompositionExcluded: "Parties without {job} · {samples} representative runs · {characters} unique characters",
       classPerformanceCompositionUnavailable: "This exact class composition does not yet have a cache that passes the reliability threshold.",
-      classPerformanceCompositionCacheNote: "Raw combat records are not included; only aggregated results for up to 128 compositions are cached.",
       classPerformanceMetricsAria: "Select class-performance percentile",
       classPerformanceP50Title: "P50 · Median",
       classPerformanceP50Text: "The midpoint after sorting all runs from low to high, representing typical real-world performance.",
@@ -719,6 +723,7 @@
     performanceMetric: localStorage.getItem("notmeter-class-performance-metric") || "p75Score",
     performanceCompositionCounts: decodeClassPerformanceComposition(
       Number(localStorage.getItem("notmeter-class-performance-composition")) || 0),
+    performanceExcludedJob: localStorage.getItem("notmeter-class-performance-excluded-job") || "",
     rankingNavigationBlockedUntil: 0,
     selectedDetail: null,
     detailMemory: new Map(),
@@ -892,6 +897,7 @@
       returnToRankingFromClassPerformance);
     elements["class-performance-composition-reset"].addEventListener("click", () => {
       state.performanceCompositionCounts = Array(JOB_ORDER.length).fill(0);
+      state.performanceExcludedJob = "";
       saveClassPerformanceComposition();
       renderClassPerformance();
     });
@@ -902,8 +908,19 @@
       }
       const index = Number(button.dataset.compositionJob);
       const delta = Number(button.dataset.compositionDelta);
-      if (!Number.isInteger(index) || index < 0 || index >= JOB_ORDER.length ||
-          (delta !== -1 && delta !== 1)) {
+      const action = button.dataset.compositionAction;
+      if (!Number.isInteger(index) || index < 0 || index >= JOB_ORDER.length) {
+        return;
+      }
+      if (action === "exclude") {
+        const jobName = JOB_ORDER[index];
+        state.performanceCompositionCounts = Array(JOB_ORDER.length).fill(0);
+        state.performanceExcludedJob = state.performanceExcludedJob === jobName ? "" : jobName;
+        saveClassPerformanceComposition();
+        renderClassPerformance();
+        return;
+      }
+      if (delta !== -1 && delta !== 1) {
         return;
       }
       const counts = [...state.performanceCompositionCounts];
@@ -913,6 +930,7 @@
       }
       counts[index] = Math.max(0, Math.min(10, counts[index] + delta));
       state.performanceCompositionCounts = counts;
+      state.performanceExcludedJob = "";
       saveClassPerformanceComposition();
       renderClassPerformance();
     });
@@ -2429,6 +2447,13 @@
     } else {
       localStorage.removeItem("notmeter-class-performance-composition");
     }
+    if (JOB_ORDER.includes(state.performanceExcludedJob)) {
+      localStorage.setItem(
+        "notmeter-class-performance-excluded-job",
+        state.performanceExcludedJob);
+    } else {
+      localStorage.removeItem("notmeter-class-performance-excluded-job");
+    }
   }
 
   function renderClassPerformanceComposition(snapshot) {
@@ -2436,8 +2461,9 @@
     const total = state.performanceCompositionCounts.reduce((sum, value) => sum + value, 0);
     JOB_ORDER.forEach((job, index) => {
       const count = state.performanceCompositionCounts[index];
+      const excluded = state.performanceExcludedJob === job;
       const tile = document.createElement("article");
-      tile.className = `class-performance-composition-job${count > 0 ? " active" : ""}`;
+      tile.className = `class-performance-composition-job${count > 0 ? " active" : ""}${excluded ? " excluded" : ""}`;
       tile.style.setProperty("--job-color", PERFORMANCE_JOB_COLORS[job] || "#46e0d5");
 
       const identity = document.createElement("div");
@@ -2466,29 +2492,54 @@
       increase.disabled = total >= 10;
       increase.setAttribute("aria-label", t("classPerformanceCompositionIncrease", { job: jobName(job) }));
       controls.append(decrease, value, increase);
-      tile.append(identity, controls);
+      const exclude = document.createElement("button");
+      exclude.type = "button";
+      exclude.className = "class-performance-composition-exclude";
+      exclude.dataset.compositionJob = String(index);
+      exclude.dataset.compositionAction = "exclude";
+      exclude.setAttribute("aria-pressed", String(excluded));
+      exclude.setAttribute(
+        "aria-label",
+        t("classPerformanceCompositionExcludeJob", { job: jobName(job) }));
+      exclude.textContent = t("classPerformanceCompositionExclude");
+      tile.append(identity, controls, exclude);
       fragment.append(tile);
     });
     elements["class-performance-composition-jobs"].replaceChildren(fragment);
-    elements["class-performance-composition-reset"].disabled = total === 0;
+    elements["class-performance-composition-reset"].disabled =
+      total === 0 && !state.performanceExcludedJob;
 
     const code = encodeClassPerformanceComposition(state.performanceCompositionCounts);
     const composition = code > 0
       ? (snapshot?.partyCompositions || []).find(item => Number(item.code) === code)
       : null;
+    const excludedJob = JOB_ORDER.includes(state.performanceExcludedJob)
+      ? state.performanceExcludedJob
+      : "";
+    const exclusion = excludedJob
+      ? (snapshot?.excludedJobs || []).find(item => item.jobName === excludedJob)
+      : null;
     elements["class-performance-composition-status"].classList.toggle(
       "unavailable",
-      code > 0 && !composition);
-    elements["class-performance-composition-status"].textContent = code === 0
-      ? t("classPerformanceCompositionAll")
-      : composition
+      (code > 0 && !composition) || (excludedJob && !exclusion));
+    elements["class-performance-composition-status"].textContent = excludedJob
+      ? exclusion
+        ? t("classPerformanceCompositionExcluded", {
+            job: jobName(excludedJob),
+            samples: formatInteger(Number(exclusion.sampleCount) || 0),
+            characters: formatInteger(Number(exclusion.uniqueCharacters) || 0),
+          })
+        : t("classPerformanceCompositionUnavailable")
+      : code === 0
+        ? t("classPerformanceCompositionAll")
+        : composition
         ? t("classPerformanceCompositionSelected", {
             partySize: Number(composition.partySize) || total,
             samples: formatInteger(Number(composition.sampleCount) || 0),
             characters: formatInteger(Number(composition.uniqueCharacters) || 0),
           })
         : t("classPerformanceCompositionUnavailable");
-    return { code, composition };
+    return { code, composition, excludedJob, exclusion };
   }
 
   function renderClassPerformance() {
@@ -2504,9 +2555,11 @@
     }
 
     const compositionSelection = renderClassPerformanceComposition(snapshot);
-    const selectedSnapshot = compositionSelection.code > 0
-      ? compositionSelection.composition
-      : snapshot;
+    const selectedSnapshot = compositionSelection.excludedJob
+      ? compositionSelection.exclusion
+      : compositionSelection.code > 0
+        ? compositionSelection.composition
+        : snapshot;
     if (!selectedSnapshot || !Array.isArray(selectedSnapshot.rows)) {
       elements["class-performance-summary"].textContent = "—";
       elements["class-performance-empty"].hidden = false;
