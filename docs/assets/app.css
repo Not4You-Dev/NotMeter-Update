@@ -1841,14 +1841,14 @@ button:focus-visible,
 .class-performance-heading p {
   margin-top: 6px;
   color: #8fa9b9;
-  font-size: 11.5px;
+  font-size: 13px;
   font-weight: 650;
   line-height: 1.5;
 }
 
 .class-performance-method {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   padding: 12px 14px 0;
 }
@@ -1875,7 +1875,7 @@ button:focus-visible,
   border-radius: 6px;
   background: rgba(32, 112, 113, 0.16);
   color: #6de1d8;
-  font-size: 8.5px;
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
   font-weight: 950;
 }
@@ -1883,16 +1883,16 @@ button:focus-visible,
 .class-performance-method strong {
   display: block;
   color: #dceaf1;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 900;
 }
 
 .class-performance-method p {
   margin-top: 3px;
   color: #7895a7;
-  font-size: 9.5px;
+  font-size: 11.5px;
   font-weight: 650;
-  line-height: 1.45;
+  line-height: 1.55;
 }
 
 .class-performance-proof {
@@ -1934,7 +1934,7 @@ button:focus-visible,
 .class-performance-proof-heading span {
   display: block;
   color: #58cbc5;
-  font-size: 8px;
+  font-size: 9.5px;
   font-weight: 950;
   letter-spacing: 0.12em;
 }
@@ -1942,7 +1942,7 @@ button:focus-visible,
 .class-performance-proof-heading h3 {
   margin-top: 3px;
   color: #e4f4f7;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 950;
 }
 
@@ -1953,7 +1953,7 @@ button:focus-visible,
   border-radius: 999px;
   background: rgba(37, 139, 133, 0.13);
   color: #73ded5;
-  font-size: 8px;
+  font-size: 9.5px;
   font-weight: 900;
 }
 
@@ -1971,7 +1971,7 @@ button:focus-visible,
   background: rgba(5, 17, 25, 0.84);
   color: #baf7f1;
   font-family: "Cascadia Mono", "Consolas", monospace;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 850;
   text-align: center;
 }
@@ -1979,14 +1979,14 @@ button:focus-visible,
 .class-performance-formula + p {
   margin-top: 7px;
   color: #8aa7b6;
-  font-size: 9.5px;
+  font-size: 11px;
   font-weight: 650;
   line-height: 1.5;
 }
 
 .class-performance-proof-rule {
   display: grid;
-  grid-template-columns: 98px minmax(0, 1fr);
+  grid-template-columns: 118px minmax(0, 1fr);
   gap: 8px;
   margin-top: 7px;
   padding-top: 7px;
@@ -1995,13 +1995,13 @@ button:focus-visible,
 
 .class-performance-proof-rule strong {
   color: #b6d2da;
-  font-size: 9px;
+  font-size: 10.5px;
   font-weight: 900;
 }
 
 .class-performance-proof-rule span {
   color: #708f9f;
-  font-size: 8.7px;
+  font-size: 10.5px;
   font-weight: 650;
   line-height: 1.45;
 }
@@ -2033,13 +2033,13 @@ button:focus-visible,
   justify-content: center;
   border: 1px solid currentColor;
   border-radius: 5px;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 950;
 }
 
 .class-performance-grade-list span {
   color: #829fad;
-  font-size: 8.8px;
+  font-size: 10.5px;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -2063,7 +2063,7 @@ button:focus-visible,
 .class-performance-confidence-note {
   margin-top: 7px;
   color: #668595;
-  font-size: 8.5px;
+  font-size: 10px;
   font-weight: 650;
   line-height: 1.5;
 }
@@ -2103,7 +2103,7 @@ button:focus-visible,
   background: #0b1c29;
   color: #8eabba;
   cursor: pointer;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 900;
 }
 
@@ -2123,21 +2123,21 @@ button:focus-visible,
 .class-performance-metric-guide strong {
   display: block;
   color: #bffcf7;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 900;
 }
 
 .class-performance-metric-guide p {
   margin-top: 3px;
   color: #7897a8;
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 650;
   line-height: 1.4;
 }
 
 .class-performance-summary {
   color: #86a7b8;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 750;
   text-align: right;
 }
@@ -2333,14 +2333,14 @@ button:focus-visible,
   padding: 9px 11px;
   color: #9eb7c5;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 900;
 }
 
 .class-performance-notice p {
   padding: 0 11px 11px;
   color: #7794a5;
-  font-size: 9.5px;
+  font-size: 11px;
   line-height: 1.55;
 }
 
