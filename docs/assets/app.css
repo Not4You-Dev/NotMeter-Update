@@ -2096,6 +2096,7 @@ button:focus-visible,
 .class-performance-composition {
   display: grid;
   gap: 12px;
+  margin: 8px 14px 0;
   padding: 16px;
   border: 1px solid rgba(67, 218, 210, 0.25);
   border-radius: 12px;
