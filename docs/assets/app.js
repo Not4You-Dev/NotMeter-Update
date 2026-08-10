@@ -197,6 +197,12 @@
       classPerformanceTrustTitle: "신뢰도 공개",
       classPerformanceTrustText: "고유 캐릭터·콘텐츠 범위·95% 신뢰구간을 함께 표시하고 표본이 부족하면 순위를 매기지 않습니다.",
       classPerformanceMetricsAria: "직업 성능 백분위 선택",
+      classPerformanceP50Title: "P50 · 중앙값",
+      classPerformanceP50Text: "전체 기록을 낮은 순으로 정렬했을 때 정확히 가운데인 지점으로, 일반적인 실전 성능을 비교합니다.",
+      classPerformanceP75Title: "P75 · 상위 25% 기준",
+      classPerformanceP75Text: "전체 기록의 75%가 이 값 이하인 지점으로, 숙련된 유저의 실전 성능을 비교합니다.",
+      classPerformanceP90Title: "P90 · 상위 10% 기준",
+      classPerformanceP90Text: "전체 기록의 90%가 이 값 이하인 지점으로, 최상위권 성능을 보여주지만 표본 변화에 더 민감합니다.",
       classPerformancePending: "이번 주 신뢰도 통계 캐시 갱신을 기다리는 중입니다.",
       classPerformanceEmpty: "신뢰도 기준을 충족한 직업 표본이 아직 없습니다.",
       classPerformanceNoticeTitle: "지표 해석과 제한사항",
@@ -428,6 +434,12 @@
       classPerformanceTrustTitle: "Visible confidence",
       classPerformanceTrustText: "Unique characters, content coverage, and a 95% confidence interval are shown. Small samples receive no rank.",
       classPerformanceMetricsAria: "Select class-performance percentile",
+      classPerformanceP50Title: "P50 · Median",
+      classPerformanceP50Text: "The midpoint after sorting all runs from low to high, representing typical real-world performance.",
+      classPerformanceP75Title: "P75 · Top 25% threshold",
+      classPerformanceP75Text: "The point where 75% of runs are at or below it, representing experienced-player performance.",
+      classPerformanceP90Title: "P90 · Top 10% threshold",
+      classPerformanceP90Text: "The point where 90% of runs are at or below it, highlighting elite performance but reacting more to sample changes.",
       classPerformancePending: "Waiting for this week's confidence cache to refresh.",
       classPerformanceEmpty: "No class sample meets the confidence threshold yet.",
       classPerformanceNoticeTitle: "How to read this index",
@@ -694,6 +706,8 @@
       openOptimizationView();
     } else if (pageView === "field-boss") {
       openFieldBossView();
+    } else if (pageView === "class-performance") {
+      openClassPerformanceView(false);
     } else if (window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
@@ -729,6 +743,7 @@
       "optimization-frame",
       "class-performance-button", "class-performance-surface",
       "class-performance-back-button", "class-performance-summary",
+      "class-performance-metric-title", "class-performance-metric-description",
       "class-performance-pending", "class-performance-empty", "class-performance-chart",
       "class-top10-button", "class-top10-surface", "class-top10-back-button",
       "class-top10-tabs", "class-top10-pending", "class-top10-empty",
@@ -799,19 +814,6 @@
         returnToRankingFromClassTop10();
       } else {
         openClassTop10View(true);
-      }
-    });
-    elements["class-performance-button"].addEventListener("click", () => {
-      if (initialPageView() !== "ranking") {
-        const target = new URL("./", window.location.href);
-        target.hash = "class-performance";
-        window.location.assign(target.href);
-        return;
-      }
-      if (state.surfaceMode === "classPerformance") {
-        returnToRankingFromClassPerformance();
-      } else {
-        openClassPerformanceView(true);
       }
     });
     elements["optimization-frame"].addEventListener("load", () => {
@@ -1140,7 +1142,8 @@
 
   function initialPageView() {
     const view = new URLSearchParams(window.location.search).get("view");
-    return view === "field-boss" || view === "optimization" ? view : "ranking";
+    return view === "field-boss" || view === "optimization" ||
+      view === "class-performance" ? view : "ranking";
   }
 
   function openOptimizationView() {
@@ -1258,7 +1261,7 @@
     document.body.classList.add("class-performance-view");
     elements["class-performance-surface"].hidden = false;
     elements["class-performance-button"].classList.add("active");
-    elements["class-performance-button"].setAttribute("aria-pressed", "true");
+    elements["class-performance-button"].setAttribute("aria-current", "page");
     updatePageIdentity();
     renderClassPerformance();
     if (pushHistory) {
@@ -1275,11 +1278,15 @@
     document.body.classList.remove("class-performance-view");
     elements["class-performance-surface"].hidden = true;
     elements["class-performance-button"].classList.remove("active");
-    elements["class-performance-button"].setAttribute("aria-pressed", "false");
+    elements["class-performance-button"].setAttribute("aria-current", "false");
     updatePageIdentity();
   }
 
   function returnToRankingFromClassPerformance() {
+    if (initialPageView() === "class-performance") {
+      window.location.assign(new URL("./", window.location.href).href);
+      return;
+    }
     if (history.state?.notMeterStatsView === "class-performance") {
       history.back();
       return;
@@ -2329,6 +2336,13 @@
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
     });
+    const metricCopy = {
+      p50Score: ["classPerformanceP50Title", "classPerformanceP50Text"],
+      p75Score: ["classPerformanceP75Title", "classPerformanceP75Text"],
+      p90Score: ["classPerformanceP90Title", "classPerformanceP90Text"],
+    }[state.performanceMetric];
+    elements["class-performance-metric-title"].textContent = t(metricCopy[0]);
+    elements["class-performance-metric-description"].textContent = t(metricCopy[1]);
 
     const ranked = snapshot.rows
       .filter(row => Number(row.rank) > 0 && row.confidenceGrade !== "insufficient")

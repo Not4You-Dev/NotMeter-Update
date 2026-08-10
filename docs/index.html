@@ -18,13 +18,13 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260810-6">
+  <link rel="stylesheet" href="./assets/app.css?v=20260810-7">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
-  <script src="./assets/field-boss-catalog.js?v=20260810-6" defer></script>
-  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260810-6" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260810-6" defer></script>
-  <script src="./assets/stats-copy.zh-TW.js?v=20260810-6" defer></script>
-  <script src="./assets/app.js?v=20260810-6" defer></script>
+  <script src="./assets/field-boss-catalog.js?v=20260810-7" defer></script>
+  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260810-7" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260810-7" defer></script>
+  <script src="./assets/stats-copy.zh-TW.js?v=20260810-7" defer></script>
+  <script src="./assets/app.js?v=20260810-7" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -41,14 +41,14 @@
       </div>
       <div class="topbar-actions">
         <nav class="service-links" aria-label="NotMeter 바로가기" data-i18n-aria-label="serviceLinksAria">
-          <button class="service-link class-performance-link" id="class-performance-button" type="button" aria-pressed="false">
+          <a class="service-link class-performance-link" id="class-performance-button" href="./?view=class-performance" aria-current="false">
             <span class="service-link-icon class-performance-link-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <path d="M5 18V11M10 18V7M15 18V4M20 18V9"></path>
               </svg>
             </span>
             <span class="service-link-label" data-i18n="classPerformance">직업 성능</span>
-          </button>
+          </a>
           <button class="service-link class-top10-link" id="class-top10-button" type="button" aria-pressed="false">
             <span class="service-link-icon class-top10-link-icon" aria-hidden="true">10</span>
             <span class="service-link-label" data-i18n="classTop10">클래스 TOP 10</span>
@@ -232,10 +232,16 @@
       </div>
 
       <div class="class-performance-toolbar">
-        <div class="class-performance-metrics" role="group" aria-label="성능 지표" data-i18n-aria-label="classPerformanceMetricsAria">
-          <button type="button" data-performance-metric="p50Score">P50</button>
-          <button type="button" data-performance-metric="p75Score" class="active">P75</button>
-          <button type="button" data-performance-metric="p90Score">P90</button>
+        <div class="class-performance-metric-selector">
+          <div class="class-performance-metrics" role="group" aria-label="성능 지표" data-i18n-aria-label="classPerformanceMetricsAria">
+            <button type="button" data-performance-metric="p50Score">P50</button>
+            <button type="button" data-performance-metric="p75Score" class="active">P75</button>
+            <button type="button" data-performance-metric="p90Score">P90</button>
+          </div>
+          <div class="class-performance-metric-guide" aria-live="polite">
+            <strong id="class-performance-metric-title" data-i18n="classPerformanceP75Title">P75 · 상위 25% 기준</strong>
+            <p id="class-performance-metric-description" data-i18n="classPerformanceP75Text">전체 기록의 75%가 이 값 이하인 지점으로, 숙련된 유저의 실전 성능을 비교합니다.</p>
+          </div>
         </div>
         <div class="class-performance-summary" id="class-performance-summary">—</div>
       </div>
