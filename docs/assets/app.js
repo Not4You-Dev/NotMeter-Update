@@ -32,7 +32,7 @@
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const FIELD_BOSS_CACHE_SCHEMA = "notmeter-field-boss-public-cache-v1";
-  const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260806-2";
+  const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260812-1";
   const SUPPORTED_LOCALES = ["ko", "en", "zh-TW"];
   const LANGUAGE_BUTTON_LABELS = {
     ko: "한국어",
@@ -92,6 +92,8 @@
     "권성": "Brawler",
   };
   const DUNGEON_NAMES_EN = {
+    "deus-research-hard": "Corrupted Deus Research Base (Hard)",
+    "noiran-legacy-4": "Noiran's Hidden Legacy (Stage 4)",
     "training-dummy-60s": "Training Dummy (1 min)",
     "bakron-trial": "Trial: Bakron's Sky Island",
     "musphel-hard": "Musphel's Grail (Hard)",
@@ -100,6 +102,8 @@
     "nightmare-atheron-10": "Nightmare: Awakened Atheron (Stage 10)",
   };
   const DUNGEON_NAMES_ZH_TW = {
+    "deus-research-hard": "受侵蝕的德烏斯研究基地（困難）",
+    "noiran-legacy-4": "諾伊蘭的隱藏遺產（第4階段）",
     "training-dummy-60s": "訓練用稻草人（1分鐘）",
     "bakron-trial": "試煉：巴克隆空中島",
     "musphel-hard": "穆斯費爾聖杯（困難）",
@@ -110,6 +114,7 @@
   const GAME_NAME_OVERRIDES_ZH_TW = {
     "각성한 아테론 10단계": "覺醒阿特隆 第10階段",
   };
+  const FEATURED_DUNGEON_KEYS = ["deus-research-hard", "noiran-legacy-4"];
   const SERVER_NAMES_ELYOS = [
     "시엘", "네자칸", "바이젤", "카이시넬", "유스티엘", "아리엘", "프레기온", "메스람타에다",
     "히타니에", "나니아", "타하바타", "루터스", "페르노스", "다미누", "카사카", "바카르마",
@@ -1164,6 +1169,7 @@
         }),
       ]);
       validateCache(cache);
+      cache.dungeons = orderDungeonsForDisplay(cache.dungeons);
       let classOverallCache = initialClassOverallCache;
       if (!isMatchingClassOverallCache(classOverallCache, cache.generatedAt)) {
         console.warn("class overall cache generation mismatch; retrying matching cache", {
@@ -2972,6 +2978,8 @@
   function fullOverallDungeonName(dungeonKey, displayName) {
     const names = state.locale === "en"
       ? {
+          "deus-research-hard": "Corrupted Deus Research Base (Hard)",
+          "noiran-legacy-4": "Noiran's Hidden Legacy (Stage 4)",
           "training-dummy-60s": "Training Dummy (1 min)",
           "bakron-trial": "Trial: Bakron's Sky Island",
           "musphel-hard": "Musphel's Holy Grail (Hard)",
@@ -2982,6 +2990,8 @@
       : state.locale === "zh-TW"
         ? DUNGEON_NAMES_ZH_TW
         : {
+          "deus-research-hard": "잠식된 데우스 연구기지(어려움)",
+          "noiran-legacy-4": "노이란의 숨겨진 유산(4단계)",
           "training-dummy-60s": "훈련용 허수아비 (1분)",
           "bakron-trial": "시련: 바크론의 공중섬",
           "musphel-hard": "무스펠의 성배(어려움)",
@@ -4857,6 +4867,23 @@
 
   function currentDungeon() {
     return state.data?.dungeons?.find(item => item.key === state.dungeonKey) || null;
+  }
+
+  function orderDungeonsForDisplay(dungeons) {
+    const featuredOrder = new Map(
+      FEATURED_DUNGEON_KEYS.map((key, index) => [key, index]));
+    return [...(Array.isArray(dungeons) ? dungeons : [])]
+      .map((dungeon, index) => ({ dungeon, index }))
+      .sort((left, right) => {
+        const leftOrder = featuredOrder.get(left.dungeon?.key);
+        const rightOrder = featuredOrder.get(right.dungeon?.key);
+        if (leftOrder !== undefined || rightOrder !== undefined) {
+          return (leftOrder ?? Number.MAX_SAFE_INTEGER) -
+            (rightOrder ?? Number.MAX_SAFE_INTEGER);
+        }
+        return left.index - right.index;
+      })
+      .map(item => item.dungeon);
   }
 
   function dungeonName(dungeon) {
