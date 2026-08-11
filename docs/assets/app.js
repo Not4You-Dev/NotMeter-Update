@@ -2666,9 +2666,9 @@
     const available = snapshot && Array.isArray(snapshot.rows);
     elements["class-performance-pending"].hidden = available;
     elements["class-performance-empty"].hidden = true;
-    elements["class-performance-chart"].hidden = true;
     if (!available) {
       elements["class-performance-summary"].textContent = "—";
+      elements["class-performance-chart"].hidden = true;
       elements["class-performance-chart"].replaceChildren();
       return;
     }
@@ -2680,6 +2680,7 @@
     if (!selectedSnapshot || !Array.isArray(selectedSnapshot.rows)) {
       elements["class-performance-summary"].textContent = "—";
       elements["class-performance-empty"].hidden = false;
+      elements["class-performance-chart"].hidden = true;
       elements["class-performance-chart"].replaceChildren();
       return;
     }
@@ -2718,6 +2719,7 @@
     });
     if (selectedSnapshot.rows.length === 0) {
       elements["class-performance-empty"].hidden = false;
+      elements["class-performance-chart"].hidden = true;
       elements["class-performance-chart"].replaceChildren();
       return;
     }
