@@ -2593,9 +2593,6 @@
       chart.style.minHeight = `${Math.ceil(chartHeight)}px`;
     }
     renderClassPerformance();
-    if (state.performanceExclusionMask === 0) {
-      chart.style.removeProperty("min-height");
-    }
 
     const restorePosition = () => {
       if (anchor && Number.isFinite(anchorTop)) {
