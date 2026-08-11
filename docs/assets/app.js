@@ -914,8 +914,7 @@
     elements["class-performance-back-button"].addEventListener(
       "click",
       returnToRankingFromClassPerformance);
-    elements["class-performance-composition-reset"].addEventListener("click", event => {
-      event.currentTarget.blur();
+    elements["class-performance-composition-reset"].addEventListener("click", () => {
       state.performanceExclusionMask = 0;
       saveClassPerformanceExclusion();
       renderClassPerformanceInPlace();
@@ -929,7 +928,6 @@
       if (!Number.isInteger(index) || index < 0 || index >= JOB_ORDER.length) {
         return;
       }
-      button.blur();
       state.performanceExclusionMask ^= 1 << index;
       saveClassPerformanceExclusion();
       renderClassPerformanceInPlace();
