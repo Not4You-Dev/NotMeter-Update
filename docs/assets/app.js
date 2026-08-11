@@ -372,7 +372,8 @@
       detailLoading: "전투 상세 정보를 불러오는 중입니다",
       detailUnavailable: "전투 상세 정보를 불러오지 못했습니다 다시 시도해 주세요",
       detailUnavailableTitle: "상세 기록 없음",
-      detailUnavailableOld: "1.0.149 이전 버전에서 업로드되어 전투 상세가 수집되지 않은 기록입니다",
+      detailUnavailableOld: "현재 전투 상세 캐시에 포함되지 않은 기록입니다. 1.0.149 이하 기록은 통계에서 제외됩니다.",
+      detailUnavailableCustomCp: "직접 CP 조회의 순위 기록은 정상입니다. 다만 이 기록은 현재 전투 상세 캐시에 게시되지 않았으며, 1.0.149 기록이라는 뜻은 아닙니다.",
       partyMembers: "파티원",
       totalDamage: "총 데미지",
       contribution: "기여도",
@@ -640,7 +641,8 @@
       detailLoading: "Loading combat details",
       detailUnavailable: "Combat details are temporarily unavailable. Please try again.",
       detailUnavailableTitle: "Details unavailable",
-      detailUnavailableOld: "This record was uploaded by a version earlier than 1.0.149, so combat details were not collected.",
+      detailUnavailableOld: "This record is not included in the current combat-detail cache. Records from version 1.0.149 or earlier are excluded from statistics.",
+      detailUnavailableCustomCp: "This custom-CP ranking record is valid, but its combat details are not currently published in the detail cache. This does not mean the record is from version 1.0.149.",
       partyMembers: "Party members",
       totalDamage: "Total damage",
       contribution: "Contribution",
@@ -708,6 +710,8 @@
     customCpLoad: null,
     customCpRankData: new Map(),
     customCpRankLoads: new Map(),
+    customCpSummaryIndexes: new Map(),
+    customCpRankIndexes: new Map(),
     locale: normalizeLocale(localStorage.getItem("notmeter-stats-locale")),
     dungeonKey: "",
     bossIndex: 0,
@@ -910,10 +914,11 @@
     elements["class-performance-back-button"].addEventListener(
       "click",
       returnToRankingFromClassPerformance);
-    elements["class-performance-composition-reset"].addEventListener("click", () => {
+    elements["class-performance-composition-reset"].addEventListener("click", event => {
+      event.currentTarget.blur();
       state.performanceExclusionMask = 0;
       saveClassPerformanceExclusion();
-      renderClassPerformance();
+      renderClassPerformanceInPlace();
     });
     elements["class-performance-composition-jobs"].addEventListener("click", event => {
       const button = event.target.closest("[data-composition-job]");
@@ -924,9 +929,10 @@
       if (!Number.isInteger(index) || index < 0 || index >= JOB_ORDER.length) {
         return;
       }
+      button.blur();
       state.performanceExclusionMask ^= 1 << index;
       saveClassPerformanceExclusion();
-      renderClassPerformance();
+      renderClassPerformanceInPlace();
     });
     document.querySelectorAll("[data-performance-metric]").forEach(button => {
       button.addEventListener("click", () => {
@@ -1180,35 +1186,57 @@
       if (cache.classOverall && !cache.classOverallGeneratedAt) {
         cache.classOverallGeneratedAt = cache.generatedAt;
       }
-      state.lastCacheSyncAt = Date.now();
       if (preserveView &&
         state.data &&
         String(cache.generatedAt) === String(state.data.generatedAt) &&
         String(cache.classOverallGeneratedAt || "") ===
           String(state.data.classOverallGeneratedAt || "")) {
+        state.lastCacheSyncAt = Date.now();
         return;
       }
       const previousDungeon = state.dungeonKey;
+      const nextDungeon = cache.dungeons.some(item => item.key === previousDungeon)
+        ? previousDungeon
+        : cache.dungeons[0]?.key || "";
+      const generationChanged = !state.data ||
+        String(cache.generatedAt) !== String(state.data.generatedAt);
+      let preparedCustomCp = null;
+      let preparedCustomCpRank = null;
+      if (state.cpFilterMode === "custom" && generationChanged) {
+        const prepared = await prepareCustomCpGeneration(
+          cache.generatedAt,
+          nextDungeon,
+          force,
+          state.mode === "class");
+        preparedCustomCp = prepared.summary;
+        preparedCustomCpRank = prepared.rank;
+      }
+      state.lastCacheSyncAt = Date.now();
       closeCombatDetail();
-      if (!state.data ||
-          String(cache.generatedAt) !== String(state.data.generatedAt)) {
+      if (generationChanged) {
         state.customCpData = null;
         state.customCpLoad = null;
         state.customCpRankData.clear();
         state.customCpRankLoads.clear();
+        state.customCpSummaryIndexes.clear();
+        state.customCpRankIndexes.clear();
       }
       state.data = cache;
+      if (preparedCustomCp) {
+        state.customCpData = preparedCustomCp;
+      }
+      if (preparedCustomCpRank) {
+        state.customCpRankData.set(nextDungeon, preparedCustomCpRank);
+      }
       state.detailMemory.clear();
       void pruneDetailCache(cache.generatedAt);
-      state.dungeonKey = cache.dungeons.some(item => item.key === previousDungeon)
-        ? previousDungeon
-        : cache.dungeons[0]?.key || "";
+      state.dungeonKey = nextDungeon;
       if (!preserveView || state.dungeonKey !== previousDungeon) {
         resetClassSelection();
       }
       updateDailyUsers();
       populateFilters();
-      if (state.cpFilterMode === "custom") {
+      if (state.cpFilterMode === "custom" && !state.customCpData) {
         await ensureCustomCpCache(force);
       }
       render();
@@ -2192,20 +2220,24 @@
     }
   }
 
-  function validateCustomCpCache(cache) {
-    if (!cache ||
-        cache.schema !== EXPECTED_CUSTOM_CP_SCHEMA ||
-        Number(cache.version) !== 4 ||
-        !Array.isArray(cache.cpTiers) ||
-        !Array.isArray(cache.views) ||
-        !cache.classRankings ||
-        !parseWeeklyRange(cache.currentWeekPeriodLabel) ||
-        !cache.summaryBucketsByDungeon ||
-        typeof cache.summaryBucketsByDungeon !== "object" ||
-        !cache.generatedAt ||
-        String(cache.generatedAt) !== String(state.data?.generatedAt)) {
+  function validateCustomCpCache(cache, expectedGeneratedAt = state.data?.generatedAt) {
+    if (!isMatchingCustomCpCache(cache, expectedGeneratedAt)) {
       throw new Error(t("cacheInvalid"));
     }
+  }
+
+  function isMatchingCustomCpCache(cache, expectedGeneratedAt) {
+    return Boolean(cache &&
+        cache.schema === EXPECTED_CUSTOM_CP_SCHEMA &&
+        Number(cache.version) === 4 &&
+        Array.isArray(cache.cpTiers) &&
+        Array.isArray(cache.views) &&
+        cache.classRankings &&
+        parseWeeklyRange(cache.currentWeekPeriodLabel) &&
+        cache.summaryBucketsByDungeon &&
+        typeof cache.summaryBucketsByDungeon === "object" &&
+        cache.generatedAt &&
+        String(cache.generatedAt) === String(expectedGeneratedAt || ""));
   }
 
   function customCpRankCacheUrls(dungeonKey) {
@@ -2219,16 +2251,67 @@
     ];
   }
 
-  function validateCustomCpRankCache(cache, dungeonKey) {
-    if (!cache ||
-        cache.schema !== EXPECTED_CUSTOM_CP_RANK_SCHEMA ||
-        Number(cache.version) !== 1 ||
-        cache.dungeonKey !== dungeonKey ||
-        !Array.isArray(cache.rankBuckets) ||
-        !cache.generatedAt ||
-        String(cache.generatedAt) !== String(state.data?.generatedAt)) {
+  function validateCustomCpRankCache(
+      cache,
+      dungeonKey,
+      expectedGeneratedAt = state.data?.generatedAt) {
+    if (!isMatchingCustomCpRankCache(
+        cache,
+        dungeonKey,
+        expectedGeneratedAt)) {
       throw new Error(t("cacheInvalid"));
     }
+  }
+
+  function isMatchingCustomCpRankCache(cache, dungeonKey, expectedGeneratedAt) {
+    return Boolean(cache &&
+        cache.schema === EXPECTED_CUSTOM_CP_RANK_SCHEMA &&
+        Number(cache.version) === 1 &&
+        cache.dungeonKey === dungeonKey &&
+        Array.isArray(cache.rankBuckets) &&
+        cache.generatedAt &&
+        String(cache.generatedAt) === String(expectedGeneratedAt || ""));
+  }
+
+  async function fetchCustomCpCacheForGeneration(expectedGeneratedAt, force = false) {
+    const normalizedExpected = String(expectedGeneratedAt || "");
+    const cache = await fetchCompressedJson(
+      CUSTOM_CP_CACHE_URLS,
+      force,
+      candidate => isMatchingCustomCpCache(candidate, normalizedExpected),
+      normalizedExpected);
+    validateCustomCpCache(cache, normalizedExpected);
+    return cache;
+  }
+
+  async function fetchCustomCpRankCacheForGeneration(
+      dungeonKey,
+      expectedGeneratedAt,
+      force = false) {
+    const normalizedExpected = String(expectedGeneratedAt || "");
+    const cache = await fetchCompressedJson(
+      customCpRankCacheUrls(dungeonKey),
+      force,
+      candidate => isMatchingCustomCpRankCache(
+        candidate,
+        dungeonKey,
+        normalizedExpected),
+      normalizedExpected);
+    validateCustomCpRankCache(cache, dungeonKey, normalizedExpected);
+    return cache;
+  }
+
+  async function prepareCustomCpGeneration(
+      expectedGeneratedAt,
+      dungeonKey,
+      force,
+      includeRank) {
+    const summaryLoad = fetchCustomCpCacheForGeneration(expectedGeneratedAt, force);
+    const rankLoad = includeRank
+      ? fetchCustomCpRankCacheForGeneration(dungeonKey, expectedGeneratedAt, force)
+      : Promise.resolve(null);
+    const [summary, rank] = await Promise.all([summaryLoad, rankLoad]);
+    return { summary, rank };
   }
 
   async function ensureCustomCpCache(force = false) {
@@ -2240,14 +2323,21 @@
     if (state.customCpLoad && !force) {
       return state.customCpLoad;
     }
-    const load = fetchCompressedJson(CUSTOM_CP_CACHE_URLS, force)
+    const expectedGeneratedAt = String(state.data?.generatedAt || "");
+    let load;
+    load = fetchCustomCpCacheForGeneration(expectedGeneratedAt, force)
       .then(cache => {
-        validateCustomCpCache(cache);
+        if (String(state.data?.generatedAt || "") !== expectedGeneratedAt) {
+          return cache;
+        }
         state.customCpData = cache;
+        state.customCpSummaryIndexes.clear();
         return cache;
       })
       .finally(() => {
-        state.customCpLoad = null;
+        if (state.customCpLoad === load) {
+          state.customCpLoad = null;
+        }
       });
     state.customCpLoad = load;
     return load;
@@ -2263,14 +2353,24 @@
     if (state.customCpRankLoads.has(dungeonKey) && !force) {
       return state.customCpRankLoads.get(dungeonKey);
     }
-    const load = fetchCompressedJson(customCpRankCacheUrls(dungeonKey), force)
+    const expectedGeneratedAt = String(state.data?.generatedAt || "");
+    let load;
+    load = fetchCustomCpRankCacheForGeneration(
+      dungeonKey,
+      expectedGeneratedAt,
+      force)
       .then(cache => {
-        validateCustomCpRankCache(cache, dungeonKey);
+        if (String(state.data?.generatedAt || "") !== expectedGeneratedAt) {
+          return cache;
+        }
         state.customCpRankData.set(dungeonKey, cache);
+        state.customCpRankIndexes.delete(dungeonKey);
         return cache;
       })
       .finally(() => {
-        state.customCpRankLoads.delete(dungeonKey);
+        if (state.customCpRankLoads.get(dungeonKey) === load) {
+          state.customCpRankLoads.delete(dungeonKey);
+        }
       });
     state.customCpRankLoads.set(dungeonKey, load);
     return load;
@@ -2364,6 +2464,11 @@
     localStorage.setItem("notmeter-stats-custom-cp-max-k", String(maximum));
     elements["custom-cp-apply"].disabled = true;
     showState("loading");
+    const rankLoad = ensureCustomCpRankCache(state.dungeonKey)
+      .catch(error => {
+        console.warn("custom CP rank cache prefetch failed", error);
+        return null;
+      });
     try {
       await ensureCustomCpCache();
     } catch (error) {
@@ -2386,6 +2491,11 @@
     syncCustomCpControls();
     leaveClassView();
     render();
+    void rankLoad.then(cache => {
+      if (cache && state.mode === "class") {
+        renderClassRanking();
+      }
+    });
   }
 
   function matchingCustomCpTiers() {
@@ -2472,6 +2582,28 @@
       localStorage.removeItem("notmeter-class-performance-exclusion-mask");
     }
     localStorage.removeItem("notmeter-class-performance-excluded-job");
+  }
+
+  function renderClassPerformanceInPlace() {
+    const anchor = document.querySelector(".class-performance-composition");
+    const anchorTop = anchor?.getBoundingClientRect().top;
+    const scrollLeft = window.scrollX;
+    const scrollTop = window.scrollY;
+    renderClassPerformance();
+
+    const restorePosition = () => {
+      if (anchor && Number.isFinite(anchorTop)) {
+        const offset = anchor.getBoundingClientRect().top - anchorTop;
+        if (Math.abs(offset) > 0.5) {
+          window.scrollBy(0, offset);
+        }
+        return;
+      }
+      window.scrollTo(scrollLeft, scrollTop);
+    };
+
+    restorePosition();
+    window.requestAnimationFrame(restorePosition);
   }
 
   function renderClassPerformanceComposition(snapshot) {
@@ -3085,7 +3217,11 @@
       } else if (canBuildLookupKey) {
         await openRemoteCombatDetail(player, await getDetailLookupKey(), tr);
       } else {
-        openUnavailableCombatDetail(player, t("detailUnavailableOld"));
+        openUnavailableCombatDetail(
+          player,
+          state.cpFilterMode === "custom"
+            ? t("detailUnavailableCustomCp")
+            : t("detailUnavailableOld"));
       }
     };
     tr.addEventListener("click", event => {
@@ -3227,7 +3363,9 @@
     const job = String(state.selectedJob || "").trim().normalize("NFC");
     const name = String(player.name || "").trim().normalize("NFC");
     const serverId = Math.max(0, Math.trunc(Number(player.serverId) || 0));
-    const combatPower = Math.max(0, Math.trunc(Number(player.combatPower) || 0));
+    const combatPower = Math.max(
+      0,
+      Math.trunc(Number(player.recordCombatPower ?? player.combatPower) || 0));
     const rawDuration = Number(player.durationSeconds);
     const roundedDuration = Math.round(
       (Number.isFinite(rawDuration) ? Math.max(0, rawDuration) : 0) * 1000) / 1000;
@@ -3331,8 +3469,8 @@
       elements["detail-close"].focus({ preventScroll: true });
     } catch (error) {
       console.error(error);
-      const reason = Number(error?.status) === 404
-        ? t("detailUnavailableOld")
+      const reason = state.cpFilterMode === "custom"
+        ? t("detailUnavailableCustomCp")
         : t("detailUnavailable");
       row.title = reason;
       openUnavailableCombatDetail(player, reason);
@@ -4227,6 +4365,7 @@
           name: String(item.player.N || ""),
           serverId: Number(item.player.S) || 0,
           combatPower: Number(item.player.C) || 0,
+          recordCombatPower: Number(item.player.O) || Number(item.player.C) || 0,
           durationSeconds: Number(item.player.U) || 0,
           partyJobNames: null,
           dps: Number(item.player.X) || 0,
@@ -4250,29 +4389,74 @@
   }
 
   function filterCustomCpSummaryBuckets(period) {
-    const buckets = state.customCpData?.summaryBucketsByDungeon?.[state.dungeonKey];
-    if (!Array.isArray(buckets)) {
-      return [];
-    }
+    const buckets = customCpBucketsInRange(
+      customCpSummaryIndex(state.dungeonKey));
     const periodMask = customCpPeriodMask(period);
     return buckets.filter(bucket =>
-      Number(bucket.K) >= state.customCpMinK &&
-      Number(bucket.K) <= state.customCpMaxK &&
       (state.bossIndex === 0 || Number(bucket.B) === state.bossIndex) &&
       (Number(bucket.M) & periodMask) !== 0);
   }
 
   function filterCustomCpRankBuckets(period) {
-    const buckets = state.customCpRankData.get(state.dungeonKey)?.rankBuckets;
-    if (!Array.isArray(buckets)) {
-      return [];
-    }
+    const buckets = customCpBucketsInRange(
+      customCpRankIndex(state.dungeonKey));
     const periodMask = customCpPeriodMask(period);
     return buckets.filter(bucket =>
-      Number(bucket.K) >= state.customCpMinK &&
-      Number(bucket.K) <= state.customCpMaxK &&
       (state.bossIndex === 0 || Number(bucket.B) === state.bossIndex) &&
       Number(bucket.M) === periodMask);
+  }
+
+  function customCpSummaryIndex(dungeonKey) {
+    if (state.customCpSummaryIndexes.has(dungeonKey)) {
+      return state.customCpSummaryIndexes.get(dungeonKey);
+    }
+    const buckets = state.customCpData?.summaryBucketsByDungeon?.[dungeonKey];
+    const index = indexCustomCpBuckets(buckets);
+    state.customCpSummaryIndexes.set(dungeonKey, index);
+    return index;
+  }
+
+  function customCpRankIndex(dungeonKey) {
+    if (state.customCpRankIndexes.has(dungeonKey)) {
+      return state.customCpRankIndexes.get(dungeonKey);
+    }
+    const buckets = state.customCpRankData.get(dungeonKey)?.rankBuckets;
+    const index = indexCustomCpBuckets(buckets);
+    state.customCpRankIndexes.set(dungeonKey, index);
+    return index;
+  }
+
+  function indexCustomCpBuckets(buckets) {
+    const index = new Map();
+    if (!Array.isArray(buckets)) {
+      return index;
+    }
+    for (const bucket of buckets) {
+      const combatPowerK = Number(bucket.K);
+      if (!Number.isInteger(combatPowerK)) {
+        continue;
+      }
+      const rows = index.get(combatPowerK);
+      if (rows) {
+        rows.push(bucket);
+      } else {
+        index.set(combatPowerK, [bucket]);
+      }
+    }
+    return index;
+  }
+
+  function customCpBucketsInRange(index) {
+    const buckets = [];
+    for (let combatPowerK = state.customCpMinK;
+         combatPowerK <= state.customCpMaxK;
+         combatPowerK++) {
+      const rows = index.get(combatPowerK);
+      if (rows) {
+        buckets.push(...rows);
+      }
+    }
+    return buckets;
   }
 
   function customCpPeriodMask(period) {
