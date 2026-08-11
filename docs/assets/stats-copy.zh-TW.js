@@ -137,7 +137,7 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   allBosses: "所有首領",
   dungeonSelectionAria: "選擇副本",
   bossSelectionAria: "選擇首領",
-  moreDungeons: "更多 +{count}",
+  moreDungeons: "顯示其他 {count} 個副本",
   expandDungeons: "展開副本列表",
   collapseDungeons: "收合副本列表",
   allCp: "所有 CP",

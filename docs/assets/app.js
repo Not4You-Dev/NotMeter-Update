@@ -32,7 +32,7 @@
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const FIELD_BOSS_CACHE_SCHEMA = "notmeter-field-boss-public-cache-v1";
-  const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260812-1";
+  const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260812-2";
   const SUPPORTED_LOCALES = ["ko", "en", "zh-TW"];
   const LANGUAGE_BUTTON_LABELS = {
     ko: "한국어",
@@ -318,7 +318,7 @@
       allBosses: "전체 보스",
       dungeonSelectionAria: "던전 선택",
       bossSelectionAria: "보스 선택",
-      moreDungeons: "더보기 +{count}",
+      moreDungeons: "다른 던전 +{count}개 더보기",
       expandDungeons: "던전 목록 펼치기",
       collapseDungeons: "던전 목록 접기",
       allCp: "전체 CP",
@@ -592,7 +592,7 @@
       allBosses: "All bosses",
       dungeonSelectionAria: "Select dungeon",
       bossSelectionAria: "Select boss",
-      moreDungeons: "More +{count}",
+      moreDungeons: "Show {count} more dungeons",
       expandDungeons: "Show all dungeons",
       collapseDungeons: "Collapse dungeons",
       allCp: "All CP",
@@ -997,7 +997,6 @@
         return;
       }
       closeCombatDetail();
-      state.dungeonFilterExpanded = false;
       applyDungeonSelection(button.dataset.dungeonKey);
       populateFilters();
       render();
