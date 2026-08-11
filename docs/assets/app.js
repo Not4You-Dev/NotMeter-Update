@@ -115,6 +115,7 @@
     "각성한 아테론 10단계": "覺醒阿特隆 第10階段",
   };
   const FEATURED_DUNGEON_KEYS = ["deus-research-hard", "noiran-legacy-4"];
+  const DUNGEON_BUTTON_COLLAPSED_LIMIT = 6;
   const SERVER_NAMES_ELYOS = [
     "시엘", "네자칸", "바이젤", "카이시넬", "유스티엘", "아리엘", "프레기온", "메스람타에다",
     "히타니에", "나니아", "타하바타", "루터스", "페르노스", "다미누", "카사카", "바카르마",
@@ -315,6 +316,11 @@
       privacyPolicy: "개인정보처리방침",
       advertisingNotice: "Google AdSense 광고를 사용합니다.",
       allBosses: "전체 보스",
+      dungeonSelectionAria: "던전 선택",
+      bossSelectionAria: "보스 선택",
+      moreDungeons: "더보기 +{count}",
+      expandDungeons: "던전 목록 펼치기",
+      collapseDungeons: "던전 목록 접기",
       allCp: "전체 CP",
       customCp: "직접 CP 지정",
       customCpTitle: "직접 CP 지정",
@@ -584,6 +590,11 @@
       privacyPolicy: "Privacy policy",
       advertisingNotice: "This site uses Google AdSense advertising.",
       allBosses: "All bosses",
+      dungeonSelectionAria: "Select dungeon",
+      bossSelectionAria: "Select boss",
+      moreDungeons: "More +{count}",
+      expandDungeons: "Show all dungeons",
+      collapseDungeons: "Collapse dungeons",
       allCp: "All CP",
       customCp: "Custom CP",
       customCpTitle: "Custom CP",
@@ -719,6 +730,7 @@
     customCpRankIndexes: new Map(),
     locale: normalizeLocale(localStorage.getItem("notmeter-stats-locale")),
     dungeonKey: "",
+    dungeonFilterExpanded: false,
     bossIndex: 0,
     cpTierIndex: 0,
     cpFilterMode: "standard",
@@ -830,7 +842,8 @@
       "field-boss-entry-count", "field-boss-cache-age", "field-boss-loading-state",
       "field-boss-error-state", "field-boss-error-message", "field-boss-empty-state",
       "field-boss-content", "field-boss-tabs", "field-boss-list",
-      "dungeon-filter", "boss-filter", "cp-filter",
+      "dungeon-filter", "dungeon-filter-buttons", "dungeon-filter-more",
+      "boss-filter", "boss-filter-buttons", "cp-filter",
       "custom-cp-panel", "custom-cp-min", "custom-cp-max", "custom-cp-apply", "custom-cp-result",
       "period-filter", "refresh-button", "retry-button", "snapshot-title", "snapshot-caption",
       "sample-meta", "generated-meta", "weekly-guide", "class-heading", "class-title",
@@ -978,9 +991,39 @@
       populateFilters();
       render();
     });
+    elements["dungeon-filter-buttons"].addEventListener("click", event => {
+      const button = event.target.closest("[data-dungeon-key]");
+      if (!button || button.dataset.dungeonKey === state.dungeonKey) {
+        return;
+      }
+      closeCombatDetail();
+      state.dungeonFilterExpanded = false;
+      applyDungeonSelection(button.dataset.dungeonKey);
+      populateFilters();
+      render();
+    });
+    elements["dungeon-filter-more"].addEventListener("click", () => {
+      state.dungeonFilterExpanded = !state.dungeonFilterExpanded;
+      renderDungeonFilterButtons();
+    });
     elements["boss-filter"].addEventListener("change", event => {
       state.bossIndex = Number(event.target.value);
       leaveClassView();
+      render();
+    });
+    elements["boss-filter-buttons"].addEventListener("click", event => {
+      const button = event.target.closest("[data-boss-index]");
+      if (!button) {
+        return;
+      }
+      const bossIndex = Number(button.dataset.bossIndex);
+      if (!Number.isInteger(bossIndex) || bossIndex === state.bossIndex) {
+        return;
+      }
+      state.bossIndex = bossIndex;
+      elements["boss-filter"].value = String(bossIndex);
+      leaveClassView();
+      renderBossFilterButtons();
       render();
     });
     elements["cp-filter"].addEventListener("change", event => {
@@ -2390,6 +2433,7 @@
       item => item.key,
       item => dungeonName(item),
       state.dungeonKey);
+    renderDungeonFilterButtons();
 
     const dungeon = currentDungeon();
     const bosses = [{ index: 0, name: t("allBosses") }]
@@ -2406,6 +2450,7 @@
       item => item.index,
       item => item.name,
       state.bossIndex);
+    renderBossFilterButtons(bosses);
 
     const cpTiers = state.data.cpTiers
       .filter(item => Number(item.index) < STANDARD_CP_TIER_LIMIT)
@@ -2436,6 +2481,71 @@
       item => item,
       item => periodName(item),
       state.period);
+  }
+
+  function renderDungeonFilterButtons() {
+    const dungeons = state.data?.dungeons || [];
+    const collapsed = dungeons.slice(0, DUNGEON_BUTTON_COLLAPSED_LIMIT);
+    if (!state.dungeonFilterExpanded &&
+        state.dungeonKey &&
+        !collapsed.some(item => item.key === state.dungeonKey)) {
+      collapsed[collapsed.length - 1] = dungeons.find(item => item.key === state.dungeonKey);
+    }
+    const visible = state.dungeonFilterExpanded ? dungeons : collapsed.filter(Boolean);
+    const fragment = document.createDocumentFragment();
+    for (const dungeon of visible) {
+      const selected = dungeon.key === state.dungeonKey;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "filter-option-button dungeon-filter-button";
+      button.classList.toggle("is-active", selected);
+      button.dataset.dungeonKey = dungeon.key;
+      button.setAttribute("role", "radio");
+      button.setAttribute("aria-checked", String(selected));
+      button.textContent = dungeonName(dungeon);
+      fragment.append(button);
+    }
+    elements["dungeon-filter-buttons"].replaceChildren(fragment);
+
+    const moreButton = elements["dungeon-filter-more"];
+    const overflowCount = Math.max(0, dungeons.length - DUNGEON_BUTTON_COLLAPSED_LIMIT);
+    moreButton.hidden = overflowCount === 0;
+    moreButton.textContent = state.dungeonFilterExpanded
+      ? t("collapseDungeons")
+      : t("moreDungeons", { count: overflowCount });
+    moreButton.title = t(state.dungeonFilterExpanded ? "collapseDungeons" : "expandDungeons");
+    moreButton.setAttribute("aria-label", moreButton.title);
+    moreButton.setAttribute("aria-expanded", String(state.dungeonFilterExpanded));
+  }
+
+  function renderBossFilterButtons(bosses = null) {
+    const items = bosses || [{ index: 0, name: t("allBosses") }]
+      .concat((currentDungeon()?.bossNames || []).map((name, index) => ({
+        index: index + 1,
+        name: localizeGameName(name),
+      })));
+    const fragment = document.createDocumentFragment();
+    for (const boss of items) {
+      const selected = boss.index === state.bossIndex;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "filter-option-button boss-filter-button";
+      button.classList.toggle("is-active", selected);
+      button.dataset.bossIndex = String(boss.index);
+      button.setAttribute("role", "radio");
+      button.setAttribute("aria-checked", String(selected));
+      if (boss.index > 0) {
+        const order = document.createElement("b");
+        order.className = "boss-filter-order";
+        order.textContent = String(boss.index);
+        button.append(order);
+      }
+      const label = document.createElement("span");
+      label.textContent = boss.name;
+      button.append(label);
+      fragment.append(button);
+    }
+    elements["boss-filter-buttons"].replaceChildren(fragment);
   }
 
   function replaceOptions(select, items, valueSelector, labelSelector, selectedValue) {

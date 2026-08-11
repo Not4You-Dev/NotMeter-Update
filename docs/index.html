@@ -18,13 +18,13 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260810-23">
+  <link rel="stylesheet" href="./assets/app.css?v=20260812-1">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
-  <script src="./assets/field-boss-catalog.js?v=20260810-23" defer></script>
-  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260810-23" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260810-23" defer></script>
-  <script src="./assets/stats-copy.zh-TW.js?v=20260810-23" defer></script>
-  <script src="./assets/app.js?v=20260810-23" defer></script>
+  <script src="./assets/field-boss-catalog.js?v=20260812-1" defer></script>
+  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260812-1" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260812-1" defer></script>
+  <script src="./assets/stats-copy.zh-TW.js?v=20260812-1" defer></script>
+  <script src="./assets/app.js?v=20260812-1" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -386,14 +386,21 @@
     </section>
 
     <section class="filter-panel" aria-label="통계 필터" data-i18n-aria-label="statsFiltersAria">
-      <label class="filter-field">
-        <span data-i18n="dungeon">던전</span>
-        <select id="dungeon-filter"></select>
-      </label>
-      <label class="filter-field">
-        <span data-i18n="boss">보스</span>
-        <select id="boss-filter"></select>
-      </label>
+      <div class="filter-choice filter-choice-dungeon">
+        <div class="filter-choice-heading">
+          <span data-i18n="dungeon">던전</span>
+          <button class="filter-expand-button" id="dungeon-filter-more" type="button" hidden></button>
+        </div>
+        <div class="filter-button-list dungeon-filter-buttons" id="dungeon-filter-buttons" role="radiogroup" aria-label="던전 선택" data-i18n-aria-label="dungeonSelectionAria"></div>
+        <select class="filter-native-select" id="dungeon-filter" tabindex="-1" aria-hidden="true"></select>
+      </div>
+      <div class="filter-choice filter-choice-boss">
+        <div class="filter-choice-heading">
+          <span data-i18n="boss">보스</span>
+        </div>
+        <div class="filter-button-list boss-filter-buttons" id="boss-filter-buttons" role="radiogroup" aria-label="보스 선택" data-i18n-aria-label="bossSelectionAria"></div>
+        <select class="filter-native-select" id="boss-filter" tabindex="-1" aria-hidden="true"></select>
+      </div>
       <label class="filter-field">
         <span>CP</span>
         <select id="cp-filter"></select>
