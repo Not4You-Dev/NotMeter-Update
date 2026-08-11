@@ -2589,7 +2589,15 @@
     const anchorTop = anchor?.getBoundingClientRect().top;
     const scrollLeft = window.scrollX;
     const scrollTop = window.scrollY;
+    const chart = elements["class-performance-chart"];
+    const chartHeight = chart.getBoundingClientRect().height;
+    if (chartHeight > 0) {
+      chart.style.minHeight = `${Math.ceil(chartHeight)}px`;
+    }
     renderClassPerformance();
+    if (state.performanceExclusionMask === 0) {
+      chart.style.removeProperty("min-height");
+    }
 
     const restorePosition = () => {
       if (anchor && Number.isFinite(anchorTop)) {
