@@ -915,7 +915,7 @@
       openClassPerformanceView(false);
     } else if (pageView === "contribution") {
       openContributionView();
-    } else if (window.location.hash === "#class-top10" ||
+    } else if (pageView === "class-top10" || window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
     } else if (window.location.hash === "#class-performance" ||
@@ -1037,19 +1037,6 @@
             renderCombatDetail();
           }
         });
-      }
-    });
-    elements["class-top10-button"].addEventListener("click", () => {
-      if (initialPageView() !== "ranking") {
-        const target = new URL("./", window.location.href);
-        target.hash = "class-top10";
-        window.location.assign(target.href);
-        return;
-      }
-      if (state.surfaceMode === "classTop10") {
-        returnToRankingFromClassTop10();
-      } else {
-        openClassTop10View(true);
       }
     });
     elements["optimization-frame"].addEventListener("load", () => {
@@ -1484,7 +1471,7 @@
 
   function initialPageView() {
     const view = new URLSearchParams(window.location.search).get("view");
-    return view === "field-boss" || view === "optimization" ||
+    return view === "class-top10" || view === "field-boss" || view === "optimization" ||
       view === "class-performance" || view === "contribution" ? view : "ranking";
   }
 
@@ -1565,7 +1552,7 @@
     document.body.classList.add("class-top10-view");
     elements["class-top10-surface"].hidden = false;
     elements["class-top10-button"].classList.add("active");
-    elements["class-top10-button"].setAttribute("aria-pressed", "true");
+    elements["class-top10-button"].setAttribute("aria-current", "page");
     updatePageIdentity();
     renderClassTop10();
     if (pushHistory) {
@@ -1582,11 +1569,15 @@
     document.body.classList.remove("class-top10-view");
     elements["class-top10-surface"].hidden = true;
     elements["class-top10-button"].classList.remove("active");
-    elements["class-top10-button"].setAttribute("aria-pressed", "false");
+    elements["class-top10-button"].setAttribute("aria-current", "false");
     updatePageIdentity();
   }
 
   function returnToRankingFromClassTop10() {
+    if (initialPageView() === "class-top10") {
+      window.location.assign(new URL("./", window.location.href).href);
+      return;
+    }
     if (history.state?.notMeterStatsView === "class-top10") {
       history.back();
       return;
@@ -1653,7 +1644,6 @@
     elements["contribution-button"].classList.add("active");
     elements["contribution-button"].setAttribute("aria-current", "page");
     updatePageIdentity();
-    refreshAdsForPageView();
     if (state.contributionData) {
       renderContributionStats();
     } else {
@@ -1671,14 +1661,6 @@
     elements["contribution-button"].classList.remove("active");
     elements["contribution-button"].setAttribute("aria-current", "false");
     updatePageIdentity();
-    refreshAdsForPageView();
-  }
-
-  function refreshAdsForPageView() {
-    document.querySelectorAll("ins.adsbygoogle").forEach(slot => {
-      if (slot.dataset.adsbygoogleStatus) return;
-      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch { /* ad blocker */ }
-    });
   }
 
   function openFieldBossView() {
