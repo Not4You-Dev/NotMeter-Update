@@ -2461,7 +2461,10 @@
       return;
     }
 
-    elements["contribution-period"].textContent = String(cache.periodLabel || "—");
+    const contributionRange = parseWeeklyRange(cache.periodLabel);
+    elements["contribution-period"].textContent = contributionRange
+      ? formatWeeklyRange(contributionRange)
+      : t("thisWeek");
     elements["contribution-records"].textContent = t("contributionCountValue", {
       value: formatInteger(selected.recordCount),
     });
