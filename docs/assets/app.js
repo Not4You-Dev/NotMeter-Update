@@ -118,10 +118,10 @@
     "각성한 아테론 10단계": "覺醒阿特隆 第10階段",
   };
   const FEATURED_DUNGEON_KEYS = ["deus-research-hard", "noiran-legacy-4"];
-  // These values are the 1-based indexes in the actual encounter order.
-  const BOSS_PRESENTATION_ORDERS = Object.freeze({
-    "deus-research-hard": [1, 2, 3],
-    "noiran-legacy-4": [1, 3, 2],
+  // Resolve display order by name so both old and current cache arrays remain compatible.
+  const BOSS_PRESENTATION_NAMES = Object.freeze({
+    "deus-research-hard": ["감독관 그롬카스", "연구소장 자일러스", "오만의 아티엘"],
+    "noiran-legacy-4": ["불완전한 브라운트", "광기의 클로민스터", "아스크란"],
   });
   const DUNGEON_BUTTON_COLLAPSED_LIMIT = 6;
   const SERVER_NAMES_ELYOS = [
@@ -2561,12 +2561,14 @@
 
   function bossFilterItems(dungeon = currentDungeon()) {
     const names = dungeon?.bossNames || [];
-    const configuredOrder = BOSS_PRESENTATION_ORDERS[dungeon?.key];
-    const sourceIndexes = Array.isArray(configuredOrder) &&
-        configuredOrder.length === names.length &&
-        new Set(configuredOrder).size === names.length &&
-        configuredOrder.every(index => Number.isInteger(index) && index >= 1 && index <= names.length)
-      ? configuredOrder
+    const configuredNames = BOSS_PRESENTATION_NAMES[dungeon?.key];
+    const configuredIndexes = Array.isArray(configuredNames)
+      ? configuredNames.map(name => names.indexOf(name) + 1)
+      : [];
+    const sourceIndexes = configuredIndexes.length === names.length &&
+        new Set(configuredIndexes).size === names.length &&
+        configuredIndexes.every(index => index >= 1 && index <= names.length)
+      ? configuredIndexes
       : names.map((_, index) => index + 1);
     return [{ index: 0, order: 0, name: t("allBosses") }]
       .concat(sourceIndexes.map((sourceIndex, displayIndex) => ({
