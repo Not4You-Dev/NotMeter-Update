@@ -2700,6 +2700,7 @@
       : "custom";
     syncCustomCpControls();
     leaveClassView();
+    populateFilters();
     render();
     void rankLoad.then(cache => {
       if (cache && state.mode === "class") {
