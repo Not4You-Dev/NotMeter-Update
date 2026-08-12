@@ -192,7 +192,7 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   rankerDungeonNightmareTitle: "惡夢",
   rankerDungeonNightmareBosses: "覺醒阿特隆 第10階段 · 不依 DPS，而依最短戰鬥時間排序",
   rankerDungeonGuideScope: "6 個一般副本依 DPS 由高到低排序；惡夢則依戰鬥時間由短到長排序。「所有首領」只用於一次查看統計，計量器排行標記仍依各首領的個別名次判定。",
-  rankerDungeonGuideDummy: "訓練用稻草人（1分鐘）提供網站排行與前幾 % 統計，但不屬於 DPS 計量器的 CP 區間排行標記對象。",
+  rankerDungeonGuideDummy: "訓練用稻草人（1分鐘）僅提供網站排行；DPS 計量器不會顯示戰鬥結束後的區間名次／前 % 標籤，也不會顯示即時排行標記。",
   rankerDungeonGuidePeriod: "DPS 計量器排行標記依全部期間 TOP 20 紀錄判定，且目前偵測到的 CP 必須與該紀錄位於相同區間才會顯示。",
   weeklyCompare: "▲▼ 表示相同條件下，各職業前 25% DPS 相較上週的變化",
   weeklyTooltip: "相同條件下與上週比較",
