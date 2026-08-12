@@ -1064,6 +1064,7 @@ p {
 }
 
 .filter-panel {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(420px, 1.8fr) minmax(135px, 0.65fr) minmax(135px, 0.65fr) auto;
   gap: 12px;
@@ -1226,6 +1227,196 @@ p {
   color: #7f9bac;
   font-size: 10.5px;
   font-weight: 800;
+}
+
+.filter-cp-field {
+  position: relative;
+}
+
+.cp-filter-toggle {
+  display: flex;
+  width: 100%;
+  height: 38px;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid #29485d;
+  border-radius: 8px;
+  background: #0b1925;
+  color: #f3f8fb;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.cp-filter-toggle > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cp-filter-toggle:hover,
+.cp-filter-toggle[aria-expanded="true"] {
+  border-color: #4edbd3;
+  background: #102533;
+}
+
+.cp-filter-toggle-glyph {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #7998a9;
+  border-bottom: 2px solid #7998a9;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 120ms ease;
+}
+
+.cp-filter-toggle[aria-expanded="true"] .cp-filter-toggle-glyph {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.cp-filter-menu {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(710px, calc(100vw - 44px));
+  max-height: min(68vh, 650px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px;
+  border: 1px solid #2c6072;
+  border-radius: 12px;
+  background: rgba(6, 17, 27, 0.985);
+  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.56), inset 0 0 0 1px rgba(83, 229, 219, 0.05);
+}
+
+.cp-filter-menu[hidden] {
+  display: none;
+}
+
+.cp-filter-menu-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(60, 105, 125, 0.44);
+}
+
+.cp-filter-menu-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.cp-filter-menu-heading strong {
+  color: #f5fbff;
+  font-size: 15px;
+}
+
+.cp-filter-menu-heading span {
+  color: #89a6b6;
+  font-size: 11px;
+}
+
+.cp-filter-menu-close {
+  display: inline-flex;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #315064;
+  border-radius: 8px;
+  background: #10202e;
+  color: #b7cad4;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.cp-filter-menu-close:hover {
+  border-color: #4edbd3;
+  color: #ffffff;
+}
+
+.cp-filter-menu-section {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.cp-filter-menu-section > strong {
+  color: #7f9bac;
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+}
+
+.cp-filter-quick {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.cp-filter-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cp-filter-group {
+  display: grid;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid rgba(47, 82, 102, 0.72);
+  border-radius: 9px;
+  background: rgba(11, 26, 38, 0.78);
+}
+
+.cp-filter-group > strong {
+  color: #90b0c1;
+  font-size: 10.5px;
+}
+
+.cp-filter-group-buttons {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.cp-filter-option {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+  border: 1px solid #29485d;
+  border-radius: 7px;
+  background: #0c1c28;
+  color: #dce9ef;
+  cursor: pointer;
+  font-size: 11.5px;
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.cp-filter-option:hover {
+  border-color: #3e8796;
+  background: #122938;
+  color: #ffffff;
+}
+
+.cp-filter-option.is-active {
+  border-color: #4edbd3;
+  background: linear-gradient(180deg, rgba(31, 125, 130, 0.85), rgba(14, 70, 82, 0.92));
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(127, 244, 234, 0.16);
 }
 
 select {
@@ -4395,6 +4586,21 @@ tr:nth-child(3) .rank-badge {
   .app-shell {
     width: min(100% - 16px, 1220px);
     padding-top: 10px;
+  }
+
+  .cp-filter-menu {
+    position: fixed;
+    top: auto;
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    width: auto;
+    max-height: min(76vh, 650px);
+    padding: 12px;
+  }
+
+  .cp-filter-groups {
+    grid-template-columns: 1fr;
   }
 
   .class-performance-composition {
