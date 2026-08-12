@@ -797,6 +797,7 @@
     cpTierIndex: 0,
     cpFilterMode: "standard",
     customCpPresetTierIndex: 0,
+    customCpEditorOpen: false,
     customCpMinK: Math.min(1998, Math.max(400, Number(localStorage.getItem("notmeter-stats-custom-cp-min-k")) || 400)),
     customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
@@ -2349,13 +2350,13 @@
     }
   }
 
-  function validateCustomCpCache(cache, expectedGeneratedAt = state.data?.generatedAt) {
-    if (!isMatchingCustomCpCache(cache, expectedGeneratedAt)) {
+  function validateCustomCpCache(cache) {
+    if (!isValidCustomCpCache(cache)) {
       throw new Error(t("cacheInvalid"));
     }
   }
 
-  function isMatchingCustomCpCache(cache, expectedGeneratedAt) {
+  function isValidCustomCpCache(cache) {
     return Boolean(cache &&
         cache.schema === EXPECTED_CUSTOM_CP_SCHEMA &&
         Number(cache.version) === 4 &&
@@ -2365,8 +2366,12 @@
         parseWeeklyRange(cache.currentWeekPeriodLabel) &&
         cache.summaryBucketsByDungeon &&
         typeof cache.summaryBucketsByDungeon === "object" &&
-        cache.generatedAt &&
-        String(cache.generatedAt) === String(expectedGeneratedAt || ""));
+        cache.generatedAt);
+  }
+
+  function isMatchingCustomCpCache(cache, expectedGeneratedAt) {
+    return isValidCustomCpCache(cache) &&
+      String(cache.generatedAt) === String(expectedGeneratedAt || "");
   }
 
   function customCpRankCacheUrls(dungeonKey) {
@@ -2402,14 +2407,12 @@
         String(cache.generatedAt) === String(expectedGeneratedAt || ""));
   }
 
-  async function fetchCustomCpCacheForGeneration(expectedGeneratedAt, force = false) {
-    const normalizedExpected = String(expectedGeneratedAt || "");
+  async function fetchCustomCpCacheForGeneration(_expectedGeneratedAt, force = false) {
     const cache = await fetchCompressedJson(
       CUSTOM_CP_CACHE_URLS,
       force,
-      candidate => isMatchingCustomCpCache(candidate, normalizedExpected),
-      normalizedExpected);
-    validateCustomCpCache(cache, normalizedExpected);
+      isValidCustomCpCache);
+    validateCustomCpCache(cache);
     return cache;
   }
 
@@ -2435,18 +2438,15 @@
       dungeonKey,
       force,
       includeRank) {
-    const summaryLoad = fetchCustomCpCacheForGeneration(expectedGeneratedAt, force);
-    const rankLoad = includeRank
-      ? fetchCustomCpRankCacheForGeneration(dungeonKey, expectedGeneratedAt, force)
-      : Promise.resolve(null);
-    const [summary, rank] = await Promise.all([summaryLoad, rankLoad]);
+    const summary = await fetchCustomCpCacheForGeneration(expectedGeneratedAt, force);
+    const rank = includeRank
+      ? await fetchCustomCpRankCacheForGeneration(dungeonKey, summary.generatedAt, force)
+      : null;
     return { summary, rank };
   }
 
   async function ensureCustomCpCache(force = false) {
-    if (state.customCpData &&
-        String(state.customCpData.generatedAt) === String(state.data?.generatedAt) &&
-        !force) {
+    if (isValidCustomCpCache(state.customCpData) && !force) {
       return state.customCpData;
     }
     if (state.customCpLoad && !force) {
@@ -2473,23 +2473,24 @@
   }
 
   async function ensureCustomCpRankCache(dungeonKey, force = false) {
+    const summary = await ensureCustomCpCache(force);
+    const expectedGeneratedAt = String(summary.generatedAt || "");
     const current = state.customCpRankData.get(dungeonKey);
     if (current &&
-        String(current.generatedAt) === String(state.data?.generatedAt) &&
+        String(current.generatedAt) === expectedGeneratedAt &&
         !force) {
       return current;
     }
     if (state.customCpRankLoads.has(dungeonKey) && !force) {
       return state.customCpRankLoads.get(dungeonKey);
     }
-    const expectedGeneratedAt = String(state.data?.generatedAt || "");
     let load;
     load = fetchCustomCpRankCacheForGeneration(
       dungeonKey,
       expectedGeneratedAt,
       force)
       .then(cache => {
-        if (String(state.data?.generatedAt || "") !== expectedGeneratedAt) {
+        if (String(state.customCpData?.generatedAt || "") !== expectedGeneratedAt) {
           return cache;
         }
         state.customCpRankData.set(dungeonKey, cache);
@@ -2690,6 +2691,9 @@
   }
 
   function currentCpSelectionValue() {
+    if (state.customCpEditorOpen) {
+      return "custom";
+    }
     if (state.cpFilterMode === "custom") {
       return state.customCpPresetTierIndex > 0
         ? `preset:${state.customCpPresetTierIndex}`
@@ -2771,9 +2775,10 @@
 
   async function applyCpFilterSelection(value) {
     if (value === "custom") {
-      state.cpFilterMode = "custom";
-      state.customCpPresetTierIndex = 0;
-      await applyCustomCpValue();
+      state.customCpEditorOpen = true;
+      syncCustomCpControls();
+      renderCpFilterMenu();
+      window.requestAnimationFrame(() => elements["custom-cp-min"].focus());
       return;
     }
     if (String(value).startsWith("preset:")) {
@@ -2782,6 +2787,7 @@
     }
     state.cpFilterMode = "standard";
     state.customCpPresetTierIndex = 0;
+    state.customCpEditorOpen = false;
     state.cpTierIndex = Number(value);
     elements["cp-filter"].value = String(state.cpTierIndex);
     syncCustomCpControls();
@@ -2791,6 +2797,7 @@
   }
 
   async function applyPresetCpTier(tierIndex) {
+    state.customCpEditorOpen = false;
     const tier = (state.data?.cpTiers || []).find(item =>
       Number(item.index) === tierIndex &&
       Number(item.index) >= STANDARD_CP_TIER_LIMIT);
@@ -2829,24 +2836,21 @@
   }
 
   async function activateCustomCpRange(minimum, maximum, presetTierIndex) {
+    const previousMinimum = state.customCpMinK;
+    const previousMaximum = state.customCpMaxK;
     state.customCpMinK = minimum;
     state.customCpMaxK = maximum;
-    state.cpFilterMode = "custom";
-    state.customCpPresetTierIndex = presetTierIndex;
     elements["custom-cp-apply"].disabled = true;
-    showState("loading");
-    const rankLoad = ensureCustomCpRankCache(state.dungeonKey)
-      .catch(error => {
-        console.warn("custom CP rank cache prefetch failed", error);
-        return null;
-      });
+    elements["custom-cp-result"].textContent = t("loading");
+    elements["custom-cp-result"].classList.remove("error");
     try {
       await ensureCustomCpCache();
     } catch (error) {
       console.error(error);
-      elements["error-message"].textContent =
-        error instanceof Error && error.message ? error.message : t("cacheUnavailable");
-      showState("error");
+      state.customCpMinK = previousMinimum;
+      state.customCpMaxK = previousMaximum;
+      elements["custom-cp-result"].textContent = t("cacheUnavailable");
+      elements["custom-cp-result"].classList.add("error");
       return;
     } finally {
       elements["custom-cp-apply"].disabled = false;
@@ -2857,6 +2861,9 @@
       return;
     }
 
+    state.cpFilterMode = "custom";
+    state.customCpPresetTierIndex = presetTierIndex;
+    state.customCpEditorOpen = false;
     state.cpTierIndex = -1;
     elements["cp-filter"].value = presetTierIndex > 0
       ? `preset:${presetTierIndex}`
@@ -2865,6 +2872,11 @@
     leaveClassView();
     populateFilters();
     render();
+    const rankLoad = ensureCustomCpRankCache(state.dungeonKey)
+      .catch(error => {
+        console.warn("custom CP rank cache prefetch failed", error);
+        return null;
+      });
     void rankLoad.then(cache => {
       if (cache && state.mode === "class") {
         renderClassRanking();
@@ -2890,12 +2902,13 @@
   }
 
   function syncCustomCpControls() {
-    const custom = state.cpFilterMode === "custom" && state.customCpPresetTierIndex === 0;
+    const custom = state.customCpEditorOpen ||
+      (state.cpFilterMode === "custom" && state.customCpPresetTierIndex === 0);
     elements["custom-cp-panel"].hidden = !custom;
     elements["custom-cp-min"].value = String(state.customCpMinK);
     elements["custom-cp-max"].value = String(state.customCpMaxK);
     elements["custom-cp-result"].classList.remove("error");
-    if (!custom || !state.data) {
+    if (!custom || !state.data || (state.customCpEditorOpen && !state.customCpData)) {
       elements["custom-cp-result"].textContent = "";
       return;
     }
