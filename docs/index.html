@@ -19,6 +19,104 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260812-13">
+  <script>
+    (() => {
+      const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
+      const pageView = ["ranking", "class-performance", "field-boss", "optimization"]
+        .includes(requestedView) ? requestedView : "ranking";
+      let savedLocale = "";
+      try {
+        savedLocale = localStorage.getItem("notmeter-stats-locale") || "";
+      } catch {
+        // Storage can be unavailable in privacy mode; browser language remains safe.
+      }
+      const browserLocale = String(navigator.language || "").toLowerCase();
+      const locale = ["ko", "en", "zh-TW"].includes(savedLocale)
+        ? savedLocale
+        : browserLocale.startsWith("zh")
+          ? "zh-TW"
+          : browserLocale.startsWith("ko") ? "ko" : "en";
+      const routeMetadata = {
+        ko: {
+          ranking: {
+            title: "NotMeter 던전 통계",
+            description: "NotMeter 던전 통계와 직업별 DPS 랭킹을 웹에서 확인하세요."
+          },
+          "class-performance": {
+            title: "NotMeter CP 보정 직업 DPS 통계",
+            description: "이번 주 동일 조건 전투기록을 CP로 보정해 직업별 DPS 성능과 신뢰도를 비교합니다."
+          },
+          "field-boss": {
+            title: "NotMeter 필드보스 현황",
+            description: "NotMeter가 수집한 서버별 필드보스 출현 시간과 남은 시간을 확인하세요."
+          },
+          "optimization": {
+            title: "NotMeter 아이온2 그래픽 최적화",
+            description: "PC 사양과 증상에 맞는 안전한 아이온2 Unreal Engine 5 설정을 생성합니다."
+          }
+        },
+        en: {
+          ranking: {
+            title: "NotMeter Dungeon Statistics",
+            description: "Explore NotMeter dungeon statistics and DPS rankings by class."
+          },
+          "class-performance": {
+            title: "NotMeter CP-adjusted Class DPS",
+            description: "Compare weekly class DPS and confidence using CP-adjusted encounters under matching conditions."
+          },
+          "field-boss": {
+            title: "NotMeter Field Boss Status",
+            description: "Check field boss spawn times and remaining time collected by NotMeter for each server."
+          },
+          "optimization": {
+            title: "NotMeter AION2 Graphics Optimizer",
+            description: "Generate safe AION2 Unreal Engine 5 settings for your PC and performance issues."
+          }
+        },
+        "zh-TW": {
+          ranking: {
+            title: "NotMeter 副本統計",
+            description: "查看 NotMeter 副本統計與各職業 DPS 排名。"
+          },
+          "class-performance": {
+            title: "NotMeter CP 校正職業 DPS 統計",
+            description: "使用本週相同條件的戰鬥紀錄校正 CP，比較各職業 DPS 表現與可信度。"
+          },
+          "field-boss": {
+            title: "NotMeter 世界首領現況",
+            description: "查看 NotMeter 收集的各伺服器世界首領出現時間與剩餘時間。"
+          },
+          "optimization": {
+            title: "NotMeter AION2 圖形最佳化",
+            description: "依照電腦配備與問題，產生安全的 AION2 Unreal Engine 5 設定。"
+          }
+        }
+      };
+      const metadata = routeMetadata[locale][pageView] || routeMetadata[locale].ranking;
+
+      const canonicalUrl = new URL("https://notmeter.com/");
+      canonicalUrl.searchParams.set("view", pageView);
+      const canonical = canonicalUrl.toString();
+      const setMeta = (selector, content) => {
+        const element = document.querySelector(selector);
+        if (element) {
+          element.setAttribute("content", content);
+        }
+      };
+
+      document.documentElement.lang = locale;
+      document.title = metadata.title;
+      document.querySelector('link[rel="canonical"]')?.setAttribute(
+        "href",
+        pageView === "ranking" ? "https://notmeter.com/" : canonical);
+      setMeta('meta[name="description"]', metadata.description);
+      setMeta('meta[property="og:title"]', metadata.title);
+      setMeta('meta[property="og:description"]', metadata.description);
+      setMeta('meta[property="og:url"]', pageView === "ranking" ? "https://notmeter.com/" : canonical);
+      setMeta('meta[name="twitter:title"]', metadata.title);
+      setMeta('meta[name="twitter:description"]', metadata.description);
+    })();
+  </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
   <script src="./assets/field-boss-catalog.js?v=20260812-5" defer></script>
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260812-5" defer></script>
