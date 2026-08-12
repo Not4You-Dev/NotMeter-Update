@@ -12,6 +12,10 @@
     "./data/notmeter-ranking-class-overall.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-class-overall.json.gz",
   ];
+  const CONTRIBUTION_CACHE_URLS = [
+    "./data/notmeter-ranking-contribution.json.gz",
+    "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-contribution.json.gz",
+  ];
   const CUSTOM_CP_CACHE_URLS = [
     `${IWINV_RANKING_CACHE_ROOT}/custom-cp/summary`,
     "https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/summary",
@@ -28,6 +32,7 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update";
   const EXPECTED_SCHEMA = "notmeter-web-ranking-v1";
   const EXPECTED_CLASS_OVERALL_SCHEMA = "notmeter-web-class-overall-v1";
+  const EXPECTED_CONTRIBUTION_SCHEMA = "notmeter-web-contribution-stats-v1";
   const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v4";
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
@@ -171,6 +176,30 @@
       dailyUsers: "일일 사용자",
       classPerformance: "직업 성능",
       newFeature: "새로 추가된 기능",
+      contributionStats: "기여도 통계",
+      contributionPageTitle: "NotMeter 기여도 통계",
+      contributionPageSubtitle: "이번 주 최종 보스 기여도 5% 미만 발생 빈도",
+      contributionStatsTitle: "최종 보스 기여도 통계",
+      contributionStatsDescription: "이번 주 주요 던전 최종 보스에서 직업별 기여도 5% 미만 발생 빈도를 비교합니다.",
+      contributionPeriod: "집계 기간", contributionRecords: "최종 보스 기록",
+      contributionSamples: "플레이어 표본", contributionLowSamples: "5% 미만",
+      contributionDungeonAria: "기여도 통계 던전 선택",
+      contributionLoading: "이번 주 기여도 통계 캐시를 불러오는 중입니다",
+      contributionLoadError: "기여도 통계 캐시를 불러오지 못했습니다",
+      contributionEmpty: "이번 주 집계 가능한 최종 보스 기록이 아직 없습니다",
+      contributionSortGuide: "5% 미만 발생률 높은 순", contributionLowCount: "5% 미만",
+      contributionTotalCount: "전체 표본", contributionRate: "발생률",
+      contributionBoss: "최종 보스 · {boss}", contributionCountValue: "{value}회",
+      contributionMethodTitle: "기여도 통계는 어떻게 계산하나요?",
+      contributionMethodScopeTitle: "집계 대상",
+      contributionMethodScopeText: "이번 주 수요일 05:00부터 다음 수요일 05:00까지 저장된 4개 던전의 최종 보스 확정 처치 기록만 사용합니다.",
+      contributionMethodFormulaTitle: "5% 계산",
+      contributionMethodFormulaText: "처치기록에 저장된 기여도를 사용하며 5% 미만만 집계합니다. 과거 기록은 저장된 피해량과 보스 MAX HP로 같은 기준을 복원하고, 정확히 5%는 제외합니다.",
+      contributionMethodSampleTitle: "표본 단위",
+      contributionMethodSampleText: "한 캐릭터가 여러 번 참여하면 각 전투를 별도 표본으로 셉니다. 발생률은 5% 미만 표본 수 ÷ 해당 직업 전체 표본 수입니다.",
+      contributionMethodTrustTitle: "신뢰성 기준",
+      contributionMethodTrustText: "서버·직업·파티원이 모두 확인되고 통계 유효성 검증을 통과한 완전한 기록만 사용합니다. 불완전하거나 변조가 의심되는 기록은 제외합니다.",
+      contributionCaution: "이 지표는 보상 기준 미달이 발생한 빈도이며 직업 DPS 순위가 아닙니다. 파티 구성·공략 역할·숙련도 차이를 함께 고려해 해석해 주세요.",
       classTop10: "클래스 TOP 10",
       fieldBoss: "필드보스",
       optimization: "최적화",
@@ -472,6 +501,30 @@
       dailyUsers: "Daily users",
       classPerformance: "Class Performance",
       newFeature: "Newly added feature",
+      contributionStats: "Contribution",
+      contributionPageTitle: "NotMeter Contribution Statistics",
+      contributionPageSubtitle: "Weekly frequency of final-boss contribution below 5%",
+      contributionStatsTitle: "Final Boss Contribution Statistics",
+      contributionStatsDescription: "Compare how often each class records contribution below 5% on key final bosses this week.",
+      contributionPeriod: "Period", contributionRecords: "Final-boss records",
+      contributionSamples: "Player samples", contributionLowSamples: "Below 5%",
+      contributionDungeonAria: "Select contribution-statistics dungeon",
+      contributionLoading: "Loading this week's contribution cache",
+      contributionLoadError: "Could not load contribution statistics",
+      contributionEmpty: "No eligible final-boss records are available this week",
+      contributionSortGuide: "Sorted by highest <5% rate", contributionLowCount: "<5%",
+      contributionTotalCount: "All samples", contributionRate: "Rate",
+      contributionBoss: "Final boss · {boss}", contributionCountValue: "{value}",
+      contributionMethodTitle: "How are these statistics calculated?",
+      contributionMethodScopeTitle: "Scope",
+      contributionMethodScopeText: "Only confirmed final-boss kills from the four listed dungeons during the current Wednesday 05:00 to next Wednesday 05:00 KST window are included.",
+      contributionMethodFormulaTitle: "5% formula",
+      contributionMethodFormulaText: "The contribution saved in each combat record is used. Legacy records are restored from saved damage and boss MAX HP. Exactly 5% is excluded.",
+      contributionMethodSampleTitle: "Sample unit",
+      contributionMethodSampleText: "Repeated runs by one character count as separate combat samples. Rate = samples below 5% ÷ all samples for that class.",
+      contributionMethodTrustTitle: "Validation",
+      contributionMethodTrustText: "Only complete records with confirmed server, class, and party data that pass statistics validation are included. Incomplete or suspicious records are excluded.",
+      contributionCaution: "This measures reward-threshold failure frequency, not class DPS ranking. Interpret it with party composition, encounter roles, and player skill in mind.",
       classTop10: "Class TOP 10",
       fieldBoss: "Field Boss",
       optimization: "Optimization",
@@ -831,6 +884,9 @@
     fieldBossForceRefreshPending: false,
     fieldBossCountdownElements: new Map(),
     fieldBossClock: 0,
+    contributionData: null,
+    contributionLoad: null,
+    contributionDungeonKey: "",
   };
 
   const elements = {};
@@ -857,6 +913,8 @@
       openFieldBossView();
     } else if (pageView === "class-performance") {
       openClassPerformanceView(false);
+    } else if (pageView === "contribution") {
+      openContributionView();
     } else if (window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
@@ -890,6 +948,12 @@
       "page-title", "page-subtitle", "daily-user-count", "language-button",
       "optimization-button", "optimization-surface", "optimization-back-button",
       "optimization-frame",
+      "contribution-button", "contribution-surface", "contribution-back-button",
+      "contribution-summary", "contribution-period", "contribution-records",
+      "contribution-samples", "contribution-low-samples", "contribution-tabs",
+      "contribution-loading-state", "contribution-error-state", "contribution-error-message",
+      "contribution-retry-button", "contribution-empty-state", "contribution-content",
+      "contribution-dungeon-title", "contribution-boss-title", "contribution-rows",
       "class-performance-button", "class-performance-surface",
       "class-performance-back-button", "class-performance-summary",
       "class-performance-metric-title", "class-performance-metric-description",
@@ -998,6 +1062,15 @@
     elements["class-performance-back-button"].addEventListener(
       "click",
       returnToRankingFromClassPerformance);
+    elements["contribution-retry-button"].addEventListener("click", () => {
+      void loadContributionCache(true);
+    });
+    elements["contribution-tabs"].addEventListener("click", event => {
+      const button = event.target.closest("[data-contribution-dungeon]");
+      if (!button) return;
+      state.contributionDungeonKey = button.dataset.contributionDungeon;
+      renderContributionStats();
+    });
     elements["class-performance-composition-reset"].addEventListener("click", () => {
       state.performanceExclusionMask = 0;
       saveClassPerformanceExclusion();
@@ -1148,9 +1221,14 @@
         openClassTop10View(false);
         return;
       }
+      if (event.state?.notMeterStatsView === "contribution") {
+        openContributionView();
+        return;
+      }
       closeFieldBossView();
       closeClassTop10View();
       closeClassPerformanceView();
+      closeContributionView();
       closeOptimizationView();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
@@ -1407,13 +1485,14 @@
   function initialPageView() {
     const view = new URLSearchParams(window.location.search).get("view");
     return view === "field-boss" || view === "optimization" ||
-      view === "class-performance" ? view : "ranking";
+      view === "class-performance" || view === "contribution" ? view : "ranking";
   }
 
   function openOptimizationView() {
     closeFieldBossView();
     closeClassTop10View();
     closeClassPerformanceView();
+    closeContributionView();
     closeCombatDetail();
     state.surfaceMode = "optimization";
     document.body.classList.add("optimization-view");
@@ -1480,6 +1559,7 @@
     closeFieldBossView();
     closeOptimizationView();
     closeClassPerformanceView();
+    closeContributionView();
     closeCombatDetail();
     state.surfaceMode = "classTop10";
     document.body.classList.add("class-top10-view");
@@ -1512,6 +1592,7 @@
       return;
     }
     closeClassTop10View();
+    closeContributionView();
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1560,9 +1641,50 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function openContributionView() {
+    closeFieldBossView();
+    closeOptimizationView();
+    closeClassTop10View();
+    closeClassPerformanceView();
+    closeCombatDetail();
+    state.surfaceMode = "contribution";
+    document.body.classList.add("contribution-view");
+    elements["contribution-surface"].hidden = false;
+    elements["contribution-button"].classList.add("active");
+    elements["contribution-button"].setAttribute("aria-current", "page");
+    updatePageIdentity();
+    refreshAdsForPageView();
+    if (state.contributionData) {
+      renderContributionStats();
+    } else {
+      showContributionState("loading");
+      void loadContributionCache();
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeContributionView() {
+    if (state.surfaceMode !== "contribution") return;
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("contribution-view");
+    elements["contribution-surface"].hidden = true;
+    elements["contribution-button"].classList.remove("active");
+    elements["contribution-button"].setAttribute("aria-current", "false");
+    updatePageIdentity();
+    refreshAdsForPageView();
+  }
+
+  function refreshAdsForPageView() {
+    document.querySelectorAll("ins.adsbygoogle").forEach(slot => {
+      if (slot.dataset.adsbygoogleStatus) return;
+      try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch { /* ad blocker */ }
+    });
+  }
+
   function openFieldBossView() {
     closeClassTop10View();
     closeClassPerformanceView();
+    closeContributionView();
     closeOptimizationView();
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
@@ -2262,6 +2384,119 @@
       normalizedExpected);
   }
 
+  async function loadContributionCache(force = false) {
+    if (state.contributionLoad) {
+      return state.contributionLoad;
+    }
+    showContributionState("loading");
+    state.contributionLoad = (async () => {
+      try {
+        const cache = await fetchCompressedJson(CONTRIBUTION_CACHE_URLS, force);
+        if (cache?.schema !== EXPECTED_CONTRIBUTION_SCHEMA ||
+            Number(cache.version) !== 1 ||
+            !Array.isArray(cache.dungeons)) {
+          throw new Error("invalid contribution cache schema");
+        }
+        state.contributionData = cache;
+        const currentKey = state.contributionDungeonKey;
+        state.contributionDungeonKey = cache.dungeons.some(item => item.dungeonKey === currentKey)
+          ? currentKey
+          : String(cache.dungeons[0]?.dungeonKey || "");
+        renderContributionStats();
+        return cache;
+      } catch (error) {
+        console.error(error);
+        elements["contribution-error-message"].textContent =
+          error instanceof Error && error.message ? error.message : t("cacheUnavailable");
+        showContributionState("error");
+        return null;
+      } finally {
+        state.contributionLoad = null;
+      }
+    })();
+    return state.contributionLoad;
+  }
+
+  function showContributionState(name) {
+    elements["contribution-loading-state"].hidden = name !== "loading";
+    elements["contribution-error-state"].hidden = name !== "error";
+    elements["contribution-empty-state"].hidden = name !== "empty";
+    elements["contribution-content"].hidden = name !== "content";
+    elements["contribution-summary"].hidden = name !== "content";
+  }
+
+  function renderContributionStats() {
+    const cache = state.contributionData;
+    const dungeons = Array.isArray(cache?.dungeons) ? cache.dungeons : [];
+    if (dungeons.length === 0) {
+      elements["contribution-tabs"].replaceChildren();
+      showContributionState("empty");
+      return;
+    }
+
+    const selected = dungeons.find(item => item.dungeonKey === state.contributionDungeonKey) ||
+      dungeons[0];
+    state.contributionDungeonKey = selected.dungeonKey;
+    const tabs = document.createDocumentFragment();
+    for (const dungeon of dungeons) {
+      const button = document.createElement("button");
+      const active = dungeon.dungeonKey === selected.dungeonKey;
+      button.type = "button";
+      button.className = `contribution-tab${active ? " active" : ""}`;
+      button.dataset.contributionDungeon = dungeon.dungeonKey;
+      button.setAttribute("aria-pressed", String(active));
+      button.textContent = localizeGameName(dungeon.dungeonName, "mob");
+      tabs.append(button);
+    }
+    elements["contribution-tabs"].replaceChildren(tabs);
+
+    const jobs = (Array.isArray(selected.jobs) ? selected.jobs : [])
+      .filter(row => Number(row.playerSampleCount) > 0)
+      .sort((left, right) =>
+        Number(right.lowContributionRatePercent) - Number(left.lowContributionRatePercent) ||
+        Number(right.lowContributionCount) - Number(left.lowContributionCount) ||
+        JOB_ORDER.indexOf(left.jobName) - JOB_ORDER.indexOf(right.jobName));
+    if (jobs.length === 0) {
+      showContributionState("empty");
+      return;
+    }
+
+    elements["contribution-period"].textContent = String(cache.periodLabel || "—");
+    elements["contribution-records"].textContent = t("contributionCountValue", {
+      value: formatInteger(selected.recordCount),
+    });
+    elements["contribution-samples"].textContent = formatInteger(selected.playerSampleCount);
+    elements["contribution-low-samples"].textContent = formatInteger(selected.lowContributionCount);
+    elements["contribution-dungeon-title"].textContent = localizeGameName(selected.dungeonName, "mob");
+    elements["contribution-boss-title"].textContent = t("contributionBoss", {
+      boss: localizeGameName(selected.bossName, "mob"),
+    });
+
+    const rows = document.createDocumentFragment();
+    for (const row of jobs) {
+      const article = document.createElement("article");
+      article.className = "contribution-row";
+      article.style.setProperty("--contribution-rate", `${Math.min(100, Math.max(0, Number(row.lowContributionRatePercent) || 0))}%`);
+      const identity = document.createElement("div");
+      identity.className = "contribution-row-identity";
+      identity.append(createJobIcon(row.jobName));
+      const name = document.createElement("strong");
+      name.textContent = jobName(row.jobName);
+      identity.append(name);
+      const low = document.createElement("strong");
+      low.textContent = formatInteger(row.lowContributionCount);
+      const total = document.createElement("span");
+      total.textContent = formatInteger(row.playerSampleCount);
+      const rate = document.createElement("strong");
+      rate.className = "contribution-row-rate";
+      rate.textContent = formatPercent(row.lowContributionRatePercent, 1);
+      article.append(identity, low, total, rate);
+      rows.append(article);
+    }
+    elements["contribution-rows"].replaceChildren(rows);
+    showContributionState("content");
+  }
+
   async function fetchCompressedJson(urls, force, accept = null, revision = "") {
     const errors = [];
     for (const baseUrl of urls) {
@@ -2937,6 +3172,12 @@
     }
     if (state.surfaceMode === "classPerformance") {
       renderClassPerformance();
+      return;
+    }
+    if (state.surfaceMode === "contribution") {
+      if (state.contributionData) {
+        renderContributionStats();
+      }
       return;
     }
     if (!state.data) {
@@ -5189,8 +5430,11 @@
     const classTop10 = state.surfaceMode === "classTop10";
     const classPerformance = state.surfaceMode === "classPerformance";
     const optimization = state.surfaceMode === "optimization";
+    const contribution = state.surfaceMode === "contribution";
     const title = t(optimization
       ? "optimizationPageTitle"
+      : contribution
+        ? "contributionPageTitle"
       : fieldBoss
         ? "fieldBossPageTitle"
         : classTop10
@@ -5200,6 +5444,8 @@
           : "title");
     const subtitle = t(optimization
       ? "optimizationPageSubtitle"
+      : contribution
+        ? "contributionPageSubtitle"
       : fieldBoss
         ? "fieldBossPageSubtitle"
         : classTop10

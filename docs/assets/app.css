@@ -81,6 +81,76 @@ body.optimization-view .ranking-panel {
   display: none !important;
 }
 
+body.contribution-view .filter-panel,
+body.contribution-view .custom-cp-panel,
+body.contribution-view .snapshot-bar,
+body.contribution-view .weekly-guide,
+body.contribution-view .ranking-panel {
+  display: none !important;
+}
+
+.contribution-surface {
+  min-height: 620px;
+  overflow: hidden;
+  border: 1px solid #28515a;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(72, 224, 211, 0.055), transparent 32rem), rgba(6, 15, 23, 0.95);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.22);
+}
+
+.contribution-surface[hidden],
+.contribution-state[hidden],
+.contribution-summary[hidden],
+.contribution-content[hidden] { display: none; }
+
+.contribution-heading,
+.contribution-heading-copy,
+.contribution-summary,
+.contribution-content-heading,
+.contribution-row-identity { display: flex; align-items: center; }
+
+.contribution-heading { justify-content: space-between; gap: 18px; padding: 20px 22px 17px; border-bottom: 1px solid #1c3b46; background: rgba(8, 22, 31, 0.84); }
+.contribution-heading-copy { gap: 13px; min-width: 0; }
+.contribution-heading-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border: 1px solid #3f8f87; border-radius: 11px; color: #76e7d9; background: rgba(41, 143, 132, 0.16); }
+.contribution-heading-icon svg { width: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.contribution-kicker { color: #66dcd1; font-size: 9px; font-weight: 950; letter-spacing: .14em; }
+.contribution-heading h2 { margin: 3px 0 0; color: #efffff; font-size: 22px; font-weight: 950; }
+.contribution-heading p { margin: 5px 0 0; color: #8fa9b9; font-size: 13px; line-height: 1.5; }
+
+.contribution-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 13px 14px; }
+.contribution-summary > div { padding: 11px 13px; border: 1px solid #20414d; border-radius: 9px; background: rgba(9, 28, 38, .76); }
+.contribution-summary span { display: block; color: #7899aa; font-size: 10px; }
+.contribution-summary strong { display: block; margin-top: 4px; color: #e7f8fa; font-size: 15px; font-variant-numeric: tabular-nums; }
+
+.contribution-tabs { display: flex; gap: 7px; padding: 0 14px 13px; overflow-x: auto; }
+.contribution-tab { min-height: 37px; padding: 0 14px; border: 1px solid #285463; border-radius: 8px; color: #a9c2ce; background: #0c1d29; white-space: nowrap; cursor: pointer; }
+.contribution-tab:hover, .contribution-tab.active { border-color: #42cabe; color: #ecffff; background: rgba(35, 136, 132, .22); box-shadow: inset 0 -2px #48ded1; }
+
+.contribution-state { min-height: 250px; display: grid; place-items: center; align-content: center; gap: 12px; padding: 30px; color: #91acb9; text-align: center; }
+.contribution-content { padding: 0 14px 14px; }
+.contribution-content-heading { justify-content: space-between; gap: 12px; padding: 12px 13px; border: 1px solid #214552; border-radius: 9px 9px 0 0; background: #0b202b; }
+.contribution-content-heading > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.contribution-content-heading strong { color: #efffff; font-size: 16px; }
+.contribution-content-heading span { color: #7fa4b3; font-size: 11px; }
+.contribution-table-heading, .contribution-row { display: grid; grid-template-columns: minmax(170px, 1fr) 100px 100px 120px; align-items: center; gap: 8px; }
+.contribution-table-heading { padding: 8px 13px; color: #6f94a6; font-size: 10px; }
+.contribution-row { position: relative; min-height: 51px; padding: 7px 13px; overflow: hidden; border: 1px solid #1b3b48; border-radius: 8px; background: #0b1d29; font-variant-numeric: tabular-nums; }
+.contribution-row::before { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--contribution-rate); max-width: 100%; background: linear-gradient(90deg, rgba(234, 97, 91, .16), transparent); pointer-events: none; }
+.contribution-row + .contribution-row { margin-top: 6px; }
+.contribution-row > * { position: relative; z-index: 1; }
+.contribution-row-identity { gap: 9px; }
+.contribution-row-identity .job-icon { width: 30px; height: 30px; }
+.contribution-row-rate { color: #ffbd76; font-size: 16px; }
+
+.contribution-method { margin: 0 14px 14px; border: 1px solid #214552; border-radius: 10px; background: rgba(8, 25, 34, .82); }
+.contribution-method summary { padding: 13px 15px; color: #d9f4f4; cursor: pointer; }
+.contribution-method-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0 12px 12px; }
+.contribution-method article { position: relative; min-height: 76px; padding: 11px 12px 10px 46px; border: 1px solid #1e404c; border-radius: 8px; background: rgba(11, 30, 40, .8); }
+.contribution-method article b { position: absolute; top: 11px; left: 11px; display: grid; width: 25px; height: 25px; place-items: center; border: 1px solid #287a7b; border-radius: 6px; color: #6de1d8; font-size: 9px; }
+.contribution-method article strong { color: #dceaf1; }
+.contribution-method article p { margin: 5px 0 0; color: #86a6b5; font-size: 11px; line-height: 1.55; }
+.contribution-caution { margin: 0 12px 12px; padding: 10px 12px; border-left: 3px solid #d29c49; color: #c2a978; background: rgba(126, 81, 21, .1); font-size: 11px; line-height: 1.55; }
+
 button,
 select,
 input {
@@ -4731,6 +4801,16 @@ tr:nth-child(3) .rank-badge {
   .class-performance-heading .ranking-back-button {
     width: 100%;
   }
+
+  .contribution-heading { align-items: stretch; flex-direction: column; padding: 15px 13px; }
+  .contribution-heading h2 { font-size: 19px; }
+  .contribution-heading .ranking-back-button { width: 100%; }
+  .contribution-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); padding-inline: 9px; }
+  .contribution-tabs, .contribution-content { padding-inline: 9px; }
+  .contribution-table-heading, .contribution-row { grid-template-columns: minmax(120px, 1fr) 58px 58px 72px; }
+  .contribution-table-heading, .contribution-row { gap: 4px; padding-inline: 9px; }
+  .contribution-method { margin-inline: 9px; }
+  .contribution-method-grid { grid-template-columns: 1fr; }
 
   .class-performance-method {
     grid-template-columns: 1fr;
