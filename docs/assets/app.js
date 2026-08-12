@@ -54,6 +54,9 @@
   const FIELD_BOSS_TARGET_HOLD_THRESHOLD_MS = 10 * 60 * 1000;
   const DAILY_USER_KEY = "__notmeter_daily_active_users__";
   const STANDARD_CP_TIER_LIMIT = 100;
+  const PRESET_CP_TIER_MINIMUM = 400_000;
+  const PRESET_CP_TIER_LAST_START = 1_200_000;
+  const PRESET_CP_TIER_SIZE = 25_000;
   const INTERNAL_REPLAY_PERIOD_LABEL = "__notmeter_replay_top20_v1__";
   const WEEKLY_LABEL_PREFIX = "weekly-wed05|";
   const PERIODS = ["Weekly", "Today", "Recent14Days", "All"];
@@ -323,6 +326,7 @@
       collapseDungeons: "던전 목록 접기",
       allCp: "전체 CP",
       customCp: "직접 CP 지정",
+      meterRankingPeriodHint: "딜미터기 랭커 표시와 동일한 이번 주 기준입니다",
       customCpTitle: "직접 CP 지정",
       customCpDescription: "400~420은 40만 CP부터 42만 CP 구간까지 조회합니다",
       customCpMinimum: "최소 CP",
@@ -353,7 +357,7 @@
       rankingEntryPurposeTitle: "적용 목적",
       rankingEntryPurpose: "버스 또는 전투력 격차가 큰 파티의 기록으로 인해 직업별 DPS 통계가 왜곡되는 것을 방지하기 위한 기준입니다.",
       rankingEntryRankerDisplayTitle: "딜미터기 랭커 표시",
-      rankingEntryRankerDisplay: "실시간 랭커 아이콘은 현재 감지 CP와 랭킹 기록이 같은 25K 구간일 때만 표시됩니다. 예: 900,000~924,999 구간 기록은 899,999 이하에서 숨겨지고, 해당 구간으로 돌아오면 자동 복원됩니다. 닉네임 효과의 TOP 3 권한은 보유한 모든 구간을 별도로 확인합니다.",
+      rankingEntryRankerDisplay: "실시간 랭커 아이콘은 현재 감지 CP와 이번 주 랭킹 기록이 같은 25K 구간일 때만 표시됩니다. 예: 900,000~924,999 구간 기록은 899,999 이하에서 숨겨지고, 해당 구간으로 돌아오면 자동 복원됩니다. 구간 랭커 효과는 전체 기간으로 산정됩니다.",
       rankingEntryNote: "CP를 알 수 없는 파티원은 차이 계산에서 제외됩니다. 일반 던전 기록은 확정 처치와 파티원 5인 이상 조건을 충족해야 하며, 1인 콘텐츠인 악몽은 1인 이상 확정 처치부터 집계합니다. 훈련용 허수아비는 별도 기준을 사용합니다.",
       weeklyCompare: "▲▼는 직전 주 동일 조건의 직업별 상위 25% DPS 변화",
       weeklyTooltip: "직전 주 동일 조건 비교",
@@ -369,7 +373,7 @@
       weeklyGuideMeaningTitle: "퍼센트 의미",
       weeklyGuideMeaning: "변화율은 (이번 주 P75−직전 주 P75)÷직전 주 P75×100으로 계산합니다. ▲2.4%는 이번 주 값이 2.4% 높고, ▼2.4%는 2.4% 낮다는 뜻입니다.",
       weeklyGuideRankingTitle: "랭킹 반영 방식",
-      weeklyGuideRanking: "직업 순서는 이번 주 상위 25% DPS로 정렬됩니다. 딜미터기·처치 기록의 랭커 표시, 상위 %, 구간 1~20위는 표본 확보를 위해 전체 기간 동일 조건을 기준으로 계산합니다.",
+      weeklyGuideRanking: "직업 순서와 딜미터기·처치 기록의 랭커 표시, 상위 %, 구간 1~20위는 이번 주 동일 조건을 기준으로 계산합니다. 구간 랭커 효과는 전체 기간으로 산정됩니다.",
       weeklyGuideNote: "직전 주에 같은 조건의 기록이 없으면 화살표가 표시되지 않습니다. 화살표에 마우스를 올리면 이전·현재 DPS와 표본 수를 확인할 수 있습니다.",
       classDps: "{job} DPS 1~{count}위",
       classCombatTime: "{job} 전투 시간 1~{count}위",
@@ -597,6 +601,7 @@
       collapseDungeons: "Collapse dungeons",
       allCp: "All CP",
       customCp: "Custom CP",
+      meterRankingPeriodHint: "Uses the same current-week basis as the in-game meter rank marker",
       customCpTitle: "Custom CP",
       customCpDescription: "400–420 includes every CP bucket from 400K through 420K",
       customCpMinimum: "Minimum CP",
@@ -627,7 +632,7 @@
       rankingEntryPurposeTitle: "Why this rule exists",
       rankingEntryPurpose: "This prevents carry runs and parties with very large CP gaps from distorting class DPS statistics.",
       rankingEntryRankerDisplayTitle: "Live meter ranker display",
-      rankingEntryRankerDisplay: "The live ranker icon is shown only while the currently detected CP is in the same 25K bracket as the ranked record. For example, a record in the 900,000–924,999 bracket is hidden at 899,999 or below and returns automatically after re-entering that bracket. Top 3 nickname-effect access is checked separately across every bracket the character holds.",
+      rankingEntryRankerDisplay: "The live ranker icon is shown only while the currently detected CP is in the same 25K bracket as the current-week ranked record. For example, a record in the 900,000–924,999 bracket is hidden at 899,999 or below and returns automatically after re-entering that bracket. Ranker nickname-effect access is calculated separately from all-time rankings.",
       rankingEntryNote: "Party members whose CP is unknown are not included in the spread calculation. Regular dungeon records require a confirmed kill and at least five players. Nightmare is solo content and accepts confirmed kills with one or more players. Training-dummy records use separate rules.",
       weeklyCompare: "▲▼ shows the change in each class's top-25% DPS under the same filters",
       weeklyTooltip: "Previous week, same filters",
@@ -643,7 +648,7 @@
       weeklyGuideMeaningTitle: "Percentage meaning",
       weeklyGuideMeaning: "The change is calculated as (this week's P75 − previous week's P75) ÷ previous week's P75 × 100. ▲2.4% means this week's value is 2.4% higher, while ▼2.4% means it is 2.4% lower.",
       weeklyGuideRankingTitle: "How ranking uses it",
-      weeklyGuideRanking: "Classes are sorted by this week's top-25% DPS. Ranker indicators, Combat Record Top %, and ranks 1–20 use all-time matching data to maintain sufficient samples.",
+      weeklyGuideRanking: "Class order, in-game ranker indicators, Combat Record Top %, and ranks 1–20 all use this week's matching data. Ranker nickname-effect access is calculated separately from all-time rankings.",
       weeklyGuideNote: "No arrow is shown when the previous week has no records under the same filters. Hover over an arrow to see the previous and current DPS and sample counts.",
       classDps: "{job} DPS — Top {count}",
       classCombatTime: "{job} Combat Time — Top {count}",
@@ -734,6 +739,7 @@
     bossIndex: 0,
     cpTierIndex: 0,
     cpFilterMode: "standard",
+    customCpPresetTierIndex: 0,
     customCpMinK: Math.min(1998, Math.max(400, Number(localStorage.getItem("notmeter-stats-custom-cp-min-k")) || 400)),
     customCpMaxK: Math.min(1999, Math.max(401, Number(localStorage.getItem("notmeter-stats-custom-cp-max-k")) || 420)),
     period: "Weekly",
@@ -1028,10 +1034,16 @@
     elements["cp-filter"].addEventListener("change", event => {
       if (event.target.value === "custom") {
         state.cpFilterMode = "custom";
+        state.customCpPresetTierIndex = 0;
         void applyCustomCpValue();
         return;
       }
+      if (String(event.target.value).startsWith("preset:")) {
+        void applyPresetCpTier(Number(String(event.target.value).slice("preset:".length)));
+        return;
+      }
       state.cpFilterMode = "standard";
+      state.customCpPresetTierIndex = 0;
       state.cpTierIndex = Number(event.target.value);
       syncCustomCpControls();
       leaveClassView();
@@ -1047,6 +1059,11 @@
       });
     }
     elements["period-filter"].addEventListener("change", event => {
+      if (usesMeterRankingPeriod()) {
+        state.period = "Weekly";
+        event.target.value = "Weekly";
+        return;
+      }
       state.period = event.target.value;
       leaveClassView();
       render();
@@ -2451,24 +2468,31 @@
       state.bossIndex);
     renderBossFilterButtons(bosses);
 
-    const cpTiers = state.data.cpTiers
-      .filter(item => Number(item.index) < STANDARD_CP_TIER_LIMIT)
-      .sort((left, right) => Number(left.index) - Number(right.index));
-    if (state.cpFilterMode !== "custom" &&
-        !cpTiers.some(item => Number(item.index) === state.cpTierIndex)) {
+    const cpTiers = homepageCpTierOptions();
+    if (state.cpFilterMode === "standard" &&
+        !cpTiers.some(item => String(item.value) === String(state.cpTierIndex))) {
       state.cpTierIndex = 0;
     }
+    if (state.cpFilterMode === "custom" && state.customCpPresetTierIndex > 0 &&
+        !cpTiers.some(item => item.value === `preset:${state.customCpPresetTierIndex}`)) {
+      state.cpFilterMode = "standard";
+      state.customCpPresetTierIndex = 0;
+      state.cpTierIndex = 0;
+    }
+    syncMeterRankingPeriod();
     replaceOptions(
       elements["cp-filter"],
       cpTiers,
-      item => item.index,
-      item => Number(item.index) === 0 ? t("allCp") : item.label,
-      state.cpTierIndex);
+      item => item.value,
+      item => item.label,
+      state.cpFilterMode === "custom" && state.customCpPresetTierIndex > 0
+        ? `preset:${state.customCpPresetTierIndex}`
+        : state.cpTierIndex);
     const customOption = document.createElement("option");
     customOption.value = "custom";
     customOption.textContent = t("customCp");
     elements["cp-filter"].append(customOption);
-    if (state.cpFilterMode === "custom") {
+    if (state.cpFilterMode === "custom" && state.customCpPresetTierIndex === 0) {
       state.cpTierIndex = -1;
       elements["cp-filter"].value = "custom";
     }
@@ -2480,6 +2504,10 @@
       item => item,
       item => periodName(item),
       state.period);
+    elements["period-filter"].disabled = usesMeterRankingPeriod();
+    elements["period-filter"].title = usesMeterRankingPeriod()
+      ? t("meterRankingPeriodHint")
+      : "";
   }
 
   function renderDungeonFilterButtons() {
@@ -2559,6 +2587,67 @@
     select.replaceChildren(fragment);
   }
 
+  function homepageCpTierOptions() {
+    const options = (state.data?.cpTiers || [])
+      .filter(item => Number(item.index) < STANDARD_CP_TIER_LIMIT)
+      .filter(item => Number(item.index) <= 1)
+      .sort((left, right) => Number(left.index) - Number(right.index))
+      .map(item => ({
+        value: String(item.index),
+        label: Number(item.index) === 0 ? t("allCp") : item.label,
+      }));
+    const detailed = (state.data?.cpTiers || [])
+      .filter(item => Number(item.index) >= STANDARD_CP_TIER_LIMIT)
+      .filter(item => {
+        const minimum = Number(item.minCombatPower);
+        const maximum = Number(item.maxCombatPowerExclusive);
+        return Number.isFinite(minimum) &&
+          Number.isFinite(maximum) &&
+          minimum >= PRESET_CP_TIER_MINIMUM &&
+          minimum <= PRESET_CP_TIER_LAST_START &&
+          maximum - minimum === PRESET_CP_TIER_SIZE;
+      })
+      .sort((left, right) => Number(left.minCombatPower) - Number(right.minCombatPower))
+      .map(item => ({
+        value: `preset:${item.index}`,
+        label: item.label,
+      }));
+    return options.concat(detailed);
+  }
+
+  async function applyPresetCpTier(tierIndex) {
+    const tier = (state.data?.cpTiers || []).find(item =>
+      Number(item.index) === tierIndex &&
+      Number(item.index) >= STANDARD_CP_TIER_LIMIT);
+    const minimum = Number(tier?.minCombatPower);
+    const maximumExclusive = Number(tier?.maxCombatPowerExclusive);
+    if (!Number.isFinite(minimum) || !Number.isFinite(maximumExclusive) ||
+        maximumExclusive - minimum !== PRESET_CP_TIER_SIZE) {
+      state.cpFilterMode = "standard";
+      state.customCpPresetTierIndex = 0;
+      state.cpTierIndex = 0;
+      populateFilters();
+      render();
+      return;
+    }
+
+    await activateCustomCpRange(
+      Math.trunc(minimum / 1000),
+      Math.trunc((maximumExclusive - 1) / 1000),
+      tierIndex);
+  }
+
+  function usesMeterRankingPeriod() {
+    return (state.cpFilterMode === "standard" && state.cpTierIndex === 1) ||
+      (state.cpFilterMode === "custom" && state.customCpPresetTierIndex > 0);
+  }
+
+  function syncMeterRankingPeriod() {
+    if (usesMeterRankingPeriod()) {
+      state.period = "Weekly";
+    }
+  }
+
   async function applyCustomCpValue() {
     const minimum = Math.trunc(Number(elements["custom-cp-min"].value));
     const maximum = Math.trunc(Number(elements["custom-cp-max"].value));
@@ -2570,11 +2659,17 @@
       return;
     }
 
+    localStorage.setItem("notmeter-stats-custom-cp-min-k", String(minimum));
+    localStorage.setItem("notmeter-stats-custom-cp-max-k", String(maximum));
+    await activateCustomCpRange(minimum, maximum, 0);
+  }
+
+  async function activateCustomCpRange(minimum, maximum, presetTierIndex) {
     state.customCpMinK = minimum;
     state.customCpMaxK = maximum;
     state.cpFilterMode = "custom";
-    localStorage.setItem("notmeter-stats-custom-cp-min-k", String(minimum));
-    localStorage.setItem("notmeter-stats-custom-cp-max-k", String(maximum));
+    state.customCpPresetTierIndex = presetTierIndex;
+    syncMeterRankingPeriod();
     elements["custom-cp-apply"].disabled = true;
     showState("loading");
     const rankLoad = ensureCustomCpRankCache(state.dungeonKey)
@@ -2600,7 +2695,9 @@
     }
 
     state.cpTierIndex = -1;
-    elements["cp-filter"].value = "custom";
+    elements["cp-filter"].value = presetTierIndex > 0
+      ? `preset:${presetTierIndex}`
+      : "custom";
     syncCustomCpControls();
     leaveClassView();
     render();
@@ -2629,7 +2726,7 @@
   }
 
   function syncCustomCpControls() {
-    const custom = state.cpFilterMode === "custom";
+    const custom = state.cpFilterMode === "custom" && state.customCpPresetTierIndex === 0;
     elements["custom-cp-panel"].hidden = !custom;
     elements["custom-cp-min"].value = String(state.customCpMinK);
     elements["custom-cp-max"].value = String(state.customCpMaxK);
@@ -4839,6 +4936,13 @@
   }
 
   function customCpRangeLabel() {
+    if (state.customCpPresetTierIndex > 0) {
+      const tier = state.data?.cpTiers?.find(item =>
+        Number(item.index) === state.customCpPresetTierIndex);
+      if (tier?.label) {
+        return tier.label;
+      }
+    }
     return `${formatInteger(state.customCpMinK)}K~${formatInteger(state.customCpMaxK)}K`;
   }
 
