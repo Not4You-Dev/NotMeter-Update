@@ -118,6 +118,12 @@
     "각성한 아테론 10단계": "覺醒阿特隆 第10階段",
   };
   const FEATURED_DUNGEON_KEYS = ["deus-research-hard", "noiran-legacy-4"];
+  // The ranking protocol order is kept stable for already-distributed meter clients.
+  // These values are the 1-based protocol indexes in the actual encounter order.
+  const BOSS_PRESENTATION_ORDERS = Object.freeze({
+    "deus-research-hard": [1, 3, 2],
+    "noiran-legacy-4": [1, 3, 2],
+  });
   const DUNGEON_BUTTON_COLLAPSED_LIMIT = 6;
   const SERVER_NAMES_ELYOS = [
     "시엘", "네자칸", "바이젤", "카이시넬", "유스티엘", "아리엘", "프레기온", "메스람타에다",
@@ -2444,12 +2450,7 @@
       state.dungeonKey);
     renderDungeonFilterButtons();
 
-    const dungeon = currentDungeon();
-    const bosses = [{ index: 0, name: t("allBosses") }]
-      .concat((dungeon?.bossNames || []).map((name, index) => ({
-        index: index + 1,
-        name: localizeGameName(name),
-      })));
+    const bosses = bossFilterItems();
     if (!bosses.some(item => item.index === state.bossIndex)) {
       state.bossIndex = 0;
     }
@@ -2534,11 +2535,7 @@
   }
 
   function renderBossFilterButtons(bosses = null) {
-    const items = bosses || [{ index: 0, name: t("allBosses") }]
-      .concat((currentDungeon()?.bossNames || []).map((name, index) => ({
-        index: index + 1,
-        name: localizeGameName(name),
-      })));
+    const items = bosses || bossFilterItems();
     const fragment = document.createDocumentFragment();
     for (const boss of items) {
       const selected = boss.index === state.bossIndex;
@@ -2552,7 +2549,7 @@
       if (boss.index > 0) {
         const order = document.createElement("b");
         order.className = "boss-filter-order";
-        order.textContent = String(boss.index);
+        order.textContent = String(boss.order);
         button.append(order);
       }
       const label = document.createElement("span");
@@ -2561,6 +2558,23 @@
       fragment.append(button);
     }
     elements["boss-filter-buttons"].replaceChildren(fragment);
+  }
+
+  function bossFilterItems(dungeon = currentDungeon()) {
+    const names = dungeon?.bossNames || [];
+    const configuredOrder = BOSS_PRESENTATION_ORDERS[dungeon?.key];
+    const sourceIndexes = Array.isArray(configuredOrder) &&
+        configuredOrder.length === names.length &&
+        new Set(configuredOrder).size === names.length &&
+        configuredOrder.every(index => Number.isInteger(index) && index >= 1 && index <= names.length)
+      ? configuredOrder
+      : names.map((_, index) => index + 1);
+    return [{ index: 0, order: 0, name: t("allBosses") }]
+      .concat(sourceIndexes.map((sourceIndex, displayIndex) => ({
+        index: sourceIndex,
+        order: displayIndex + 1,
+        name: localizeGameName(names[sourceIndex - 1]),
+      })));
   }
 
   function replaceOptions(select, items, valueSelector, labelSelector, selectedValue) {
