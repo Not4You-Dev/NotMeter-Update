@@ -1704,6 +1704,100 @@ button:focus-visible,
   line-height: 1.55;
 }
 
+.ranker-dungeon-guide {
+  border-color: rgba(184, 142, 51, 0.62);
+  background: linear-gradient(135deg, rgba(37, 31, 16, 0.96), rgba(8, 24, 34, 0.96) 58%);
+  box-shadow: inset 3px 0 0 #e2b84f;
+}
+
+.ranker-dungeon-guide .weekly-guide-icon {
+  border-color: rgba(230, 186, 77, 0.72);
+  background: rgba(98, 73, 14, 0.55);
+  color: #ffe18d;
+}
+
+.ranker-dungeon-guide-body {
+  gap: 10px;
+}
+
+.ranker-dungeon-guide-intro {
+  margin: 0;
+  color: #d7e5ec;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.ranker-dungeon-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.ranker-dungeon-item {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 9px;
+  border: 1px solid rgba(56, 91, 108, 0.78);
+  border-radius: 8px;
+  background: rgba(8, 22, 31, 0.82);
+}
+
+.ranker-dungeon-item-special {
+  border-color: rgba(194, 148, 52, 0.58);
+  background: linear-gradient(90deg, rgba(78, 56, 10, 0.28), rgba(8, 22, 31, 0.82));
+}
+
+.ranker-dungeon-number {
+  display: inline-flex;
+  width: 27px;
+  height: 23px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(82, 154, 171, 0.68);
+  border-radius: 6px;
+  color: #71d9e1;
+  font: 800 9.5px/1 "Segoe UI", sans-serif;
+}
+
+.ranker-dungeon-item > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.ranker-dungeon-item strong {
+  color: #edf7fa;
+  font-size: 10.75px;
+  font-weight: 900;
+}
+
+.ranker-dungeon-item p,
+.ranker-dungeon-guide-notes p {
+  margin: 0;
+  color: #8faabc;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.ranker-dungeon-guide-notes {
+  display: grid;
+  gap: 5px;
+  padding: 8px 10px;
+  border: 1px solid rgba(69, 111, 128, 0.6);
+  border-radius: 8px;
+  background: rgba(7, 19, 28, 0.68);
+}
+
+.ranker-dungeon-guide-notes p::before {
+  content: "·";
+  margin-right: 6px;
+  color: #e1b64a;
+  font-weight: 900;
+}
+
 .class-top10-surface {
   min-height: 640px;
   overflow: hidden;
@@ -4736,6 +4830,10 @@ tr:nth-child(3) .rank-badge {
 
   .weekly-guide-copy > div {
     grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .ranker-dungeon-list {
+    grid-template-columns: 1fr;
   }
 
   .table-scroll {
