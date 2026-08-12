@@ -331,6 +331,13 @@
       collapseDungeons: "던전 목록 접기",
       allCp: "전체 CP",
       customCp: "직접 CP 지정",
+      cpSelectionAria: "CP 구간 선택",
+      cpSelectionTitle: "CP 구간 선택",
+      cpSelectionDescription: "빠른 선택 또는 100K 묶음 안의 25K 구간을 선택하세요",
+      cpSelectionCloseAria: "CP 구간 선택 닫기",
+      cpQuickTitle: "빠른 선택",
+      cpPresetTitle: "25K 구간",
+      cpRangeGroup: "{minimum}K~{maximum}K",
       customCpTitle: "직접 CP 지정",
       customCpDescription: "400~420은 40만 CP부터 42만 CP 구간까지 조회합니다",
       customCpMinimum: "최소 CP",
@@ -361,7 +368,7 @@
       rankingEntryPurposeTitle: "적용 목적",
       rankingEntryPurpose: "버스 또는 전투력 격차가 큰 파티의 기록으로 인해 직업별 DPS 통계가 왜곡되는 것을 방지하기 위한 기준입니다.",
       rankingEntryRankerDisplayTitle: "딜미터기 랭커 표시",
-      rankingEntryRankerDisplay: "실시간 랭커 아이콘은 현재 감지 CP와 전체 기간 랭킹 기록이 같은 25K 구간일 때만 표시됩니다. 예: 900,000~924,999 구간 기록은 899,999 이하에서 숨겨지고, 해당 구간으로 돌아오면 자동 복원됩니다. 구간 랭커 효과도 전체 기간으로 산정됩니다.",
+      rankingEntryRankerDisplay: "실시간 랭커 아이콘과 랭커 닉네임 효과는 현재 감지 CP와 전체 기간 순위 기록이 같은 25K 구간일 때만 적용됩니다. 예: 900,000~924,999 구간 기록은 899,999 이하 또는 925,000 이상에서 모두 숨겨집니다. 선택한 스킨 설정은 유지되며, 다시 같은 구간의 TOP 3 자격이 확인되면 자동 복원됩니다.",
       rankingEntryNote: "CP를 알 수 없는 파티원은 차이 계산에서 제외됩니다. 일반 던전 기록은 확정 처치와 파티원 5인 이상 조건을 충족해야 하며, 1인 콘텐츠인 악몽은 1인 이상 확정 처치부터 집계합니다. 훈련용 허수아비는 별도 기준을 사용합니다.",
       rankerDungeonGuideTitle: "구간 랭킹 던전 안내",
       rankerDungeonGuideSubtitle: "딜미터기 순위 마크가 표시되는 던전과 보스를 확인하세요",
@@ -382,7 +389,7 @@
       rankerDungeonNightmareBosses: "각성한 아테론 10단계 · DPS가 아닌 빠른 전투 시간 순",
       rankerDungeonGuideScope: "일반 던전 6개는 높은 DPS 순, 악몽은 짧은 전투 시간 순으로 집계합니다. ‘전체 보스’ 조회는 통계를 한 번에 보는 기능이며, 랭커 마크는 각 보스의 개별 순위로 판정합니다.",
       rankerDungeonGuideDummy: "훈련용 허수아비(1분)는 홈페이지 랭킹만 제공하며, 딜미터기 전투 종료 구간 순위·상위% 배지와 실시간 랭커 마크 대상에서는 제외됩니다.",
-      rankerDungeonGuidePeriod: "딜미터기 랭커 마크는 전체 기간 TOP 20 기록을 기준으로 하며, 현재 감지 CP가 해당 기록과 같은 구간일 때 표시됩니다.",
+      rankerDungeonGuidePeriod: "딜미터기 랭커 마크와 랭커 닉네임 효과는 전체 기간 기록을 기준으로 하되, 현재 감지 CP가 해당 기록과 같은 25K 구간일 때만 적용됩니다. 다른 구간으로 벗어나면 즉시 숨겨집니다.",
       weeklyCompare: "▲▼는 직전 주 동일 조건의 직업별 상위 25% DPS 변화",
       weeklyTooltip: "직전 주 동일 조건 비교",
       weeklyGuideTitle: "▲▼ 이번 주 변화 표시 안내",
@@ -625,6 +632,13 @@
       collapseDungeons: "Collapse dungeons",
       allCp: "All CP",
       customCp: "Custom CP",
+      cpSelectionAria: "Select CP bracket",
+      cpSelectionTitle: "Select CP bracket",
+      cpSelectionDescription: "Use a quick option or choose a 25K bracket grouped by 100K",
+      cpSelectionCloseAria: "Close CP bracket selector",
+      cpQuickTitle: "Quick selection",
+      cpPresetTitle: "25K brackets",
+      cpRangeGroup: "{minimum}K–{maximum}K",
       customCpTitle: "Custom CP",
       customCpDescription: "400–420 includes every CP bucket from 400K through 420K",
       customCpMinimum: "Minimum CP",
@@ -655,7 +669,7 @@
       rankingEntryPurposeTitle: "Why this rule exists",
       rankingEntryPurpose: "This prevents carry runs and parties with very large CP gaps from distorting class DPS statistics.",
       rankingEntryRankerDisplayTitle: "Live meter ranker display",
-      rankingEntryRankerDisplay: "The live ranker icon is shown only while the currently detected CP is in the same 25K bracket as the all-time ranked record. For example, a record in the 900,000–924,999 bracket is hidden at 899,999 or below and returns automatically after re-entering that bracket. Ranker nickname-effect access also uses all-time rankings.",
+      rankingEntryRankerDisplay: "The live ranker icon and ranker nickname effect apply only while the detected CP is in the same 25K bracket as the all-time ranked record. For example, a 900,000–924,999 record is hidden at 899,999 or below and at 925,000 or above. The selected skin remains saved and returns automatically when Top 3 eligibility is verified again in that bracket.",
       rankingEntryNote: "Party members whose CP is unknown are not included in the spread calculation. Regular dungeon records require a confirmed kill and at least five players. Nightmare is solo content and accepts confirmed kills with one or more players. Training-dummy records use separate rules.",
       rankerDungeonGuideTitle: "Ranked-content guide",
       rankerDungeonGuideSubtitle: "See exactly which dungeons and bosses can show a live meter rank marker",
@@ -676,7 +690,7 @@
       rankerDungeonNightmareBosses: "Awakened Atheron Stage 10 · ranked by fastest combat time, not DPS",
       rankerDungeonGuideScope: "The six regular dungeons rank higher DPS first; Nightmare ranks shorter combat time first. All Bosses only combines the statistics for viewing—the live rank marker is decided by each boss's individual ranking.",
       rankerDungeonGuideDummy: "Training Dummy (1 min) provides website rankings only. It does not show the meter's post-combat bracket-rank or Top % badge, and it does not award a live rank marker.",
-      rankerDungeonGuidePeriod: "The live meter marker uses all-time Top 20 records and appears only when the currently detected CP is in the same bracket as the ranked record.",
+      rankerDungeonGuidePeriod: "The live ranker marker and ranker nickname effect use all-time records, but apply only while the detected CP is in the same 25K bracket as the ranked record. Both are hidden immediately outside that bracket.",
       weeklyCompare: "▲▼ shows the change in each class's top-25% DPS under the same filters",
       weeklyTooltip: "Previous week, same filters",
       weeklyGuideTitle: "What the ▲▼ weekly change means",
@@ -892,7 +906,9 @@
       "field-boss-error-state", "field-boss-error-message", "field-boss-empty-state",
       "field-boss-content", "field-boss-tabs", "field-boss-list",
       "dungeon-filter", "dungeon-filter-buttons", "dungeon-filter-more",
-      "boss-filter", "boss-filter-buttons", "cp-filter",
+      "boss-filter", "boss-filter-buttons", "cp-filter", "cp-filter-toggle",
+      "cp-filter-current", "cp-filter-menu", "cp-filter-menu-close",
+      "cp-filter-quick", "cp-filter-groups",
       "custom-cp-panel", "custom-cp-min", "custom-cp-max", "custom-cp-apply", "custom-cp-result",
       "period-filter", "refresh-button", "retry-button", "snapshot-title", "snapshot-caption",
       "sample-meta", "generated-meta", "weekly-guide", "class-heading", "class-title",
@@ -1075,22 +1091,25 @@
       render();
     });
     elements["cp-filter"].addEventListener("change", event => {
-      if (event.target.value === "custom") {
-        state.cpFilterMode = "custom";
-        state.customCpPresetTierIndex = 0;
-        void applyCustomCpValue();
+      void applyCpFilterSelection(event.target.value);
+    });
+    elements["cp-filter-toggle"].addEventListener("click", () => {
+      if (elements["cp-filter-menu"].hidden) {
+        openCpFilterMenu();
+      } else {
+        closeCpFilterMenu(true);
+      }
+    });
+    elements["cp-filter-menu-close"].addEventListener("click", () => {
+      closeCpFilterMenu(true);
+    });
+    elements["cp-filter-menu"].addEventListener("click", event => {
+      const button = event.target.closest("[data-cp-value]");
+      if (!button) {
         return;
       }
-      if (String(event.target.value).startsWith("preset:")) {
-        void applyPresetCpTier(Number(String(event.target.value).slice("preset:".length)));
-        return;
-      }
-      state.cpFilterMode = "standard";
-      state.customCpPresetTierIndex = 0;
-      state.cpTierIndex = Number(event.target.value);
-      syncCustomCpControls();
-      leaveClassView();
-      render();
+      closeCpFilterMenu(false);
+      void applyCpFilterSelection(button.dataset.cpValue);
     });
     elements["custom-cp-apply"].addEventListener("click", () => void applyCustomCpValue());
     for (const input of [elements["custom-cp-min"], elements["custom-cp-max"]]) {
@@ -1155,7 +1174,16 @@
         closeCombatDetail();
       }
     });
+    document.addEventListener("pointerdown", event => {
+      if (!elements["cp-filter-menu"].hidden && !event.target.closest(".filter-cp-field")) {
+        closeCpFilterMenu(false);
+      }
+    });
     document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !elements["cp-filter-menu"].hidden) {
+        closeCpFilterMenu(true);
+        return;
+      }
       if (event.key === "Escape" && state.selectedDetail) {
         closeCombatDetail();
       }
@@ -2529,6 +2557,7 @@
       elements["cp-filter"].value = "custom";
     }
     syncCustomCpControls();
+    renderCpFilterMenu(cpTiers);
 
     replaceOptions(
       elements["period-filter"],
@@ -2654,8 +2683,111 @@
       .map(item => ({
         value: `preset:${item.index}`,
         label: item.label,
+        minCombatPower: Number(item.minCombatPower),
+        maxCombatPowerExclusive: Number(item.maxCombatPowerExclusive),
       }));
     return options.concat(detailed);
+  }
+
+  function currentCpSelectionValue() {
+    if (state.cpFilterMode === "custom") {
+      return state.customCpPresetTierIndex > 0
+        ? `preset:${state.customCpPresetTierIndex}`
+        : "custom";
+    }
+    return String(state.cpTierIndex);
+  }
+
+  function renderCpFilterMenu(cpTiers = homepageCpTierOptions()) {
+    const selectedValue = currentCpSelectionValue();
+    const selectedOption = cpTiers.find(item => item.value === selectedValue);
+    elements["cp-filter-current"].textContent = selectedValue === "custom"
+      ? t("customCp")
+      : selectedOption?.label || t("allCp");
+
+    const quickFragment = document.createDocumentFragment();
+    for (const option of cpTiers.filter(item => !item.value.startsWith("preset:"))) {
+      quickFragment.append(createCpFilterButton(option, selectedValue));
+    }
+    quickFragment.append(createCpFilterButton({ value: "custom", label: t("customCp") }, selectedValue));
+    elements["cp-filter-quick"].replaceChildren(quickFragment);
+
+    const grouped = new Map();
+    for (const option of cpTiers.filter(item => item.value.startsWith("preset:"))) {
+      const minimumK = Math.trunc(option.minCombatPower / 1000);
+      const groupMinimumK = Math.floor(minimumK / 100) * 100;
+      if (!grouped.has(groupMinimumK)) {
+        grouped.set(groupMinimumK, []);
+      }
+      grouped.get(groupMinimumK).push(option);
+    }
+
+    const groupsFragment = document.createDocumentFragment();
+    for (const [minimumK, options] of grouped) {
+      const group = document.createElement("section");
+      group.className = "cp-filter-group";
+      const title = document.createElement("strong");
+      title.textContent = t("cpRangeGroup", {
+        minimum: formatInteger(minimumK),
+        maximum: formatInteger(minimumK + 99),
+      });
+      const buttons = document.createElement("div");
+      buttons.className = "cp-filter-group-buttons";
+      for (const option of options) {
+        buttons.append(createCpFilterButton(option, selectedValue));
+      }
+      group.append(title, buttons);
+      groupsFragment.append(group);
+    }
+    elements["cp-filter-groups"].replaceChildren(groupsFragment);
+  }
+
+  function createCpFilterButton(option, selectedValue) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "cp-filter-option";
+    button.dataset.cpValue = option.value;
+    button.textContent = option.label;
+    const active = option.value === selectedValue;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    return button;
+  }
+
+  function openCpFilterMenu() {
+    renderCpFilterMenu();
+    elements["cp-filter-menu"].hidden = false;
+    elements["cp-filter-toggle"].setAttribute("aria-expanded", "true");
+    elements["cp-filter-menu"].querySelector(".cp-filter-option.is-active, .cp-filter-option")?.focus();
+  }
+
+  function closeCpFilterMenu(restoreFocus) {
+    elements["cp-filter-menu"].hidden = true;
+    elements["cp-filter-toggle"].setAttribute("aria-expanded", "false");
+    if (restoreFocus) {
+      elements["cp-filter-toggle"].focus();
+    }
+  }
+
+  async function applyCpFilterSelection(value) {
+    if (value === "custom") {
+      state.cpFilterMode = "custom";
+      state.customCpPresetTierIndex = 0;
+      await applyCustomCpValue();
+      return;
+    }
+    if (String(value).startsWith("preset:")) {
+      await applyPresetCpTier(Number(String(value).slice("preset:".length)));
+      return;
+    }
+    state.cpFilterMode = "standard";
+    state.customCpPresetTierIndex = 0;
+    state.cpTierIndex = Number(value);
+    elements["cp-filter"].value = String(state.cpTierIndex);
+    syncCustomCpControls();
+    renderCpFilterMenu();
+    leaveClassView();
+    render();
   }
 
   async function applyPresetCpTier(tierIndex) {
