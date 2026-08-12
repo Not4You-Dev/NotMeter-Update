@@ -118,10 +118,9 @@
     "각성한 아테론 10단계": "覺醒阿特隆 第10階段",
   };
   const FEATURED_DUNGEON_KEYS = ["deus-research-hard", "noiran-legacy-4"];
-  // The ranking protocol order is kept stable for already-distributed meter clients.
-  // These values are the 1-based protocol indexes in the actual encounter order.
+  // These values are the 1-based indexes in the actual encounter order.
   const BOSS_PRESENTATION_ORDERS = Object.freeze({
-    "deus-research-hard": [1, 3, 2],
+    "deus-research-hard": [1, 2, 3],
     "noiran-legacy-4": [1, 3, 2],
   });
   const DUNGEON_BUTTON_COLLAPSED_LIMIT = 6;
