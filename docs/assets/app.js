@@ -1408,7 +1408,7 @@
       }
       state.lastCacheSyncAt = Date.now();
       closeCombatDetail();
-      if (preparedCustomCp) {
+      if (preparedCustomCp || (generationChanged && state.cpFilterMode !== "custom")) {
         state.customCpData = null;
         state.customCpLoad = null;
         state.customCpRankData.clear();
