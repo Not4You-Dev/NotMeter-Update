@@ -1,14 +1,12 @@
 (() => {
   "use strict";
 
-  const IWINV_RANKING_CACHE_ROOT = "https://not4you.iwinv.net/api/ranking/v1";
+  const VPS_RANKING_CACHE_ROOT = "https://notmeter.112-168-140-142.sslip.io/ranking/v1";
   const CACHE_URLS = [
-    `${IWINV_RANKING_CACHE_ROOT}/snapshot`,
     "./data/notmeter-ranking.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking.json.gz",
   ];
   const CLASS_OVERALL_CACHE_URLS = [
-    `${IWINV_RANKING_CACHE_ROOT}/class-overall`,
     "./data/notmeter-ranking-class-overall.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-class-overall.json.gz",
   ];
@@ -17,8 +15,7 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-contribution.json.gz",
   ];
   const CUSTOM_CP_CACHE_URLS = [
-    `${IWINV_RANKING_CACHE_ROOT}/custom-cp/summary`,
-    "https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/summary",
+    `${VPS_RANKING_CACHE_ROOT}/custom-cp/summary`,
     "./data/notmeter-ranking-custom-cp.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
   ];
@@ -45,8 +42,7 @@
     "zh-TW": "繁中",
   };
   const DETAIL_ENDPOINTS = [
-    `${IWINV_RANKING_CACHE_ROOT}/details/`,
-    "https://notmeter.112-168-140-142.sslip.io/ranking/v1/details/",
+    `${VPS_RANKING_CACHE_ROOT}/details/`,
   ];
   const DETAIL_CACHE_NAME = "notmeter-ranking-details-v1";
   const DETAIL_MEMORY_LIMIT = 48;
@@ -1381,7 +1377,7 @@
       if (cache.classOverall && !cache.classOverallGeneratedAt) {
         cache.classOverallGeneratedAt = cache.generatedAt;
       }
-      if (preserveView &&
+      if (preserveView && !force &&
         state.data &&
         String(cache.generatedAt) === String(state.data.generatedAt) &&
         String(cache.classOverallGeneratedAt || "") ===
@@ -1397,18 +1393,22 @@
         String(cache.generatedAt) !== String(state.data.generatedAt);
       let preparedCustomCp = null;
       let preparedCustomCpRank = null;
-      if (state.cpFilterMode === "custom" && generationChanged) {
-        const prepared = await prepareCustomCpGeneration(
-          cache.generatedAt,
-          nextDungeon,
-          force,
-          state.mode === "class");
-        preparedCustomCp = prepared.summary;
-        preparedCustomCpRank = prepared.rank;
+      if (state.cpFilterMode === "custom" && (generationChanged || force)) {
+        try {
+          const prepared = await prepareCustomCpGeneration(
+            cache.generatedAt,
+            nextDungeon,
+            force,
+            state.mode === "class");
+          preparedCustomCp = prepared.summary;
+          preparedCustomCpRank = prepared.rank;
+        } catch (error) {
+          console.warn("compatible custom CP cache unavailable; keeping the current cache", error);
+        }
       }
       state.lastCacheSyncAt = Date.now();
       closeCombatDetail();
-      if (generationChanged) {
+      if (preparedCustomCp) {
         state.customCpData = null;
         state.customCpLoad = null;
         state.customCpRankData.clear();
@@ -2598,11 +2598,18 @@
     const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
     const fileName = `notmeter-ranking-custom-cp-${safeKey}.json.gz`;
     return [
-      `${IWINV_RANKING_CACHE_ROOT}/custom-cp/${safeKey}`,
-      `https://notmeter.112-168-140-142.sslip.io/ranking/v1/custom-cp/${safeKey}`,
+      `${VPS_RANKING_CACHE_ROOT}/custom-cp/${safeKey}`,
       `./data/${fileName}`,
       `https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/${fileName}`,
     ];
+  }
+
+  function customCpCacheSourcePairs(dungeonKey) {
+    const rankUrls = customCpRankCacheUrls(dungeonKey);
+    return CUSTOM_CP_CACHE_URLS.map((summaryUrl, index) => ({
+      summaryUrl,
+      rankUrl: rankUrls[index],
+    })).filter(item => item.summaryUrl && item.rankUrl);
   }
 
   function validateCustomCpRankCache(
@@ -2618,13 +2625,17 @@
   }
 
   function isMatchingCustomCpRankCache(cache, dungeonKey, expectedGeneratedAt) {
+    return isValidCustomCpRankCache(cache, dungeonKey) &&
+      String(cache.generatedAt) === String(expectedGeneratedAt || "");
+  }
+
+  function isValidCustomCpRankCache(cache, dungeonKey) {
     return Boolean(cache &&
         cache.schema === EXPECTED_CUSTOM_CP_RANK_SCHEMA &&
         Number(cache.version) === 1 &&
         cache.dungeonKey === dungeonKey &&
         Array.isArray(cache.rankBuckets) &&
-        cache.generatedAt &&
-        String(cache.generatedAt) === String(expectedGeneratedAt || ""));
+        cache.generatedAt);
   }
 
   async function fetchCustomCpCacheForGeneration(_expectedGeneratedAt, force = false) {
@@ -2653,16 +2664,38 @@
     return cache;
   }
 
+  async function fetchCompatibleCustomCpPair(dungeonKey, force = false) {
+    const errors = [];
+    for (const source of customCpCacheSourcePairs(dungeonKey)) {
+      try {
+        const [summary, rank] = await Promise.all([
+          fetchCompressedJson([source.summaryUrl], force, isValidCustomCpCache),
+          fetchCompressedJson(
+            [source.rankUrl],
+            force,
+            candidate => isValidCustomCpRankCache(candidate, dungeonKey)),
+        ]);
+        if (String(summary.generatedAt) !== String(rank.generatedAt)) {
+          throw new Error("cache generation mismatch");
+        }
+        return { summary, rank };
+      } catch (error) {
+        errors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    throw new Error(`${t("cacheUnavailable")} (${errors.join(" / ")})`);
+  }
+
   async function prepareCustomCpGeneration(
       expectedGeneratedAt,
       dungeonKey,
       force,
       includeRank) {
+    if (includeRank) {
+      return fetchCompatibleCustomCpPair(dungeonKey, force);
+    }
     const summary = await fetchCustomCpCacheForGeneration(expectedGeneratedAt, force);
-    const rank = includeRank
-      ? await fetchCustomCpRankCacheForGeneration(dungeonKey, summary.generatedAt, force)
-      : null;
-    return { summary, rank };
+    return { summary, rank: null };
   }
 
   async function ensureCustomCpCache(force = false) {
@@ -2705,17 +2738,22 @@
       return state.customCpRankLoads.get(dungeonKey);
     }
     let load;
-    load = fetchCustomCpRankCacheForGeneration(
-      dungeonKey,
-      expectedGeneratedAt,
-      force)
-      .then(cache => {
-        if (String(state.customCpData?.generatedAt || "") !== expectedGeneratedAt) {
-          return cache;
+    load = fetchCustomCpRankCacheForGeneration(dungeonKey, expectedGeneratedAt, force)
+      .then(cache => ({ summary, rank: cache }))
+      .catch(error => {
+        console.warn("custom CP generation mismatch; retrying a compatible cache pair", error);
+        return fetchCompatibleCustomCpPair(dungeonKey, true);
+      })
+      .then(pair => {
+        if (String(state.customCpData?.generatedAt || "") !== String(pair.summary.generatedAt)) {
+          state.customCpData = pair.summary;
+          state.customCpSummaryIndexes.clear();
+          state.customCpRankData.clear();
+          state.customCpRankIndexes.clear();
         }
-        state.customCpRankData.set(dungeonKey, cache);
+        state.customCpRankData.set(dungeonKey, pair.rank);
         state.customCpRankIndexes.delete(dungeonKey);
-        return cache;
+        return pair.rank;
       })
       .finally(() => {
         if (state.customCpRankLoads.get(dungeonKey) === load) {
