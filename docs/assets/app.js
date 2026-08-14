@@ -817,7 +817,10 @@
       cacheUnavailable: "Please refresh again in a moment.",
     },
   };
-  COPY["zh-TW"] = globalThis.NotMeterStatsCopyZhTw || {};
+  COPY["zh-TW"] = {
+    ...(globalThis.NotMeterStatsCopyZhTw || {}),
+    peopleValue: "{value} 人",
+  };
 
   function normalizeLocale(value) {
     const candidate = String(value || "").trim();
