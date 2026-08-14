@@ -432,6 +432,11 @@ const ISSUES = {
     desc: "충돌 가능 설정을 게임 기본값으로 돌립니다.",
     tune: { flightEffects: "compatible", motionBlur: "game" },
   },
+  telegraph: {
+    title: "화면이 밝고 장판이 옅음",
+    desc: "밝은 화면과 기믹 장판의 대비를 안전하게 보정합니다.",
+    tune: { telegraphContrast: 2 },
+  },
   heat: {
     title: "발열·팬 소음이 큼",
     desc: "프레임을 90으로 제한해 순간 부하를 줄입니다.",
@@ -452,6 +457,7 @@ const DEFAULT_TUNE = {
   foliage: 0,
   postprocess: 0,
   stutter: 0,
+  telegraphContrast: 0,
   latency: "smooth",
   vram: "auto",
   water: "auto",
@@ -475,6 +481,7 @@ const LABELS = {
   foliage: { "-2": "가볍게", "-1": "줄임", 0: "기본", 1: "풍성", 2: "최대" },
   postprocess: { "-2": "최소", "-1": "가볍게", 0: "기본", 1: "품질", 2: "고품질" },
   stutter: { "-2": "즉시 정리", "-1": "메모리 절약", 0: "기본", 1: "끊김 완화", 2: "최대 완화" },
+  telegraphContrast: { 0: "게임 기본값", 1: "약하게", 2: "권장", 3: "강하게" },
 };
 
 const VRAM_CAPS = { 4: 1800, 6: 2600, 8: 3500, 12: 4096, 16: 6144 };
@@ -579,6 +586,7 @@ function sanitizeTune(value) {
   ]) {
     result[key] = Math.max(-2, Math.min(2, Math.round(Number(value?.[key]) || 0)));
   }
+  result.telegraphContrast = Math.max(0, Math.min(3, Math.round(Number(value?.telegraphContrast) || 0)));
   const allowed = {
     latency: ["smooth", "responsive"],
     vram: ["auto", "4", "6", "8", "12", "16"],
@@ -642,6 +650,7 @@ const buildSummary = () => {
   if (tuneNumber("foliage") < 0) parts.push("필드 수풀과 오브젝트 부담을 줄입니다.");
   if (tuneNumber("postprocess") > 0) parts.push("공간감과 후처리 품질을 더 살립니다.");
   if (tuneNumber("postprocess") < 0) parts.push("후처리 효과를 줄여 저사양 PC 부담을 낮춥니다.");
+  if (tuneNumber("telegraphContrast") > 0) parts.push("밝은 화면의 중간톤과 번짐을 낮춰 기믹 장판 대비를 높입니다.");
   if (tune.latency === "responsive") parts.push("스킬 입력 반응성을 우선합니다.");
   if (tune.water === "off") parts.push("물과 화면 반사를 꺼서 성역/물가 프레임을 방어합니다.");
   if (tune.water === "low") parts.push("물과 반사를 낮게 유지해 화면과 프레임을 절충합니다.");
@@ -672,7 +681,7 @@ const metricLabel = (score) => {
 };
 
 const buildMetrics = () => {
-  const clarityBonus = (tune.mood === "clean" ? 1 : 0) + (tune.fog === "off" ? 1 : 0);
+  const clarityBonus = (tune.mood === "clean" ? 1 : 0) + (tune.fog === "off" ? 1 : 0) + (tuneNumber("telegraphContrast") > 0 ? 1 : 0);
   const waterQualityBonus = tune.water === "quality" ? 1 : 0;
   const frameLimitPenalty = tune.frameLimit !== "auto" ? 1 : 0;
   const qualityBonus = (tune.mood === "cinematic" ? 2 : tune.mood === "vivid" ? 1 : 0) + (tune.fog === "soft" ? 1 : 0) + waterQualityBonus;
@@ -697,6 +706,7 @@ const buildValues = () => {
   const foliage = tuneNumber("foliage");
   const postprocess = tuneNumber("postprocess");
   const stutter = tuneNumber("stutter");
+  const telegraphContrast = tuneNumber("telegraphContrast");
 
   v.screen = round(clamp((Number(v.screen) || 100) + sharpness * 3 + resolution * 5, 80, 120), 0);
   v.sharpen = round(clamp((Number(v.sharpen) || 0.5) + sharpness * 0.05, 0.28, 0.7), 2);
@@ -796,6 +806,18 @@ const buildValues = () => {
     v.bloom = Math.round(clamp((Number(v.bloom) || 1), 0, 3));
   }
 
+  // Apply documented color-grading values only when this control is enabled.
+  v.colorMid = null;
+  v.colorMax = null;
+  v.colorMin = null;
+  if (telegraphContrast > 0) {
+    v.colorMid = round(0.5 - telegraphContrast * 0.02, 2);
+    v.colorMax = round(1 - telegraphContrast * 0.02, 2);
+    v.colorMin = round(0 - telegraphContrast * 0.005, 3);
+    v.bloom = Math.round(clamp((Number(v.bloom) || 1) - telegraphContrast, 0, 5));
+    v.sharpen = round(clamp((Number(v.sharpen) || 0.5) + telegraphContrast * 0.01, 0.28, 0.7), 2);
+  }
+
   if (tune.water === "off") {
     v.waterReflection = 0;
     v.ssr = 0;
@@ -836,6 +858,13 @@ const buildConfig = () => {
     : [
       `r.TranslucencyLightingVolumeDim=${optimizationValue(v.translucencyDim)}`,
       `r.SeparateTranslucencyScreenPercentage=${optimizationValue(v.separateTranslucencyScreen)}`,
+    ].join("\n");
+  const colorVisibilityLines = v.colorMid === null
+    ? ""
+    : [
+      `r.Color.Mid=${optimizationValue(v.colorMid)}`,
+      `r.Color.Max=${optimizationValue(v.colorMax)}`,
+      `r.Color.Min=${optimizationValue(v.colorMin)}`,
     ].join("\n");
   const compatibilityComment = preserveFlightEffects
     ? translated("비행 가속 화면 효과 호환을 위해 내부 해상도와 반투명 후처리는 게임 기본값을 유지합니다.")
@@ -897,6 +926,7 @@ r.ContactShadows=${optimizationValue(v.contactShadows)}
 
 ; ===== 7. ${translated("후처리 / 안개 / 물")} =====
 ${visualLines}
+${colorVisibilityLines}
 r.SceneColorFringeQuality=0
 r.AmbientOcclusionLevels=${optimizationValue(v.ambientOcclusion)}
 r.AmbientOcclusionRadiusScale=${optimizationValue(v.ambientOcclusionRadius)}
@@ -928,6 +958,7 @@ const ALLOWED_CONFIG_KEYS = new Set([
   "r.LightShaftQuality", "r.TranslucencyLightingVolumeDim",
   "r.SeparateTranslucencyScreenPercentage", "r.BloomQuality", "r.Fog",
   "r.VolumetricFog", "r.Water.SingleLayer.Reflection",
+  "r.Color.Mid", "r.Color.Max", "r.Color.Min",
 ]);
 
 const validateConfig = (text) => {

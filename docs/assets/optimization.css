@@ -981,6 +981,16 @@ select {
   gap: 10px;
 }
 
+.range-control.visibility-control {
+  border-color: rgba(255, 187, 74, 0.42);
+  background: linear-gradient(135deg, rgba(255, 176, 46, 0.09), rgba(39, 217, 207, 0.045));
+}
+
+.range-control.visibility-control > span,
+.range-control.visibility-control > b {
+  color: #ffd28a;
+}
+
 .range-control,
 .select-control {
   min-height: 126px;
