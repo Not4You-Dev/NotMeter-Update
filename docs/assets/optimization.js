@@ -437,6 +437,11 @@ const ISSUES = {
     desc: "밝은 화면과 기믹 장판의 대비를 안전하게 보정합니다.",
     tune: { telegraphContrast: 2 },
   },
+  darkness: {
+    title: "캐릭터 선택 화면·던전이 어두움",
+    desc: "장면별 자동 노출은 유지하고 전체 화면 감마만 보정합니다.",
+    tune: { brightness: 1 },
+  },
   heat: {
     title: "발열·팬 소음이 큼",
     desc: "프레임을 90으로 제한해 순간 부하를 줄입니다.",
@@ -447,6 +452,7 @@ const ISSUES = {
 const CUSTOM_GOAL = { title: "커스텀", desc: "사용자가 직접 조절한 설정입니다.", tag: "직접 조절", tune: {} };
 
 const DEFAULT_TUNE = {
+  brightness: 0,
   sharpness: 0,
   resolution: 0,
   distance: 0,
@@ -471,6 +477,7 @@ const DEFAULT_TUNE = {
 };
 
 const LABELS = {
+  brightness: { 0: "게임 기본값", 1: "조금 밝게", 2: "밝게", 3: "매우 밝게" },
   sharpness: { "-2": "부드러움", "-1": "약하게", 0: "기본", 1: "선명", 2: "매우 선명" },
   resolution: { "-2": "성능", "-1": "조금 낮춤", 0: "기본", 1: "높임", 2: "최대" },
   distance: { "-2": "가볍게", "-1": "조금 낮춤", 0: "기본", 1: "멀리 보기", 2: "최대 시야" },
@@ -587,6 +594,7 @@ function sanitizeTune(value) {
     result[key] = Math.max(-2, Math.min(2, Math.round(Number(value?.[key]) || 0)));
   }
   result.telegraphContrast = Math.max(0, Math.min(3, Math.round(Number(value?.telegraphContrast) || 0)));
+  result.brightness = Math.max(0, Math.min(3, Math.round(Number(value?.brightness) || 0)));
   const allowed = {
     latency: ["smooth", "responsive"],
     vram: ["auto", "4", "6", "8", "12", "16"],
@@ -669,6 +677,7 @@ const buildSummary = () => {
   if (tune.mood === "clean") parts.push("번짐을 줄이고 깨끗한 화면을 우선합니다.");
   if (tune.flightEffects === "compatible") parts.push("비행 가속 효과와 충돌할 수 있는 내부 해상도·반투명 후처리는 게임 기본값을 유지합니다.");
   if (tune.flightEffects === "aggressive") parts.push("내부 해상도와 반투명 후처리까지 직접 조절합니다. 비행 중 테두리 잘림이나 그림자 잔상이 생기면 게임 효과 우선으로 바꾸세요.");
+  if (tuneNumber("brightness") > 0) parts.push("장면별 자동 노출을 유지하면서 캐릭터 선택 화면과 어두운 던전의 전체 화면 감마를 보정합니다.");
   return parts.map(translated).join(" ") ||
     translated("균형값으로 생성됩니다. 처음 쓰는 사용자는 그대로 복사해도 됩니다.");
 };
@@ -707,6 +716,7 @@ const buildValues = () => {
   const postprocess = tuneNumber("postprocess");
   const stutter = tuneNumber("stutter");
   const telegraphContrast = tuneNumber("telegraphContrast");
+  const brightness = tuneNumber("brightness");
 
   v.screen = round(clamp((Number(v.screen) || 100) + sharpness * 3 + resolution * 5, 80, 120), 0);
   v.sharpen = round(clamp((Number(v.sharpen) || 0.5) + sharpness * 0.05, 0.28, 0.7), 2);
@@ -818,6 +828,10 @@ const buildValues = () => {
     v.sharpen = round(clamp((Number(v.sharpen) || 0.5) + telegraphContrast * 0.01, 0.28, 0.7), 2);
   }
 
+  v.tonemapperGamma = brightness > 0
+    ? round(clamp(Math.max(Number(v.gamma) || 2.05, 2.1) + brightness * 0.12, 2.2, 2.5), 2)
+    : null;
+
   if (tune.water === "off") {
     v.waterReflection = 0;
     v.ssr = 0;
@@ -865,6 +879,12 @@ const buildConfig = () => {
       `r.Color.Mid=${optimizationValue(v.colorMid)}`,
       `r.Color.Max=${optimizationValue(v.colorMax)}`,
       `r.Color.Min=${optimizationValue(v.colorMin)}`,
+    ].join("\n");
+  const brightnessLines = v.tonemapperGamma === null
+    ? ""
+    : [
+      `; ${translated("장면별 자동 노출은 유지하고 전체 화면 밝기만 보정합니다.")}`,
+      `r.TonemapperGamma=${optimizationValue(v.tonemapperGamma)}`,
     ].join("\n");
   const compatibilityComment = preserveFlightEffects
     ? translated("비행 가속 화면 효과 호환을 위해 내부 해상도와 반투명 후처리는 게임 기본값을 유지합니다.")
@@ -926,6 +946,7 @@ r.ContactShadows=${optimizationValue(v.contactShadows)}
 
 ; ===== 7. ${translated("후처리 / 안개 / 물")} =====
 ${visualLines}
+${brightnessLines}
 ${colorVisibilityLines}
 r.SceneColorFringeQuality=0
 r.AmbientOcclusionLevels=${optimizationValue(v.ambientOcclusion)}
@@ -941,7 +962,7 @@ r.Water.SingleLayer.Reflection=${optimizationValue(v.waterReflection)}
 };
 
 const ALLOWED_CONFIG_KEYS = new Set([
-  "t.MaxFPS", "r.OneFrameThreadLag", "r.ScreenPercentage", "r.Tonemapper.Sharpen",
+  "t.MaxFPS", "r.OneFrameThreadLag", "r.ScreenPercentage", "r.Tonemapper.Sharpen", "r.TonemapperGamma",
   "r.ViewDistanceScale", "r.StaticMeshLODDistanceScale", "r.SkeletalMeshLODBias",
   "r.Nanite.MaxPixelsPerEdge", "foliage.DensityScale", "foliage.LODDistanceScale",
   "grass.DensityScale", "r.Lumen.Reflections.Allow", "r.Lumen.DiffuseIndirect.Allow",

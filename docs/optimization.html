@@ -259,6 +259,12 @@
             </div>
 
             <div class="control-grid">
+              <label class="range-control visibility-control is-wide">
+                <span>화면 밝기</span>
+                <b data-value-label="brightness">게임 기본값</b>
+                <input type="range" min="0" max="3" step="1" value="0" data-tune="brightness" />
+                <small>캐릭터 선택 화면이나 어두운 던전이 잘 안 보이면 1부터 올리세요. 장면별 자동 노출은 유지하고 전체 화면 감마만 보정합니다.</small>
+              </label>
               <label class="range-control">
                 <span>선명도</span>
                 <b data-value-label="sharpness">기본</b>
@@ -441,6 +447,7 @@
               <article><b>스킬 입력이 둔함</b><span>입력 반응을 `반응속도 우선`으로 변경</span></article>
               <article><b>비행 가속 중 테두리 잘림·그림자 잔상</b><span>비행 가속 화면 효과를 `게임 효과 우선 (추천)`으로 변경하고, 계속 보이면 모션 블러를 `게임 기본값 유지`로 변경</span></article>
               <article><b>화면이 밝고 기믹 장판이 옅음</b><span>색감·기믹 장판 시인성을 `권장`으로 변경하고, 너무 진하면 `약하게`로 낮춤</span></article>
+              <article><b>캐릭터 선택 화면·던전이 어두움</b><span>화면 밝기를 `조금 밝게`부터 적용하고, 부족할 때만 `밝게`로 올림</span></article>
             </div>
           </div>
         </section>
@@ -450,7 +457,7 @@
     </main>
   </div>
 
-  <script src="./assets/optimization-copy.js?v=20260814-1"></script>
-  <script src="./assets/optimization.js?v=20260814-1"></script>
+  <script src="./assets/optimization-copy.js?v=20260815-1"></script>
+  <script src="./assets/optimization.js?v=20260815-1"></script>
 </body>
 </html>
