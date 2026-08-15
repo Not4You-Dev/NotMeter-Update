@@ -18,7 +18,7 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260815-3">
+  <link rel="stylesheet" href="./assets/app.css?v=20260815-4">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -156,9 +156,9 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
   <script src="./assets/field-boss-catalog.js?v=20260815-3" defer></script>
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260815-3" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260815-3" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260815-4" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260815-3" defer></script>
-  <script src="./assets/app.js?v=20260815-3" defer></script>
+  <script src="./assets/app.js?v=20260815-4" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -341,7 +341,7 @@
       </div>
       <div class="boss-resistance-guide">
         <span data-i18n="bossResistanceAllTime">전체 기간 누적</span>
-        <p data-i18n="bossResistanceSamplesGuide">전투 수와 유효 타격 표본이 많을수록 예상값이 안정됩니다. 표본이 적은 보스는 수집 중으로 표시됩니다.</p>
+        <p data-i18n="bossResistanceSamplesGuide">원본 추정값은 그대로 표시하고, 게임 설정 추정치는 가장 가까운 5% 단위로 함께 표시합니다. 보스 표본 수가 많을수록 값이 안정됩니다.</p>
       </div>
       <nav class="boss-resistance-tabs" id="boss-resistance-tabs" aria-label="보스 저항 통계 던전 선택" data-i18n-aria-label="bossResistanceDungeonAria"></nav>
       <div class="boss-resistance-content" id="boss-resistance-content" hidden>

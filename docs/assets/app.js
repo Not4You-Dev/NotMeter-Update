@@ -335,9 +335,10 @@
       bossResistanceAllTime: "전체 기간 누적",
       hardHitResistance: "강타 저항",
       perfectResistance: "완벽 저항",
-      bossResistanceSample: "{records}전 · {hits}타",
+      bossResistanceRoundedEstimate: "설정 추정 {value}",
+      bossResistanceSample: "보스 표본 {records}회",
       bossResistancePending: "표본 수집 중",
-      bossResistanceSamplesGuide: "전투 수와 유효 타격 표본이 많을수록 예상값이 안정됩니다. 표본이 적은 보스는 수집 중으로 표시됩니다.",
+      bossResistanceSamplesGuide: "원본 추정값은 그대로 표시하고, 게임 설정 추정치는 가장 가까운 5% 단위로 함께 표시합니다. 보스 표본 수가 많을수록 값이 안정됩니다.",
       bossResistanceNoData: "표시할 보스 정보가 없습니다.",
       period: "기간",
       refresh: "새로고침",
@@ -673,9 +674,10 @@
       bossResistanceAllTime: "All-time total",
       hardHitResistance: "Power-hit resistance",
       perfectResistance: "Perfect resistance",
-      bossResistanceSample: "{records} fights · {hits} hits",
+      bossResistanceRoundedEstimate: "Estimated setting {value}",
+      bossResistanceSample: "Boss samples: {records}",
       bossResistancePending: "Collecting samples",
-      bossResistanceSamplesGuide: "Estimates stabilize as the number of fights and eligible hits grows. Bosses with insufficient samples remain marked as collecting.",
+      bossResistanceSamplesGuide: "The original estimate remains visible, with the likely game setting rounded to the nearest 5%. More boss samples make the estimate more stable.",
       bossResistanceNoData: "No boss information is available.",
       period: "Period",
       refresh: "Refresh",
@@ -855,9 +857,10 @@
     bossResistanceAllTime: "全期間累積",
     hardHitResistance: "強擊抗性",
     perfectResistance: "完美抗性",
-    bossResistanceSample: "{records} 場 · {hits} 次命中",
+    bossResistanceRoundedEstimate: "設定推估 {value}",
+    bossResistanceSample: "首領樣本 {records} 場",
     bossResistancePending: "樣本收集中",
-    bossResistanceSamplesGuide: "戰鬥場次與有效命中樣本越多，推估值越穩定；樣本不足的首領會顯示為收集中。",
+    bossResistanceSamplesGuide: "保留顯示原始推估值，並另外顯示四捨五入至最接近 5% 的遊戲設定推估。首領樣本越多，數值越穩定。",
     bossResistanceNoData: "目前沒有可顯示的首領資訊。",
   };
 
@@ -3409,10 +3412,12 @@
       valueElement.textContent = formatPercent(
         numericValue,
         numericValue % 1 === 0 ? 0 : 2);
-      sampleElement.textContent = t("bossResistanceSample", {
+      const roundedEstimate = Math.max(0, Math.min(100, Math.round(numericValue / 5) * 5));
+      sampleElement.textContent = `${t("bossResistanceRoundedEstimate", {
+        value: formatPercent(roundedEstimate),
+      })} · ${t("bossResistanceSample", {
         records: formatInteger(recordCount),
-        hits: formatInteger(hitCount),
-      });
+      })}`;
     }
     metric.append(valueElement, sampleElement);
     return metric;
