@@ -89,6 +89,14 @@ body.contribution-view .ranking-panel {
   display: none !important;
 }
 
+body.boss-resistance-view .filter-panel,
+body.boss-resistance-view .custom-cp-panel,
+body.boss-resistance-view .snapshot-bar,
+body.boss-resistance-view .weekly-guide,
+body.boss-resistance-view .ranking-panel {
+  display: none !important;
+}
+
 .contribution-surface {
   min-height: 620px;
   overflow: hidden;
@@ -454,6 +462,26 @@ p {
   border-color: rgba(70, 224, 213, 0.62);
   background: linear-gradient(180deg, rgba(18, 77, 82, 0.98), rgba(8, 38, 48, 0.98));
   color: #dcfffc;
+}
+
+.boss-resistance-link-icon {
+  color: #a9b7ff;
+}
+
+.boss-resistance-link-icon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.boss-resistance-link:hover,
+.boss-resistance-link:focus-visible,
+.boss-resistance-link.active {
+  border-color: rgba(154, 172, 255, 0.62);
+  background: linear-gradient(180deg, rgba(48, 57, 106, 0.98), rgba(22, 28, 61, 0.98));
+  color: #edf0ff;
 }
 
 .service-link-icon {
@@ -1232,6 +1260,283 @@ p {
 
 .boss-filter-buttons {
   grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+}
+
+.boss-resistance-surface {
+  min-height: 620px;
+  overflow: hidden;
+  border: 1px solid rgba(118, 139, 230, 0.48);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(112, 128, 220, 0.085), transparent 32rem), rgba(6, 15, 23, 0.96);
+  box-shadow: 0 18px 52px rgba(0, 0, 0, 0.24);
+}
+
+.boss-resistance-surface[hidden],
+.boss-resistance-content[hidden],
+.boss-resistance-empty[hidden] {
+  display: none;
+}
+
+.boss-resistance-page-heading,
+.boss-resistance-page-heading-copy,
+.boss-resistance-content-heading,
+.boss-resistance-row,
+.boss-resistance-boss,
+.boss-resistance-metric {
+  display: flex;
+  align-items: center;
+}
+
+.boss-resistance-page-heading {
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px 17px;
+  border-bottom: 1px solid rgba(101, 119, 196, 0.35);
+  background: rgba(8, 19, 31, 0.9);
+}
+
+.boss-resistance-page-heading-copy {
+  min-width: 0;
+  gap: 13px;
+}
+
+.boss-resistance-page-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(154, 172, 255, 0.58);
+  border-radius: 11px;
+  color: #b6c2ff;
+  background: rgba(79, 94, 171, 0.2);
+}
+
+.boss-resistance-page-icon svg {
+  width: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.boss-resistance-page-kicker {
+  color: #a9b7ff;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+.boss-resistance-page-heading h2 {
+  margin: 3px 0 4px;
+  color: var(--text);
+  font-size: 20px;
+}
+
+.boss-resistance-page-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.boss-resistance-guide {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 16px 18px 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(119, 139, 225, 0.3);
+  border-radius: 10px;
+  background: rgba(17, 29, 51, 0.76);
+}
+
+.boss-resistance-guide > span {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 1px solid rgba(154, 172, 255, 0.4);
+  border-radius: 999px;
+  color: #c9d1ff;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.boss-resistance-guide p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.boss-resistance-tabs {
+  display: flex;
+  gap: 7px;
+  margin: 14px 18px;
+  overflow-x: auto;
+  padding-bottom: 3px;
+  scrollbar-width: thin;
+}
+
+.boss-resistance-tab {
+  min-height: 36px;
+  flex: 0 0 auto;
+  padding: 0 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  color: var(--muted);
+  background: rgba(10, 25, 37, 0.92);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.boss-resistance-tab:hover,
+.boss-resistance-tab:focus-visible,
+.boss-resistance-tab.active {
+  border-color: rgba(154, 172, 255, 0.72);
+  color: #eef0ff;
+  background: rgba(55, 67, 124, 0.68);
+}
+
+.boss-resistance-content {
+  margin: 0 18px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(104, 123, 203, 0.38);
+  border-radius: 12px;
+  background: rgba(6, 16, 25, 0.74);
+}
+
+.boss-resistance-content-heading {
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 15px;
+  border-bottom: 1px solid rgba(96, 114, 190, 0.3);
+}
+
+.boss-resistance-content-heading strong {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.boss-resistance-content-heading span {
+  color: #aab8f4;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.boss-resistance-table-heading,
+.boss-resistance-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.25fr) minmax(150px, .75fr) minmax(150px, .75fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.boss-resistance-table-heading {
+  padding: 9px 15px;
+  color: var(--muted-2);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.boss-resistance-rows {
+  display: grid;
+  gap: 7px;
+  padding: 0 10px 10px;
+}
+
+.boss-resistance-row {
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: rgba(13, 30, 43, 0.9);
+}
+
+.boss-resistance-boss {
+  min-width: 0;
+  gap: 10px;
+}
+
+.boss-resistance-order {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(154, 172, 255, 0.42);
+  border-radius: 7px;
+  color: #c4ceff;
+  background: rgba(71, 84, 153, 0.24);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.boss-resistance-boss strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.boss-resistance-metric {
+  min-width: 0;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.boss-resistance-metric > strong {
+  color: #bac5ff;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.boss-resistance-metric > small {
+  overflow: hidden;
+  color: var(--muted-2);
+  font-size: 9px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.boss-resistance-metric.pending > strong {
+  color: var(--muted);
+}
+
+.boss-resistance-empty {
+  margin: 18px;
+  padding: 46px 18px;
+  border: 1px dashed rgba(119, 138, 217, 0.38);
+  border-radius: 12px;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .boss-resistance-page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .boss-resistance-guide {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .boss-resistance-table-heading {
+    display: none;
+  }
+
+  .boss-resistance-row {
+    grid-template-columns: 1fr;
+  }
+
+  .boss-resistance-metric {
+    padding-top: 7px;
+    border-top: 1px solid rgba(87, 105, 172, 0.24);
+  }
 }
 
 .filter-option-button {

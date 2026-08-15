@@ -326,6 +326,19 @@
       fieldBossCacheHours: "{value}시간 전 갱신",
       dungeon: "던전",
       boss: "보스",
+      bossResistanceStats: "보스 저항 통계",
+      bossResistancePageTitle: "NotMeter 보스 저항 통계",
+      bossResistancePageSubtitle: "전체 기간 누적 표본으로 보스별 강타·완벽 저항을 추정합니다",
+      bossResistanceStatsTitle: "보스 저항 통계",
+      bossResistanceStatsDescription: "전체 기간 누적 전투 표본으로 보스별 강타 저항과 완벽 저항 예상치를 확인합니다.",
+      bossResistanceDungeonAria: "보스 저항 통계 던전 선택",
+      bossResistanceAllTime: "전체 기간 누적",
+      hardHitResistance: "강타 저항",
+      perfectResistance: "완벽 저항",
+      bossResistanceSample: "{records}전 · {hits}타",
+      bossResistancePending: "표본 수집 중",
+      bossResistanceSamplesGuide: "전투 수와 유효 타격 표본이 많을수록 예상값이 안정됩니다. 표본이 적은 보스는 수집 중으로 표시됩니다.",
+      bossResistanceNoData: "표시할 보스 정보가 없습니다.",
       period: "기간",
       refresh: "새로고침",
       loading: "동일한 통계 캐시를 불러오는 중입니다",
@@ -651,6 +664,19 @@
       fieldBossCacheHours: "Updated {value}h ago",
       dungeon: "Dungeon",
       boss: "Boss",
+      bossResistanceStats: "Boss resistance",
+      bossResistancePageTitle: "NotMeter Boss Resistance Statistics",
+      bossResistancePageSubtitle: "Estimate each boss's Power-hit and Perfect resistance from all-time samples",
+      bossResistanceStatsTitle: "Boss Resistance Statistics",
+      bossResistanceStatsDescription: "Review estimated Power-hit and Perfect resistance for each boss using all-time combat samples.",
+      bossResistanceDungeonAria: "Select a dungeon for boss resistance statistics",
+      bossResistanceAllTime: "All-time total",
+      hardHitResistance: "Power-hit resistance",
+      perfectResistance: "Perfect resistance",
+      bossResistanceSample: "{records} fights · {hits} hits",
+      bossResistancePending: "Collecting samples",
+      bossResistanceSamplesGuide: "Estimates stabilize as the number of fights and eligible hits grows. Bosses with insufficient samples remain marked as collecting.",
+      bossResistanceNoData: "No boss information is available.",
       period: "Period",
       refresh: "Refresh",
       loading: "Loading the shared statistics cache",
@@ -820,6 +846,19 @@
   COPY["zh-TW"] = {
     ...(globalThis.NotMeterStatsCopyZhTw || {}),
     peopleValue: "{value} 人",
+    bossResistanceStats: "首領抗性統計",
+    bossResistancePageTitle: "NotMeter 首領抗性統計",
+    bossResistancePageSubtitle: "依全期間累積樣本推估各首領的強擊與完美抗性",
+    bossResistanceStatsTitle: "首領抗性統計",
+    bossResistanceStatsDescription: "使用全期間累積戰鬥樣本，查看各首領的強擊抗性與完美抗性推估值。",
+    bossResistanceDungeonAria: "選擇首領抗性統計副本",
+    bossResistanceAllTime: "全期間累積",
+    hardHitResistance: "強擊抗性",
+    perfectResistance: "完美抗性",
+    bossResistanceSample: "{records} 場 · {hits} 次命中",
+    bossResistancePending: "樣本收集中",
+    bossResistanceSamplesGuide: "戰鬥場次與有效命中樣本越多，推估值越穩定；樣本不足的首領會顯示為收集中。",
+    bossResistanceNoData: "目前沒有可顯示的首領資訊。",
   };
 
   function normalizeLocale(value) {
@@ -886,6 +925,7 @@
     contributionData: null,
     contributionLoad: null,
     contributionDungeonKey: "",
+    bossResistanceDungeonKey: "",
   };
 
   const elements = {};
@@ -914,6 +954,8 @@
       openClassPerformanceView(false);
     } else if (pageView === "contribution") {
       openContributionView();
+    } else if (pageView === "boss-resistance") {
+      openBossResistanceView();
     } else if (pageView === "class-top10" || window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
@@ -953,6 +995,9 @@
       "contribution-loading-state", "contribution-error-state", "contribution-error-message",
       "contribution-retry-button", "contribution-empty-state", "contribution-content",
       "contribution-dungeon-title", "contribution-boss-title", "contribution-rows",
+      "boss-resistance-button", "boss-resistance-surface", "boss-resistance-back-button",
+      "boss-resistance-tabs", "boss-resistance-content", "boss-resistance-dungeon-title",
+      "boss-resistance-rows", "boss-resistance-empty",
       "class-performance-button", "class-performance-surface",
       "class-performance-back-button", "class-performance-summary",
       "class-performance-metric-title", "class-performance-metric-description",
@@ -1056,6 +1101,12 @@
       if (!button) return;
       state.contributionDungeonKey = button.dataset.contributionDungeon;
       renderContributionStats();
+    });
+    elements["boss-resistance-tabs"].addEventListener("click", event => {
+      const button = event.target.closest("[data-boss-resistance-dungeon]");
+      if (!button) return;
+      state.bossResistanceDungeonKey = button.dataset.bossResistanceDungeon;
+      renderBossResistanceView();
     });
     elements["class-performance-composition-reset"].addEventListener("click", () => {
       state.performanceExclusionMask = 0;
@@ -1211,10 +1262,15 @@
         openContributionView();
         return;
       }
+      if (event.state?.notMeterStatsView === "boss-resistance") {
+        openBossResistanceView();
+        return;
+      }
       closeFieldBossView();
       closeClassTop10View();
       closeClassPerformanceView();
       closeContributionView();
+      closeBossResistanceView();
       closeOptimizationView();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
@@ -1359,6 +1415,9 @@
         }),
       ]);
       validateCache(cache);
+      cache.bossResistanceStats = Array.isArray(cache.bossResistanceStats)
+        ? cache.bossResistanceStats
+        : [];
       cache.dungeons = orderDungeonsForDisplay(cache.dungeons);
       let classOverallCache = initialClassOverallCache;
       if (!isMatchingClassOverallCache(classOverallCache, cache.generatedAt)) {
@@ -1475,7 +1534,8 @@
   function initialPageView() {
     const view = new URLSearchParams(window.location.search).get("view");
     return view === "class-top10" || view === "field-boss" || view === "optimization" ||
-      view === "class-performance" || view === "contribution" ? view : "ranking";
+      view === "class-performance" || view === "contribution" ||
+      view === "boss-resistance" ? view : "ranking";
   }
 
   function openOptimizationView() {
@@ -1483,6 +1543,7 @@
     closeClassTop10View();
     closeClassPerformanceView();
     closeContributionView();
+    closeBossResistanceView();
     closeCombatDetail();
     state.surfaceMode = "optimization";
     document.body.classList.add("optimization-view");
@@ -1550,6 +1611,7 @@
     closeOptimizationView();
     closeClassPerformanceView();
     closeContributionView();
+    closeBossResistanceView();
     closeCombatDetail();
     state.surfaceMode = "classTop10";
     document.body.classList.add("class-top10-view");
@@ -1586,6 +1648,7 @@
       return;
     }
     closeClassTop10View();
+    closeBossResistanceView();
     closeContributionView();
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1595,6 +1658,8 @@
     closeFieldBossView();
     closeOptimizationView();
     closeClassTop10View();
+    closeContributionView();
+    closeBossResistanceView();
     closeCombatDetail();
     state.surfaceMode = "classPerformance";
     document.body.classList.add("class-performance-view");
@@ -1631,6 +1696,7 @@
       return;
     }
     closeClassPerformanceView();
+    closeBossResistanceView();
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1640,6 +1706,7 @@
     closeOptimizationView();
     closeClassTop10View();
     closeClassPerformanceView();
+    closeBossResistanceView();
     closeCombatDetail();
     state.surfaceMode = "contribution";
     document.body.classList.add("contribution-view");
@@ -1666,10 +1733,40 @@
     updatePageIdentity();
   }
 
+  function openBossResistanceView() {
+    closeFieldBossView();
+    closeOptimizationView();
+    closeClassTop10View();
+    closeClassPerformanceView();
+    closeContributionView();
+    closeCombatDetail();
+    state.surfaceMode = "bossResistance";
+    document.body.classList.add("boss-resistance-view");
+    elements["boss-resistance-surface"].hidden = false;
+    elements["boss-resistance-button"].classList.add("active");
+    elements["boss-resistance-button"].setAttribute("aria-current", "page");
+    updatePageIdentity();
+    if (state.data) {
+      renderBossResistanceView();
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeBossResistanceView() {
+    if (state.surfaceMode !== "bossResistance") return;
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("boss-resistance-view");
+    elements["boss-resistance-surface"].hidden = true;
+    elements["boss-resistance-button"].classList.remove("active");
+    elements["boss-resistance-button"].setAttribute("aria-current", "false");
+    updatePageIdentity();
+  }
+
   function openFieldBossView() {
     closeClassTop10View();
     closeClassPerformanceView();
     closeContributionView();
+    closeBossResistanceView();
     closeOptimizationView();
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
@@ -3206,6 +3303,12 @@
       }
       return;
     }
+    if (state.surfaceMode === "bossResistance") {
+      if (state.data) {
+        renderBossResistanceView();
+      }
+      return;
+    }
     if (!state.data) {
       return;
     }
@@ -3213,6 +3316,100 @@
     updateDailyUsers();
     updateCacheAge();
     state.mode === "class" ? renderClassRanking() : renderSummary();
+  }
+
+  function bossResistanceDungeons() {
+    return (state.data?.dungeons || []).filter(dungeon =>
+      dungeon?.key !== "training-dummy-60s" &&
+      Array.isArray(dungeon?.bossNames) && dungeon.bossNames.length > 0);
+  }
+
+  function renderBossResistanceView() {
+    const dungeons = bossResistanceDungeons();
+    const availableKeys = new Set(dungeons.map(dungeon => dungeon.key));
+    if (!availableKeys.has(state.bossResistanceDungeonKey)) {
+      state.bossResistanceDungeonKey = dungeons[0]?.key || "";
+    }
+
+    const tabs = document.createDocumentFragment();
+    for (const dungeon of dungeons) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "boss-resistance-tab";
+      button.classList.toggle("active", dungeon.key === state.bossResistanceDungeonKey);
+      button.dataset.bossResistanceDungeon = dungeon.key;
+      button.setAttribute("aria-pressed", String(dungeon.key === state.bossResistanceDungeonKey));
+      button.textContent = dungeonName(dungeon);
+      tabs.append(button);
+    }
+    elements["boss-resistance-tabs"].replaceChildren(tabs);
+
+    const dungeon = dungeons.find(item => item.key === state.bossResistanceDungeonKey);
+    const hasDungeon = Boolean(dungeon);
+    elements["boss-resistance-content"].hidden = !hasDungeon;
+    elements["boss-resistance-empty"].hidden = hasDungeon;
+    if (!dungeon) {
+      elements["boss-resistance-rows"].replaceChildren();
+      return;
+    }
+
+    elements["boss-resistance-dungeon-title"].textContent = dungeonName(dungeon);
+    const statsByBoss = new Map((state.data?.bossResistanceStats || [])
+      .filter(item => String(item?.dungeonKey || "") === dungeon.key)
+      .map(item => [Number(item?.bossIndex), item]));
+    const rows = document.createDocumentFragment();
+    dungeon.bossNames.forEach((rawBossName, index) => {
+      const stats = statsByBoss.get(index + 1);
+      const row = document.createElement("article");
+      row.className = "boss-resistance-row";
+
+      const identity = document.createElement("div");
+      identity.className = "boss-resistance-boss";
+      const order = document.createElement("span");
+      order.className = "boss-resistance-order";
+      order.textContent = String(index + 1);
+      const bossName = document.createElement("strong");
+      bossName.textContent = localizeGameName(rawBossName);
+      identity.append(order, bossName);
+
+      row.append(
+        identity,
+        createBossResistanceMetric(
+          stats?.estimatedHardHitResistancePercent,
+          stats?.recordCount,
+          stats?.hardHitTrials),
+        createBossResistanceMetric(
+          stats?.estimatedPerfectResistancePercent,
+          stats?.recordCount,
+          stats?.perfectTrials));
+      rows.append(row);
+    });
+    elements["boss-resistance-rows"].replaceChildren(rows);
+  }
+
+  function createBossResistanceMetric(value, records, hits) {
+    const metric = document.createElement("div");
+    metric.className = "boss-resistance-metric";
+    const valueElement = document.createElement("strong");
+    const sampleElement = document.createElement("small");
+    const numericValue = Number(value);
+    const recordCount = Math.max(0, Math.trunc(Number(records) || 0));
+    const hitCount = Math.max(0, Math.trunc(Number(hits) || 0));
+    if (!Number.isFinite(numericValue) || recordCount <= 0 || hitCount <= 0) {
+      valueElement.textContent = "—";
+      sampleElement.textContent = t("bossResistancePending");
+      metric.classList.add("pending");
+    } else {
+      valueElement.textContent = formatPercent(
+        numericValue,
+        numericValue % 1 === 0 ? 0 : 2);
+      sampleElement.textContent = t("bossResistanceSample", {
+        records: formatInteger(recordCount),
+        hits: formatInteger(hitCount),
+      });
+    }
+    metric.append(valueElement, sampleElement);
+    return metric;
   }
 
   function decodeClassPerformanceExclusionMask() {
@@ -5449,6 +5646,9 @@
     if (state.surfaceMode === "fieldBoss" && state.fieldBossData) {
       renderFieldBoss();
     }
+    if (state.surfaceMode === "bossResistance" && state.data) {
+      renderBossResistanceView();
+    }
   }
 
   function updatePageIdentity() {
@@ -5457,10 +5657,13 @@
     const classPerformance = state.surfaceMode === "classPerformance";
     const optimization = state.surfaceMode === "optimization";
     const contribution = state.surfaceMode === "contribution";
+    const bossResistance = state.surfaceMode === "bossResistance";
     const title = t(optimization
       ? "optimizationPageTitle"
       : contribution
         ? "contributionPageTitle"
+      : bossResistance
+        ? "bossResistancePageTitle"
       : fieldBoss
         ? "fieldBossPageTitle"
         : classTop10
@@ -5472,6 +5675,8 @@
       ? "optimizationPageSubtitle"
       : contribution
         ? "contributionPageSubtitle"
+      : bossResistance
+        ? "bossResistancePageSubtitle"
       : fieldBoss
         ? "fieldBossPageSubtitle"
         : classTop10
