@@ -3319,8 +3319,14 @@
   }
 
   function bossResistanceDungeons() {
+    const excludedDungeonKeys = new Set([
+      "training-dummy-60s",
+      "abyss-horn-4",
+      "fallen-deva-hard",
+      "bakron-trial",
+    ]);
     return (state.data?.dungeons || []).filter(dungeon =>
-      dungeon?.key !== "training-dummy-60s" &&
+      !excludedDungeonKeys.has(String(dungeon?.key || "")) &&
       Array.isArray(dungeon?.bossNames) && dungeon.bossNames.length > 0);
   }
 
