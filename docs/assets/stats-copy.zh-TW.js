@@ -294,6 +294,7 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   drainHealing: "吸血",
   useCount: "使用",
   averageDamage: "平均傷害",
+  maximumDamage: "最高傷害",
   recordedBuffsNone: "沒有已記錄的增益效果",
   agoNow: "剛剛更新",
   agoMinutes: "{value} 分鐘前更新",
