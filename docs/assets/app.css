@@ -1425,7 +1425,6 @@ p {
   font-weight: 800;
 }
 
-.boss-resistance-table-heading,
 .boss-resistance-row {
   display: grid;
   grid-template-columns: minmax(180px, 1.25fr) minmax(150px, .75fr) minmax(150px, .75fr);
@@ -1433,24 +1432,17 @@ p {
   align-items: center;
 }
 
-.boss-resistance-table-heading {
-  padding: 9px 15px;
-  color: var(--muted-2);
-  font-size: 10px;
-  font-weight: 850;
-}
-
 .boss-resistance-rows {
   display: grid;
-  gap: 7px;
-  padding: 0 10px 10px;
+  gap: 8px;
+  padding: 10px;
 }
 
 .boss-resistance-row {
-  padding: 11px 12px;
+  padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 9px;
-  background: rgba(13, 30, 43, 0.9);
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(19, 42, 57, 0.94), rgba(11, 27, 40, 0.92));
 }
 
 .boss-resistance-boss {
@@ -1472,36 +1464,109 @@ p {
   font-weight: 900;
 }
 
-.boss-resistance-boss strong {
+.boss-resistance-boss-copy {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.boss-resistance-boss-copy strong {
   overflow: hidden;
   color: var(--text);
-  font-size: 12px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.boss-resistance-sample {
+  width: max-content;
+  max-width: 100%;
+  padding: 2px 7px;
+  border: 1px solid rgba(83, 214, 211, 0.28);
+  border-radius: 999px;
+  color: #86cfce;
+  background: rgba(29, 117, 120, 0.12);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .boss-resistance-metric {
+  position: relative;
   min-width: 0;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.boss-resistance-metric > strong {
-  color: #bac5ff;
-  font-size: 16px;
-  font-variant-numeric: tabular-nums;
-}
-
-.boss-resistance-metric > small {
+  min-height: 66px;
+  align-items: stretch;
+  gap: 9px;
+  padding: 9px 11px;
   overflow: hidden;
-  color: var(--muted-2);
-  font-size: 9px;
+  border: 1px solid rgba(106, 128, 158, 0.38);
+  border-radius: 9px;
+  background: rgba(4, 14, 23, 0.58);
+}
+
+.boss-resistance-metric::before {
+  width: 3px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #8f9ecf;
+  content: "";
+}
+
+.boss-resistance-metric.hard-hit::before {
+  background: #ffc760;
+}
+
+.boss-resistance-metric.perfect::before {
+  background: #aab8ff;
+}
+
+.boss-resistance-metric-label {
+  align-self: center;
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.boss-resistance-reading {
+  display: grid;
+  min-width: 0;
+  margin-left: auto;
+  justify-items: end;
+  align-content: center;
+  gap: 1px;
   text-align: right;
+}
+
+.boss-resistance-setting-label {
+  color: var(--muted-2);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.boss-resistance-reading > strong {
+  color: #c8d1ff;
+  font-size: 21px;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+
+.boss-resistance-metric.hard-hit .boss-resistance-reading > strong {
+  color: #ffd274;
+}
+
+.boss-resistance-measured {
+  overflow: hidden;
+  max-width: 100%;
+  color: #8292a7;
+  font-size: 8px;
+  font-weight: 750;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.boss-resistance-metric.pending > strong {
+.boss-resistance-metric.pending .boss-resistance-reading > strong {
   color: var(--muted);
 }
 
@@ -1525,17 +1590,12 @@ p {
     flex-direction: column;
   }
 
-  .boss-resistance-table-heading {
-    display: none;
-  }
-
   .boss-resistance-row {
     grid-template-columns: 1fr;
   }
 
   .boss-resistance-metric {
-    padding-top: 7px;
-    border-top: 1px solid rgba(87, 105, 172, 0.24);
+    min-height: 58px;
   }
 }
 

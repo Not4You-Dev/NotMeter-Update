@@ -335,8 +335,9 @@
       bossResistanceAllTime: "전체 기간 누적",
       hardHitResistance: "강타 저항",
       perfectResistance: "완벽 저항",
-      bossResistanceRoundedEstimate: "설정 추정 {value}",
-      bossResistanceSample: "보스 표본 {records}회",
+      bossResistanceSettingEstimate: "게임 설정 추정",
+      bossResistanceMeasuredEstimate: "측정 추정값 {value}",
+      bossResistanceSample: "누적 표본 {records}회",
       bossResistancePending: "표본 수집 중",
       bossResistanceSamplesGuide: "원본 추정값은 그대로 표시하고, 게임 설정 추정치는 가장 가까운 5% 단위로 함께 표시합니다. 보스 표본 수가 많을수록 값이 안정됩니다.",
       bossResistanceNoData: "표시할 보스 정보가 없습니다.",
@@ -674,8 +675,9 @@
       bossResistanceAllTime: "All-time total",
       hardHitResistance: "Power-hit resistance",
       perfectResistance: "Perfect resistance",
-      bossResistanceRoundedEstimate: "Estimated setting {value}",
-      bossResistanceSample: "Boss samples: {records}",
+      bossResistanceSettingEstimate: "Estimated game setting",
+      bossResistanceMeasuredEstimate: "Measured estimate {value}",
+      bossResistanceSample: "Cumulative samples: {records}",
       bossResistancePending: "Collecting samples",
       bossResistanceSamplesGuide: "The original estimate remains visible, with the likely game setting rounded to the nearest 5%. More boss samples make the estimate more stable.",
       bossResistanceNoData: "No boss information is available.",
@@ -857,8 +859,9 @@
     bossResistanceAllTime: "全期間累積",
     hardHitResistance: "強擊抗性",
     perfectResistance: "完美抗性",
-    bossResistanceRoundedEstimate: "設定推估 {value}",
-    bossResistanceSample: "首領樣本 {records} 場",
+    bossResistanceSettingEstimate: "遊戲設定推估",
+    bossResistanceMeasuredEstimate: "實測推估值 {value}",
+    bossResistanceSample: "累積樣本 {records} 場",
     bossResistancePending: "樣本收集中",
     bossResistanceSamplesGuide: "保留顯示原始推估值，並另外顯示四捨五入至最接近 5% 的遊戲設定推估。首領樣本越多，數值越穩定。",
     bossResistanceNoData: "目前沒有可顯示的首領資訊。",
@@ -3377,49 +3380,65 @@
       const order = document.createElement("span");
       order.className = "boss-resistance-order";
       order.textContent = String(index + 1);
+      const identityCopy = document.createElement("div");
+      identityCopy.className = "boss-resistance-boss-copy";
       const bossName = document.createElement("strong");
       bossName.textContent = localizeGameName(rawBossName);
-      identity.append(order, bossName);
+      const sample = document.createElement("small");
+      sample.className = "boss-resistance-sample";
+      const recordCount = Math.max(0, Math.trunc(Number(stats?.recordCount) || 0));
+      sample.textContent = recordCount > 0
+        ? t("bossResistanceSample", { records: formatInteger(recordCount) })
+        : t("bossResistancePending");
+      identityCopy.append(bossName, sample);
+      identity.append(order, identityCopy);
 
       row.append(
         identity,
         createBossResistanceMetric(
+          "hard-hit",
+          "hardHitResistance",
           stats?.estimatedHardHitResistancePercent,
-          stats?.recordCount,
           stats?.hardHitTrials),
         createBossResistanceMetric(
+          "perfect",
+          "perfectResistance",
           stats?.estimatedPerfectResistancePercent,
-          stats?.recordCount,
           stats?.perfectTrials));
       rows.append(row);
     });
     elements["boss-resistance-rows"].replaceChildren(rows);
   }
 
-  function createBossResistanceMetric(value, records, hits) {
+  function createBossResistanceMetric(kind, labelKey, value, hits) {
     const metric = document.createElement("div");
-    metric.className = "boss-resistance-metric";
-    const valueElement = document.createElement("strong");
-    const sampleElement = document.createElement("small");
+    metric.className = `boss-resistance-metric ${kind}`;
+    const labelElement = document.createElement("span");
+    labelElement.className = "boss-resistance-metric-label";
+    labelElement.textContent = t(labelKey);
+    const reading = document.createElement("div");
+    reading.className = "boss-resistance-reading";
+    const settingLabel = document.createElement("small");
+    settingLabel.className = "boss-resistance-setting-label";
+    settingLabel.textContent = t("bossResistanceSettingEstimate");
+    const settingValue = document.createElement("strong");
+    const measuredValue = document.createElement("small");
+    measuredValue.className = "boss-resistance-measured";
     const numericValue = Number(value);
-    const recordCount = Math.max(0, Math.trunc(Number(records) || 0));
     const hitCount = Math.max(0, Math.trunc(Number(hits) || 0));
-    if (!Number.isFinite(numericValue) || recordCount <= 0 || hitCount <= 0) {
-      valueElement.textContent = "—";
-      sampleElement.textContent = t("bossResistancePending");
+    if (!Number.isFinite(numericValue) || hitCount <= 0) {
+      settingValue.textContent = "—";
+      measuredValue.textContent = t("bossResistancePending");
       metric.classList.add("pending");
     } else {
-      valueElement.textContent = formatPercent(
-        numericValue,
-        numericValue % 1 === 0 ? 0 : 2);
       const roundedEstimate = Math.max(0, Math.min(100, Math.round(numericValue / 5) * 5));
-      sampleElement.textContent = `${t("bossResistanceRoundedEstimate", {
-        value: formatPercent(roundedEstimate),
-      })} · ${t("bossResistanceSample", {
-        records: formatInteger(recordCount),
-      })}`;
+      settingValue.textContent = formatPercent(roundedEstimate);
+      measuredValue.textContent = t("bossResistanceMeasuredEstimate", {
+        value: formatPercent(numericValue, numericValue % 1 === 0 ? 0 : 2),
+      });
     }
-    metric.append(valueElement, sampleElement);
+    reading.append(settingLabel, settingValue, measuredValue);
+    metric.append(labelElement, reading);
     return metric;
   }
 
