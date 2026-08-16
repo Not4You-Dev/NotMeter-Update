@@ -162,7 +162,10 @@
     ["healing", "healing"],
     ["drainHealing", "drainHealing"],
     ["averageDamage", "averageDamage"],
+    ["maximumDamage", "maximumDamage"],
   ];
+  const DETAIL_METRICS_MAXIMUM_DAMAGE_MIGRATION_KEY =
+    "notmeter-detail-metrics-maximum-damage-v1";
   const POTION_CODES = new Set([2011101, 2011102, 2010102, 2020101, 2020102, 2010106, 2010103]);
 
   const COPY = {
@@ -499,6 +502,7 @@
       drainHealing: "흡혈",
       useCount: "사용",
       averageDamage: "평균 데미지",
+      maximumDamage: "최고 피해",
       recordedBuffsNone: "기록된 버프 없음",
       agoNow: "방금 갱신",
       agoMinutes: "{value}분 전 갱신",
@@ -839,6 +843,7 @@
       drainHealing: "Drain",
       useCount: "Used",
       averageDamage: "Average damage",
+      maximumDamage: "Highest damage",
       recordedBuffsNone: "No recorded buffs",
       agoNow: "Updated just now",
       agoMinutes: "Updated {value}m ago",
@@ -4819,6 +4824,9 @@
     if (isDetailMetricVisible("averageDamage") && totalDamage > 0) {
       chips.append(buildDetailChip(t("averageDamage"), formatCompact(skill.averageDamage)));
     }
+    if (isDetailMetricVisible("maximumDamage") && totalDamage > 0 && Number(skill.maxHit) > 0) {
+      chips.append(buildDetailChip(t("maximumDamage"), formatCompact(skill.maxHit), "maximum"));
+    }
 
     row.append(bar, icon, title, damage, chips);
     return row;
@@ -4939,8 +4947,15 @@
       const saved = JSON.parse(localStorage.getItem("notmeter-detail-metrics") || "null");
       if (Array.isArray(saved)) {
         const allowed = new Set(DETAIL_METRICS.map(([key]) => key));
-        return new Set(saved.filter(key => allowed.has(key)));
+        const metrics = new Set(saved.filter(key => allowed.has(key)));
+        if (!localStorage.getItem(DETAIL_METRICS_MAXIMUM_DAMAGE_MIGRATION_KEY)) {
+          metrics.add("maximumDamage");
+          localStorage.setItem("notmeter-detail-metrics", JSON.stringify([...metrics]));
+          localStorage.setItem(DETAIL_METRICS_MAXIMUM_DAMAGE_MIGRATION_KEY, "1");
+        }
+        return metrics;
       }
+      localStorage.setItem(DETAIL_METRICS_MAXIMUM_DAMAGE_MIGRATION_KEY, "1");
     } catch {
     }
     return new Set(DETAIL_METRICS.map(([key]) => key));
