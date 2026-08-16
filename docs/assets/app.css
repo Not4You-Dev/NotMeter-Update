@@ -4565,6 +4565,7 @@ tr:nth-child(3) .rank-badge {
 .detail-chip.perfect b { color: #c897ff; }
 .detail-chip.double b { color: #ffac37; }
 .detail-chip.healing b { color: #7dd3fc; }
+.detail-chip.maximum b { color: #ffd166; }
 
 .detail-spec-dots {
   display: inline-flex;
