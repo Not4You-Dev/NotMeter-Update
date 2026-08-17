@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260818-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-6">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-7">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260818-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260818-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260818-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260818-7" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260818-8" defer></script>
   <script src="./assets/app.js?v=20260818-2" defer></script>
 </head>
 <body>
@@ -537,13 +537,17 @@
           <section class="result-card" id="result-card">
             <header><div><span class="result-kicker" data-stat-i18n="resultKicker">직업·스킬별 분석</span><h3 data-stat-i18n="resultTitle">스탯 효율 순위</h3></div><span class="confidence pending" id="confidence">검증 전</span></header>
 			<div class="displayed-stats" id="displayed-stats" hidden>
-			  <div class="displayed-stats-heading"><strong data-stat-i18n="displayedStatsTitle">게임 표시 스탯 검산</strong><span data-stat-i18n="displayedStatsHelp">입력 원본을 게임과 같은 방식으로 합산한 값입니다.</span></div>
-			  <div class="displayed-stats-grid">
-				<div><span data-stat-i18n="displayedAttack">최종 공격력</span><strong id="displayed-attack">—</strong></div>
-				<div><span data-stat-i18n="displayedAccuracy">최종 명중</span><strong id="displayed-accuracy">—</strong></div>
-				<div><span data-stat-i18n="displayedCritical">최종 치명타</span><strong id="displayed-critical">—</strong></div>
-				<div><span data-stat-i18n="displayedDefense">최종 방어력</span><strong id="displayed-defense">—</strong></div>
+			  <div class="displayed-stats-heading">
+				<div><strong data-stat-i18n="displayedStatsTitle">실시간 스탯 시뮬레이션</strong><span data-stat-i18n="displayedStatsHelp">복사 기준에서 입력값을 바꾸면 게임 표시 최종 스탯이 바로 갱신됩니다.</span></div>
+				<button id="simulation-reset" type="button" data-stat-i18n="simulationReset">복사 기준으로 초기화</button>
 			  </div>
+			  <div class="displayed-stats-grid">
+				<div><span data-stat-i18n="displayedAttack">최종 공격력</span><strong id="displayed-attack">—</strong><small id="displayed-attack-delta"></small></div>
+				<div><span data-stat-i18n="displayedAccuracy">최종 명중</span><strong id="displayed-accuracy">—</strong><small id="displayed-accuracy-delta"></small></div>
+				<div><span data-stat-i18n="displayedCritical">최종 치명타</span><strong id="displayed-critical">—</strong><small id="displayed-critical-delta"></small></div>
+				<div><span data-stat-i18n="displayedDefense">최종 방어력</span><strong id="displayed-defense">—</strong><small id="displayed-defense-delta"></small></div>
+			  </div>
+			  <div class="simulation-damage"><span data-stat-i18n="simulationDamage">예상 종합 피해 변화</span><strong id="simulation-damage-gain">—</strong><small id="simulation-damage-state" data-stat-i18n="simulationWaiting">기준 스탯을 붙여넣으면 자동 계산됩니다.</small></div>
 			</div>
             <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong data-stat-i18n="waitingTitle">표본을 수집하고 있습니다</strong><p data-stat-i18n="waitingDescription">신뢰 기준을 충족할 만큼 데이터가 쌓이면 계산 결과가 열립니다.</p></div>
             <div class="result-list" id="result-list" hidden></div>

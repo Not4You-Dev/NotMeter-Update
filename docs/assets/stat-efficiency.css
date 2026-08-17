@@ -59,6 +59,13 @@
 .field-grid input, .field-grid select { width: 100%; height: 39px; min-width: 0; padding: 0 10px; border: 1px solid #294657; border-radius: 8px; outline: 0; background: #071722; color: #edf7fa; font-size: 12px; font-variant-numeric: tabular-nums; }
 .field-grid input:focus, .field-grid select:focus { border-color: #42cfc3; box-shadow: 0 0 0 2px rgba(66, 207, 195, .11); }
 .field-grid input:invalid:not(:placeholder-shown) { border-color: #a34f5b; }
+.stat-input-control { display: grid; grid-template-columns: 27px minmax(0, 1fr) 27px; }
+.stat-input-control input { position: relative; z-index: 1; border-radius: 0; text-align: center; }
+.stat-step-button { min-width: 0; padding: 0; border: 1px solid #294657; background: #0b202c; color: #70c9c3; cursor: pointer; font-size: 15px; font-weight: 900; }
+.stat-step-button:first-child { border-right: 0; border-radius: 8px 0 0 8px; }
+.stat-step-button:last-child { border-left: 0; border-radius: 0 8px 8px 0; }
+.stat-step-button:hover { border-color: #42cfc3; color: #dffffb; background: #12313b; }
+.stat-step-button:active { background: #18434a; }
 
 .specialization-field { margin: 11px 0 0; padding: 10px 11px 11px; border: 1px solid #1c3948; border-radius: 9px; }
 .specialization-field legend { padding: 0 5px; color: #799bab; font-size: 9px; }
@@ -90,13 +97,25 @@
 .confidence.medium, .confidence.high { border-color: #2e7772; color: #92eee5; background: rgba(31, 105, 101, .2); }
 .confidence.high { border-color: #47c9bd; color: #d5fffb; }
 .displayed-stats { margin: 11px 11px 0; padding: 12px; border: 1px solid #2b6f6b; border-radius: 10px; background: linear-gradient(135deg, rgba(41, 150, 141, .16), rgba(7, 24, 33, .84)); }
-.displayed-stats-heading { display: grid; gap: 3px; margin-bottom: 9px; }
+.displayed-stats-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+.displayed-stats-heading > div { display: grid; gap: 3px; min-width: 0; }
 .displayed-stats-heading strong { color: #d8fffb; font-size: 11px; }
 .displayed-stats-heading span { color: #779da8; font-size: 8px; line-height: 1.45; }
+.displayed-stats-heading button { flex: 0 0 auto; padding: 5px 7px; border: 1px solid #39756f; border-radius: 6px; background: rgba(24, 91, 87, .28); color: #a9e9e3; cursor: pointer; font-size: 8px; font-weight: 850; }
+.displayed-stats-heading button:hover { border-color: #57cfc5; color: #edfffd; }
 .displayed-stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .displayed-stats-grid > div { display: grid; gap: 3px; padding: 8px 9px; border: 1px solid #1c4650; border-radius: 7px; background: rgba(5, 20, 29, .84); }
 .displayed-stats-grid span { color: #7c9daa; font-size: 8px; }
 .displayed-stats-grid strong { color: #79eee3; font-size: 15px; font-variant-numeric: tabular-nums; }
+.displayed-stats-grid small { min-height: 10px; color: #7194a0; font-size: 8px; font-variant-numeric: tabular-nums; }
+.displayed-stats-grid small.positive { color: #72e2b1; }
+.displayed-stats-grid small.negative { color: #ff9aa6; }
+.simulation-damage { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 3px 9px; margin-top: 7px; padding: 9px 10px; border: 1px solid #2e615d; border-radius: 7px; background: rgba(11, 44, 48, .52); }
+.simulation-damage > span { color: #9bc4c3; font-size: 9px; font-weight: 850; }
+.simulation-damage > strong { color: #77e9df; font-size: 16px; font-variant-numeric: tabular-nums; }
+.simulation-damage > strong.positive { color: #77ecb5; }
+.simulation-damage > strong.negative { color: #ff9ba6; }
+.simulation-damage > small { grid-column: 1 / -1; color: #6f929d; font-size: 8px; }
 .result-empty { display: grid; min-height: 288px; place-items: center; align-content: center; gap: 8px; padding: 28px; text-align: center; }
 .result-empty-mark { display: grid; width: 46px; height: 46px; place-items: center; border: 1px solid #2c4d5e; border-radius: 12px; color: #55cfc7; background: #0a1b26; font-size: 24px; }
 .result-empty strong { color: #d5e5ea; font-size: 13px; }
