@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="NotMeter 실전 표본 기반 AION2 직업별 스탯 효율 계산기">
+  <meta name="theme-color" content="#07111a">
+  <title>NotMeter 스탯 효율 계산기</title>
+  <link rel="canonical" href="https://notmeter.com/stat-efficiency.html">
+  <link rel="icon" href="./assets/notmeter-icon.png">
+  <link rel="stylesheet" href="./assets/app.css?v=20260817-1">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260817-1">
+  <script src="./assets/stat-efficiency.js?v=20260817-1" defer></script>
+</head>
+<body class="stat-efficiency-page">
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <main class="app-shell efficiency-shell">
+    <header class="topbar efficiency-topbar">
+      <a class="brand efficiency-brand" href="./" aria-label="NotMeter 던전 통계로 돌아가기">
+        <img class="brand-icon" src="./assets/notmeter-icon.png" width="44" height="44" alt="">
+        <div>
+          <h1 data-i18n="title">스탯 효율 계산기</h1>
+          <p data-i18n="subtitle">최상위 던전 실전 표본으로 검증하는 직업·스킬별 효율</p>
+        </div>
+      </a>
+      <div class="efficiency-actions">
+        <a class="ghost-button efficiency-back" href="./" data-i18n="back">통계로 돌아가기</a>
+        <button class="ghost-button" id="language-button" type="button" aria-label="언어 전환">EN</button>
+      </div>
+    </header>
+
+    <section class="test-notice" role="note">
+      <span aria-hidden="true">!</span>
+      <div>
+        <strong data-i18n="noticeTitle">테스트 기능 안내</strong>
+        <p data-i18n="notice">이 기능은 테스트 기능이며, 신뢰 테스트가 진행전 입니다.</p>
+      </div>
+    </section>
+
+    <section class="efficiency-hero">
+      <div>
+        <span class="efficiency-kicker">COMBAT SAMPLE MODEL · VPS</span>
+        <h2 data-i18n="heroTitle">내 캐릭터에서 무엇을 올려야 가장 강해지는지 확인하세요</h2>
+        <p data-i18n="heroDescription">주신 스탯, PVE·보스 스탯, 공격 방향, 스킬 레벨·특성·패시브를 같은 조건의 실전 피해 표본과 비교합니다.</p>
+      </div>
+      <div class="model-state collecting" id="model-state" aria-live="polite">
+        <span class="model-state-dot" aria-hidden="true"></span>
+        <div>
+          <strong id="model-state-title" data-i18n="collecting">표본 수집 중 · 준비 중</strong>
+          <span id="model-sample-count">0 표본</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="source-scope" aria-label="수집 대상">
+      <span data-i18n="sourceOnly">수식 학습 대상</span>
+      <strong data-i18n="deus">잠식된 데우스 연구기지(어려움)</strong>
+      <i aria-hidden="true"></i>
+      <strong data-i18n="noiran">노이란의 숨겨진 유산(4단계)</strong>
+    </section>
+
+    <div class="efficiency-layout">
+      <form class="efficiency-form" id="efficiency-form" novalidate>
+        <section class="efficiency-card">
+          <header>
+            <span>01</span>
+            <div>
+              <h3 data-i18n="combatProfile">전투 조건</h3>
+              <p data-i18n="combatProfileHelp">직업과 비교할 대표 스킬·방향을 선택합니다.</p>
+            </div>
+          </header>
+          <div class="field-grid profile-grid">
+            <label><span data-i18n="job">직업</span><select id="job" name="jobName" required></select></label>
+            <label><span data-i18n="skill">대표 스킬</span><select id="skill" name="skillCode"><option value="0">직업 종합</option></select></label>
+            <label><span data-i18n="skillLevel">스킬 레벨</span><input id="skill-level" name="skillLevel" type="number" min="0" max="99" value="0" inputmode="numeric"></label>
+            <label><span data-i18n="direction">공격 방향</span><select id="direction" name="direction"><option value="none">종합</option><option value="front">전방</option><option value="back">후방</option></select></label>
+          </div>
+          <fieldset class="specialization-field" id="specialization-field" disabled>
+            <legend data-i18n="specializations">스킬 특성</legend>
+            <div class="specialization-options">
+              <label><input type="checkbox" value="1"><span>1</span></label>
+              <label><input type="checkbox" value="2"><span>2</span></label>
+              <label><input type="checkbox" value="4"><span>3</span></label>
+              <label><input type="checkbox" value="8"><span>4</span></label>
+              <label><input type="checkbox" value="16"><span>5</span></label>
+            </div>
+          </fieldset>
+          <details class="passive-panel" id="passive-panel">
+            <summary><span data-i18n="passives">피해 관련 패시브</span><small data-i18n="passiveHelp">검증된 패시브만 표시됩니다</small></summary>
+            <div class="passive-options" id="passive-options"></div>
+          </details>
+        </section>
+
+        <section class="efficiency-card">
+          <header>
+            <span>02</span>
+            <div>
+              <h3 data-i18n="attackStats">공격 스탯</h3>
+              <p data-i18n="attackStatsHelp">게임의 스탯 정보에 표시된 값을 그대로 입력합니다.</p>
+            </div>
+          </header>
+          <div class="field-grid stat-grid">
+            <label><span data-i18n="attack">공격력</span><input name="attack" type="number" min="1" max="10000000" required></label>
+            <label><span data-i18n="nakedAttack">무기 해제 공격력 <small>선택</small></span><input name="nakedAttack" type="number" min="0" max="10000000" value="0"></label>
+            <label><span data-i18n="power">위력</span><input name="power" type="number" min="0" max="10000" required></label>
+            <label><span data-i18n="destruction">파괴</span><input name="destruction" type="number" min="0" max="10000" required></label>
+			<label><span data-i18n="accuracy">명중</span><input name="accuracy" type="number" min="0" max="10000000" required></label>
+			<label><span data-i18n="critical">치명타</span><input name="critical" type="number" min="0" max="10000000" required></label>
+			<label><span data-i18n="penetration">관통</span><input name="penetration" type="number" min="0" max="10000000" required></label>
+            <label><span data-i18n="breakthrough">돌파 장비 수</span><input name="breakthroughParts" type="number" min="0" max="20" value="0"></label>
+            <label><span data-i18n="pveAttack">PVE 공격력</span><input name="pveAttack" type="number" min="0" max="10000000" value="0"></label>
+			<label><span data-i18n="pveAccuracy">PVE 명중</span><input name="pveAccuracy" type="number" min="0" max="10000000" value="0"></label>
+            <label><span data-i18n="bossAttack">보스 공격력</span><input name="bossAttack" type="number" min="0" max="10000000" value="0"></label>
+			<label><span data-i18n="frontAttack">전방 공격력</span><input name="frontAttack" type="number" min="0" max="10000000" value="0"></label>
+			<label><span data-i18n="backAttack">후방 공격력</span><input name="backAttack" type="number" min="0" max="10000000" value="0"></label>
+          </div>
+        </section>
+
+        <section class="efficiency-card">
+          <header>
+            <span>03</span>
+            <div>
+              <h3 data-i18n="percentStats">증폭·판정 스탯</h3>
+              <p data-i18n="percentStatsHelp">% 기호 없이 화면에 보이는 숫자만 입력합니다.</p>
+            </div>
+          </header>
+          <div class="field-grid stat-grid percent-grid">
+            <label><span data-i18n="damageAmp">피해 증폭</span><input name="damageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="weaponAmp">무기 피해 증폭</span><input name="weaponDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="pveAmp">PVE 피해 증폭</span><input name="pveDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="bossAmp">보스 피해 증폭</span><input name="bossDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="criticalAmp">치명타 피해 증폭</span><input name="criticalDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+			<label><span data-i18n="additionalHit">다단 히트 적중</span><input name="additionalHitAccuracyPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+			<label><span data-i18n="perfect">완벽</span><input name="perfectPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="hardHit">강타</span><input name="hardHitPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+			<label><span data-i18n="cooldownTime">재시전 시간</span><input name="cooldownTimePercent" type="number" min="-95" max="0" step="0.1" value="0" placeholder="-37.2"></label>
+			<label><span data-i18n="combatSpeed">전투 속도</span><input name="combatSpeedPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="frontAmp">전방 피해 증폭</span><input name="frontDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+            <label><span data-i18n="backAmp">후방 피해 증폭</span><input name="backDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+          </div>
+        </section>
+
+        <button class="calculate-button" type="submit" data-i18n="calculate">VPS에서 효율 계산</button>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+      </form>
+
+      <aside class="result-column">
+        <section class="result-card" id="result-card">
+          <header>
+            <div><span class="result-kicker">PRIVATE SERVER MODEL</span><h3 data-i18n="resultTitle">스탯 효율 순위</h3></div>
+            <span class="confidence pending" id="confidence">검증 전</span>
+          </header>
+          <div class="result-empty" id="result-empty">
+            <span class="result-empty-mark" aria-hidden="true">∿</span>
+            <strong data-i18n="waitingTitle">표본을 수집하고 있습니다</strong>
+            <p data-i18n="waitingDescription">신뢰 기준을 충족한 서버 모델이 준비되면 계산 결과가 열립니다.</p>
+          </div>
+          <div class="result-list" id="result-list" hidden></div>
+          <footer>
+            <span data-i18n="formulaPrivate">계산식·계수는 VPS에서만 처리됩니다.</span>
+            <b id="formula-version">—</b>
+          </footer>
+        </section>
+        <section class="quality-card">
+          <h3 data-i18n="qualityTitle">오염 방지 기준</h3>
+          <ul>
+            <li data-i18n="qualityOne">전체 전투 스탯 패킷이 확인된 표본만 사용</li>
+            <li data-i18n="qualityTwo">스킬 레벨·특성·패시브 구성이 확정된 표본만 사용</li>
+            <li data-i18n="qualityThree">외부 출처·미확인 버프가 섞인 전투는 자동 제외</li>
+            <li data-i18n="qualityFour">두 최상위 던전의 검증된 보스 코드만 수집</li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

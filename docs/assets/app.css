@@ -484,6 +484,25 @@ p {
   color: #edf0ff;
 }
 
+.stat-efficiency-link-icon {
+  color: #66eadc;
+}
+
+.stat-efficiency-link-icon svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.stat-efficiency-link:hover,
+.stat-efficiency-link:focus-visible {
+  border-color: rgba(70, 224, 213, 0.62);
+  background: linear-gradient(180deg, rgba(18, 77, 82, 0.98), rgba(8, 38, 48, 0.98));
+  color: #dcfffc;
+}
+
 .service-link-icon {
   display: grid;
   width: 18px;
