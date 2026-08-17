@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260818-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-7">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-8">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260818-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260818-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260818-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260818-8" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260818-9" defer></script>
   <script src="./assets/app.js?v=20260818-2" defer></script>
 </head>
 <body>
@@ -466,8 +466,30 @@
             </details>
           </section>
 
+          <section class="efficiency-card divine-card">
+            <header><span>02</span><div><h3 data-stat-i18n="divineStats">주신 스탯</h3><p data-stat-i18n="divineStatsHelp">각 스탯 1당 확인된 상승 효과를 함께 표시합니다.</p></div></header>
+            <div class="field-grid divine-grid">
+              <label><span data-stat-i18n="power">위력</span><small data-stat-i18n="powerGrowth">1당 공격력 증가 +0.1%p</small><input name="power" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="vitality">체력</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="vitality" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="agility">민첩</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="agility" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="knowledge">지식</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="knowledge" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="precision">정확</span><small data-stat-i18n="precisionGrowth">1당 명중·치명타 증가 +0.1%p</small><input name="precision" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="will">의지</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="will" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="justice">정의</span><small data-stat-i18n="justiceGrowth">1당 완벽 +0.2%p</small><input name="justice" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="freedom">자유</span><small data-stat-i18n="freedomGrowth">1당 명중 증가 +0.2%p</small><input name="freedom" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="illusion">환상</span><small data-stat-i18n="illusionGrowth">1당 재시전 시간 −0.2%p</small><input name="illusion" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="life">생명</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="life" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="time">시간</span><small data-stat-i18n="timeGrowth">1당 전투 속도 +0.2%p</small><input name="time" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="destruction">파괴</span><small data-stat-i18n="destructionGrowth">1당 공격력 증가 +0.2%p</small><input name="destruction" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="death">죽음</span><small data-stat-i18n="deathGrowth">1당 치명타 증가 +0.2%p</small><input name="death" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="wisdom">지혜</span><small data-stat-i18n="wisdomGrowth">1당 강타 +0.2%p</small><input name="wisdom" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="destiny">운명</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="destiny" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="space">공간</span><small data-stat-i18n="growthPending">공격 연동 효과 확인 중</small><input name="space" type="number" min="0" max="10000" required></label>
+            </div>
+          </section>
+
           <section class="efficiency-card">
-            <header><span>02</span><div><h3 data-stat-i18n="attackStats">공격 스탯</h3><p data-stat-i18n="attackStatsHelp">복사 기능을 사용하면 자동 입력됩니다.</p></div></header>
+            <header><span>03</span><div><h3 data-stat-i18n="attackStats">공격 스탯</h3><p data-stat-i18n="attackStatsHelp">복사 기능을 사용하면 자동 입력됩니다.</p></div></header>
             <div class="field-grid stat-grid">
 			  <label><span data-stat-i18n="attack">기초 공격력</span><input name="attack" type="number" min="1" max="10000000" required></label>
 			  <label><span data-stat-i18n="additionalAttack">추가 공격력</span><input name="additionalAttack" type="number" min="0" max="10000000" required></label>
@@ -475,22 +497,6 @@
 			  <label><span data-stat-i18n="maximumAttack">최대 공격력</span><input name="maximumAttack" type="number" min="0" max="10000000" required></label>
 			  <label><span data-stat-i18n="criticalAttackPower">치명타 공격력</span><input name="criticalAttackPower" type="number" min="0" max="10000000" required></label>
 			  <label><span data-stat-i18n="sealstoneAdditionalDamage">봉혼석 추가 피해</span><input name="sealstoneAdditionalDamage" type="number" min="0" max="10000000" required></label>
-              <label><span data-stat-i18n="power">위력</span><input name="power" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="vitality">체력</span><input name="vitality" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="agility">민첩</span><input name="agility" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="knowledge">지식</span><input name="knowledge" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="precision">정확</span><input name="precision" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="will">의지</span><input name="will" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="justice">정의</span><input name="justice" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="freedom">자유</span><input name="freedom" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="illusion">환상</span><input name="illusion" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="life">생명</span><input name="life" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="time">시간</span><input name="time" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="destruction">파괴</span><input name="destruction" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="death">죽음</span><input name="death" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="wisdom">지혜</span><input name="wisdom" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="destiny">운명</span><input name="destiny" type="number" min="0" max="10000" required></label>
-              <label><span data-stat-i18n="space">공간</span><input name="space" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="accuracy">명중</span><input name="accuracy" type="number" min="0" max="10000000" required></label>
 			  <label><span data-stat-i18n="weaponAccuracy">무기 명중</span><input name="weaponAccuracy" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="critical">치명타</span><input name="critical" type="number" min="0" max="10000000" required></label>
@@ -508,7 +514,7 @@
           </section>
 
           <section class="efficiency-card">
-            <header><span>03</span><div><h3 data-stat-i18n="percentStats">증폭·판정 스탯</h3><p data-stat-i18n="percentStatsHelp">화면에 표시된 값을 그대로 사용합니다.</p></div></header>
+            <header><span>04</span><div><h3 data-stat-i18n="percentStats">증폭·판정 스탯</h3><p data-stat-i18n="percentStatsHelp">화면에 표시된 값을 그대로 사용합니다.</p></div></header>
             <div class="field-grid stat-grid percent-grid">
 			  <label><span data-stat-i18n="attackIncrease">공격력 증가율</span><input name="attackIncreasePercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
 			  <label><span data-stat-i18n="accuracyIncrease">명중 증가율</span><input name="accuracyIncreasePercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
@@ -546,6 +552,8 @@
 				<div><span data-stat-i18n="displayedAccuracy">최종 명중</span><strong id="displayed-accuracy">—</strong><small id="displayed-accuracy-delta"></small></div>
 				<div><span data-stat-i18n="displayedCritical">최종 치명타</span><strong id="displayed-critical">—</strong><small id="displayed-critical-delta"></small></div>
 				<div><span data-stat-i18n="displayedDefense">최종 방어력</span><strong id="displayed-defense">—</strong><small id="displayed-defense-delta"></small></div>
+				<div><span data-stat-i18n="displayedCooldownTime">재시전 시간</span><strong id="displayed-cooldownTimePercent">—</strong><small id="displayed-cooldownTimePercent-delta"></small></div>
+				<div><span data-stat-i18n="displayedCombatSpeed">전투 속도</span><strong id="displayed-combatSpeedPercent">—</strong><small id="displayed-combatSpeedPercent-delta"></small></div>
 			  </div>
 			  <div class="simulation-damage"><span data-stat-i18n="simulationDamage">예상 종합 피해 변화</span><strong id="simulation-damage-gain">—</strong><small id="simulation-damage-state" data-stat-i18n="simulationWaiting">기준 스탯을 붙여넣으면 자동 계산됩니다.</small></div>
 			</div>
