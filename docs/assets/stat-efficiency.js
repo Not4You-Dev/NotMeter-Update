@@ -5,8 +5,8 @@
   if (!surface) return;
 
   const API_BASE = "https://notmeter.112-168-140-142.sslip.io/formula/v1";
-  const CLIPBOARD_PREFIX = "NOTMETER_STATS_V1:";
-  const CLIPBOARD_SCHEMA = "notmeter-stat-efficiency-profile-v1";
+  const CLIPBOARD_PREFIX = "NOTMETER_STATS_V2:";
+  const CLIPBOARD_SCHEMA = "notmeter-stat-efficiency-profile-v2";
   const LOCALES = ["ko", "en", "zh-TW"];
   const FALLBACK_JOBS = [
     ["검성", "검성"], ["수호성", "수호성"], ["궁성", "궁성"],
@@ -14,7 +14,9 @@
     ["치유성", "치유성"], ["호법성", "호법성"], ["권성", "권성"],
   ];
   const PROFILE_FIELDS = [
-    "attack", "nakedAttack", "power", "destruction", "breakthroughParts",
+    "attack", "power", "vitality", "agility", "knowledge", "precision",
+    "will", "justice", "freedom", "illusion", "life", "time", "destruction",
+    "death", "wisdom", "destiny", "space",
     "accuracy", "pveAccuracy", "critical", "penetration", "pveAttack",
     "bossAttack", "frontAttack", "backAttack", "damageAmplificationPercent",
     "weaponDamageAmplificationPercent", "pveDamageAmplificationPercent",
@@ -29,39 +31,43 @@
       importTitle: "딜미터기에서 복사한 내 스탯 붙여넣기", importDescription: "처치 기록의 ‘내 스탯 복사’를 누른 뒤 아래 칸에 붙여넣으면 모든 스탯이 자동 입력됩니다.", importPlaceholder: "여기를 누르고 Ctrl+V로 붙여넣기", importWaiting: "복사한 값을 기다리고 있습니다", importSuccess: "내 스탯 {count}개를 자동 입력했습니다", importInvalid: "딜미터기에서 복사한 올바른 스탯 값이 아닙니다",
       noticeTitle: "테스트 기능 안내", notice: "이 기능은 테스트 기능이며, 신뢰 테스트가 진행전 입니다.", heroKicker: "실전 데이터 기반", heroTitle: "직업·스킬과 공격 방향에 맞는 성장 우선순위를 확인하세요", heroDescription: "주신 스탯과 PVE·보스 스탯을 함께 비교하며, 던전에서 받은 정상적인 파티 버프도 분석에 반영합니다.",
       collecting: "표본 수집 중 · 준비 중", ready: "계산 준비 완료", samples: "{count} 표본", sourceOnly: "분석 대상", deus: "잠식된 데우스 연구기지(어려움)", noiran: "노이란의 숨겨진 유산(4단계)",
-      combatProfile: "전투 조건", combatProfileHelp: "직업과 비교할 대표 스킬·방향을 선택합니다.", job: "직업", skill: "대표 스킬", overall: "직업 종합", skillLevel: "스킬 레벨", direction: "공격 방향", allDirections: "종합", front: "전방", backDirection: "후방", specializations: "스킬 특성", passives: "피해 관련 패시브", passiveHelp: "검증된 패시브만 표시됩니다", noPassives: "현재 선택 가능한 패시브가 없습니다.", level: "레벨",
-      attackStats: "공격 스탯", attackStatsHelp: "복사 기능을 사용하면 자동 입력됩니다.", attack: "공격력", nakedAttack: "무기 해제 공격력", power: "위력", destruction: "파괴", accuracy: "명중", pveAccuracy: "PVE 명중", critical: "치명타", penetration: "관통", breakthrough: "돌파 장비 수", pveAttack: "PVE 공격력", bossAttack: "보스 공격력", frontAttack: "전방 공격력", backAttack: "후방 공격력",
+      combatProfile: "전투 조건", combatProfileHelp: "직업과 분석할 보스·대표 스킬·방향을 선택합니다.", job: "직업", targetBoss: "분석 보스", targetCollecting: "표본 수집 중", skill: "대표 스킬", overall: "직업 종합", skillLevel: "스킬 레벨", direction: "공격 방향", allDirections: "종합", front: "전방", backDirection: "후방", specializations: "스킬 특성", passives: "패시브·스티그마 레벨", passiveHelp: "특성 선택 없이 실제 레벨만 반영합니다", noPassives: "현재 검증된 패시브·스티그마가 없습니다.", passive: "패시브", stigma: "스티그마", level: "레벨",
+      attackStats: "공격 스탯", attackStatsHelp: "복사 기능을 사용하면 자동 입력됩니다.", attack: "공격력", power: "위력", vitality: "체력", agility: "민첩", knowledge: "지식", precision: "정확", will: "의지", justice: "정의", freedom: "자유", illusion: "환상", life: "생명", time: "시간", destruction: "파괴", death: "죽음", wisdom: "지혜", destiny: "운명", space: "공간", accuracy: "명중", pveAccuracy: "PVE 명중", critical: "치명타", penetration: "관통", pveAttack: "PVE 공격력", bossAttack: "보스 공격력", frontAttack: "전방 공격력", backAttack: "후방 공격력",
       percentStats: "증폭·판정 스탯", percentStatsHelp: "화면에 표시된 값을 그대로 사용합니다.", damageAmp: "피해 증폭", weaponAmp: "무기 피해 증폭", pveAmp: "PVE 피해 증폭", bossAmp: "보스 피해 증폭", criticalAmp: "치명타 피해 증폭", additionalHit: "다단 히트 적중", perfect: "완벽", hardHit: "강타", cooldownTime: "재시전 시간", combatSpeed: "전투 속도", frontAmp: "전방 피해 증폭", backAmp: "후방 피해 증폭",
-      calculate: "효율 계산", calculating: "계산 중…", resultKicker: "직업·스킬별 분석", resultTitle: "스탯 효율 순위", waitingTitle: "표본을 수집하고 있습니다", waitingDescription: "신뢰 기준을 충족할 만큼 데이터가 쌓이면 계산 결과가 열립니다.", resultGuide: "현재 입력값을 기준으로 각 스탯을 올렸을 때의 효율입니다.", easyTitle: "간편하게 사용하는 방법", easyOne: "딜미터기 처치 기록에서 ‘내 스탯 복사’를 누릅니다.", easyTwo: "이 페이지 상단 입력칸에 붙여넣습니다.", easyThree: "대표 스킬과 공격 방향을 선택하고 계산합니다.",
+      calculate: "효율 계산", calculating: "계산 중…", resultKicker: "직업·스킬별 분석", resultTitle: "스탯 효율 순위", waitingTitle: "표본을 수집하고 있습니다", waitingDescription: "신뢰 기준을 충족할 만큼 데이터가 쌓이면 계산 결과가 열립니다.", resultGuide: "현재 입력값을 기준으로 각 스탯을 올렸을 때의 효율입니다.", easyTitle: "간편하게 사용하는 방법", easyOne: "딜미터기 처치 기록에서 ‘내 스탯 복사’를 누릅니다.", easyTwo: "이 페이지 상단 입력칸에 붙여넣습니다.", easyThree: "분석할 보스·대표 스킬·공격 방향을 선택하고 계산합니다.",
       pending: "검증 전", low: "낮은 신뢰", medium: "중간 신뢰", high: "높은 신뢰", invalid: "입력값을 확인해 주세요.", unavailable: "계산 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.",
-      powerEffect: "위력 +1", destructionEffect: "파괴 +1", attackEffect: "공격력 +10", accuracyEffect: "명중 +10", pveAccuracyEffect: "PVE 명중 +10", criticalEffect: "치명타 +10", penetrationEffect: "관통 +10", damageAmplificationEffect: "피해 증폭 +1%p", weaponDamageAmplificationEffect: "무기 피해 증폭 +1%p", criticalDamageAmplificationEffect: "치명타 피해 증폭 +1%p", additionalHitAccuracyEffect: "다단 히트 적중 +1%p", perfectEffect: "완벽 +1%p", hardHitEffect: "강타 +1%p", cooldownTimeEffect: "재시전 시간 -1%p", combatSpeedEffect: "전투 속도 +1%p", pveAttackEffect: "PVE 공격력 +10", pveDamageAmplificationEffect: "PVE 피해 증폭 +1%p", bossAttackEffect: "보스 공격력 +10", bossDamageAmplificationEffect: "보스 피해 증폭 +1%p", frontAttackEffect: "전방 공격력 +10", backAttackEffect: "후방 공격력 +10", frontDamageAmplificationEffect: "전방 피해 증폭 +1%p", backDamageAmplificationEffect: "후방 피해 증폭 +1%p",
+      powerEffect: "위력 +1", vitalityEffect: "체력 +1", agilityEffect: "민첩 +1", knowledgeEffect: "지식 +1", precisionEffect: "정확 +1", willEffect: "의지 +1", justiceEffect: "정의 +1", freedomEffect: "자유 +1", illusionEffect: "환상 +1", lifeEffect: "생명 +1", timeEffect: "시간 +1", destructionEffect: "파괴 +1", deathEffect: "죽음 +1", wisdomEffect: "지혜 +1", destinyEffect: "운명 +1", spaceEffect: "공간 +1", attackEffect: "공격력 +10", accuracyEffect: "명중 +10", pveAccuracyEffect: "PVE 명중 +10", criticalEffect: "치명타 +10", penetrationEffect: "관통 +10", damageAmplificationEffect: "피해 증폭 +1%p", weaponDamageAmplificationEffect: "무기 피해 증폭 +1%p", criticalDamageAmplificationEffect: "치명타 피해 증폭 +1%p", additionalHitAccuracyEffect: "다단 히트 적중 +1%p", perfectEffect: "완벽 +1%p", hardHitEffect: "강타 +1%p", cooldownTimeEffect: "재시전 시간 -1%p", combatSpeedEffect: "전투 속도 +1%p", pveAttackEffect: "PVE 공격력 +10", pveDamageAmplificationEffect: "PVE 피해 증폭 +1%p", bossAttackEffect: "보스 공격력 +10", bossDamageAmplificationEffect: "보스 피해 증폭 +1%p", frontAttackEffect: "전방 공격력 +10", backAttackEffect: "후방 공격력 +10", frontDamageAmplificationEffect: "전방 피해 증폭 +1%p", backDamageAmplificationEffect: "후방 피해 증폭 +1%p",
     },
     en: {
       title: "Stat Efficiency Calculator", subtitle: "Compare which upgrade makes your character stronger.", importTitle: "Paste stats copied from NotMeter", importDescription: "In Kill Records, press ‘Copy my stats’, then paste below to fill every stat automatically.", importPlaceholder: "Click here and press Ctrl+V", importWaiting: "Waiting for copied stats", importSuccess: "Filled {count} stats automatically", importInvalid: "This is not a valid stat value copied from NotMeter", noticeTitle: "Test feature", notice: "This is a test feature and reliability validation has not started yet.", heroKicker: "LIVE COMBAT DATA", heroTitle: "Find your upgrade priority for the selected class, skill, and direction", heroDescription: "Compare divine, PVE, and boss stats together. Verified party buffs received in dungeons are included in the analysis.", collecting: "Collecting samples · Coming soon", ready: "Ready to calculate", samples: "{count} samples", sourceOnly: "Analysis sources", deus: "Corrupted Deus Research Base (Hard)", noiran: "Noiran's Hidden Legacy (Stage 4)",
-      combatProfile: "Combat profile", combatProfileHelp: "Choose a class, representative skill, and attack direction.", job: "Class", skill: "Representative skill", overall: "Class overall", skillLevel: "Skill level", direction: "Direction", allDirections: "Overall", front: "Front", backDirection: "Back", specializations: "Skill traits", passives: "Damage passives", passiveHelp: "Only validated passives appear", noPassives: "No passives are available yet.", level: "Level",
-      attackStats: "Attack stats", attackStatsHelp: "Use copied stats to fill these automatically.", attack: "Attack", nakedAttack: "Attack without weapon", power: "Power", destruction: "Destruction", accuracy: "Accuracy", pveAccuracy: "PVE Accuracy", critical: "Critical", penetration: "Penetration", breakthrough: "Breakthrough pieces", pveAttack: "PVE Attack", bossAttack: "Boss Attack", frontAttack: "Front Attack", backAttack: "Back Attack", percentStats: "Amplification and hit stats", percentStatsHelp: "Use the exact values displayed in game.", damageAmp: "Damage Amp", weaponAmp: "Weapon Damage Amp", pveAmp: "PVE Damage Amp", bossAmp: "Boss Damage Amp", criticalAmp: "Critical Damage Amp", additionalHit: "Multi-hit Accuracy", perfect: "Perfect", hardHit: "Power Hit", cooldownTime: "Cooldown Time", combatSpeed: "Combat Speed", frontAmp: "Front Damage Amp", backAmp: "Back Damage Amp",
-      calculate: "Calculate efficiency", calculating: "Calculating…", resultKicker: "CLASS AND SKILL ANALYSIS", resultTitle: "Stat efficiency ranking", waitingTitle: "Samples are being collected", waitingDescription: "Results unlock after enough reliable data is collected.", resultGuide: "Efficiency shows the gain from increasing each stat at your current values.", easyTitle: "Quick start", easyOne: "Press ‘Copy my stats’ in NotMeter Kill Records.", easyTwo: "Paste into the box at the top of this page.", easyThree: "Choose a representative skill and direction, then calculate.", pending: "Unverified", low: "Low confidence", medium: "Medium confidence", high: "High confidence", invalid: "Check the entered values.", unavailable: "Could not reach the calculator. Try again shortly.",
-      powerEffect: "Power +1", destructionEffect: "Destruction +1", attackEffect: "Attack +10", accuracyEffect: "Accuracy +10", pveAccuracyEffect: "PVE Accuracy +10", criticalEffect: "Critical +10", penetrationEffect: "Penetration +10", damageAmplificationEffect: "Damage Amp +1%p", weaponDamageAmplificationEffect: "Weapon Damage Amp +1%p", criticalDamageAmplificationEffect: "Critical Damage Amp +1%p", additionalHitAccuracyEffect: "Multi-hit Accuracy +1%p", perfectEffect: "Perfect +1%p", hardHitEffect: "Power Hit +1%p", cooldownTimeEffect: "Cooldown Time -1%p", combatSpeedEffect: "Combat Speed +1%p", pveAttackEffect: "PVE Attack +10", pveDamageAmplificationEffect: "PVE Damage Amp +1%p", bossAttackEffect: "Boss Attack +10", bossDamageAmplificationEffect: "Boss Damage Amp +1%p", frontAttackEffect: "Front Attack +10", backAttackEffect: "Back Attack +10", frontDamageAmplificationEffect: "Front Damage Amp +1%p", backDamageAmplificationEffect: "Back Damage Amp +1%p",
+      combatProfile: "Combat profile", combatProfileHelp: "Choose a class, target boss, representative skill, and direction.", job: "Class", targetBoss: "Target boss", targetCollecting: "Collecting samples", skill: "Representative skill", overall: "Class overall", skillLevel: "Skill level", direction: "Direction", allDirections: "Overall", front: "Front", backDirection: "Back", specializations: "Skill traits", passives: "Passive and stigma levels", passiveHelp: "Only the actual level is used; no traits are selectable", noPassives: "No validated passive or stigma skills yet.", passive: "Passive", stigma: "Stigma", level: "Level",
+      attackStats: "Attack stats", attackStatsHelp: "Use copied stats to fill these automatically.", attack: "Attack", power: "Power", vitality: "Vitality", agility: "Agility", knowledge: "Knowledge", precision: "Precision", will: "Will", justice: "Justice", freedom: "Freedom", illusion: "Illusion", life: "Life", time: "Time", destruction: "Destruction", death: "Death", wisdom: "Wisdom", destiny: "Destiny", space: "Space", accuracy: "Accuracy", pveAccuracy: "PVE Accuracy", critical: "Critical", penetration: "Penetration", pveAttack: "PVE Attack", bossAttack: "Boss Attack", frontAttack: "Front Attack", backAttack: "Back Attack", percentStats: "Amplification and hit stats", percentStatsHelp: "Use the exact values displayed in game.", damageAmp: "Damage Amp", weaponAmp: "Weapon Damage Amp", pveAmp: "PVE Damage Amp", bossAmp: "Boss Damage Amp", criticalAmp: "Critical Damage Amp", additionalHit: "Multi-hit Accuracy", perfect: "Perfect", hardHit: "Power Hit", cooldownTime: "Cooldown Time", combatSpeed: "Combat Speed", frontAmp: "Front Damage Amp", backAmp: "Back Damage Amp",
+      calculate: "Calculate efficiency", calculating: "Calculating…", resultKicker: "CLASS AND SKILL ANALYSIS", resultTitle: "Stat efficiency ranking", waitingTitle: "Samples are being collected", waitingDescription: "Results unlock after enough reliable data is collected.", resultGuide: "Efficiency shows the gain from increasing each stat at your current values.", easyTitle: "Quick start", easyOne: "Press ‘Copy my stats’ in NotMeter Kill Records.", easyTwo: "Paste into the box at the top of this page.", easyThree: "Choose a target boss, representative skill, and direction, then calculate.", pending: "Unverified", low: "Low confidence", medium: "Medium confidence", high: "High confidence", invalid: "Check the entered values.", unavailable: "Could not reach the calculator. Try again shortly.",
+      powerEffect: "Power +1", vitalityEffect: "Vitality +1", agilityEffect: "Agility +1", knowledgeEffect: "Knowledge +1", precisionEffect: "Precision +1", willEffect: "Will +1", justiceEffect: "Justice +1", freedomEffect: "Freedom +1", illusionEffect: "Illusion +1", lifeEffect: "Life +1", timeEffect: "Time +1", destructionEffect: "Destruction +1", deathEffect: "Death +1", wisdomEffect: "Wisdom +1", destinyEffect: "Destiny +1", spaceEffect: "Space +1", attackEffect: "Attack +10", accuracyEffect: "Accuracy +10", pveAccuracyEffect: "PVE Accuracy +10", criticalEffect: "Critical +10", penetrationEffect: "Penetration +10", damageAmplificationEffect: "Damage Amp +1%p", weaponDamageAmplificationEffect: "Weapon Damage Amp +1%p", criticalDamageAmplificationEffect: "Critical Damage Amp +1%p", additionalHitAccuracyEffect: "Multi-hit Accuracy +1%p", perfectEffect: "Perfect +1%p", hardHitEffect: "Power Hit +1%p", cooldownTimeEffect: "Cooldown Time -1%p", combatSpeedEffect: "Combat Speed +1%p", pveAttackEffect: "PVE Attack +10", pveDamageAmplificationEffect: "PVE Damage Amp +1%p", bossAttackEffect: "Boss Attack +10", bossDamageAmplificationEffect: "Boss Damage Amp +1%p", frontAttackEffect: "Front Attack +10", backAttackEffect: "Back Attack +10", frontDamageAmplificationEffect: "Front Damage Amp +1%p", backDamageAmplificationEffect: "Back Damage Amp +1%p",
     },
     "zh-TW": {
       title: "屬性效率計算器", subtitle: "比較哪一項提升最能強化目前角色。", importTitle: "貼上從 NotMeter 複製的角色屬性", importDescription: "在討伐紀錄按下「複製我的屬性」，再貼到下方即可自動填入所有數值。", importPlaceholder: "點擊此處並按 Ctrl+V 貼上", importWaiting: "等待貼上已複製的屬性", importSuccess: "已自動填入 {count} 項屬性", importInvalid: "這不是從 NotMeter 複製的有效屬性", noticeTitle: "測試功能說明", notice: "此功能目前為測試功能，尚未開始可信度驗證。", heroKicker: "實戰資料分析", heroTitle: "確認符合職業、技能與攻擊方向的成長優先順序", heroDescription: "同時比較主神、PVE 與首領屬性，副本中已確認的隊伍增益也會納入分析。", collecting: "正在收集樣本 · 準備中", ready: "可開始計算", samples: "{count} 筆樣本", sourceOnly: "分析對象", deus: "受侵蝕的德烏斯研究基地（困難）", noiran: "諾伊蘭的隱藏遺產（第4階段）",
-      combatProfile: "戰鬥條件", combatProfileHelp: "選擇職業、代表技能與攻擊方向。", job: "職業", skill: "代表技能", overall: "職業綜合", skillLevel: "技能等級", direction: "攻擊方向", allDirections: "綜合", front: "正面", backDirection: "背面", specializations: "技能特性", passives: "傷害相關被動", passiveHelp: "只顯示已驗證項目", noPassives: "目前沒有可選被動技能。", level: "等級",
-      attackStats: "攻擊屬性", attackStatsHelp: "使用複製功能即可自動填入。", attack: "攻擊力", nakedAttack: "卸下武器攻擊力", power: "威力", destruction: "破壞", accuracy: "命中", pveAccuracy: "PVE 命中", critical: "暴擊", penetration: "貫穿", breakthrough: "突破裝備數", pveAttack: "PVE 攻擊力", bossAttack: "首領攻擊力", frontAttack: "正面攻擊力", backAttack: "背面攻擊力", percentStats: "增幅與判定屬性", percentStatsHelp: "使用遊戲畫面顯示的原始數值。", damageAmp: "傷害增幅", weaponAmp: "武器傷害增幅", pveAmp: "PVE 傷害增幅", bossAmp: "首領傷害增幅", criticalAmp: "暴擊傷害增幅", additionalHit: "多段命中", perfect: "完美", hardHit: "強擊", cooldownTime: "再使用時間", combatSpeed: "戰鬥速度", frontAmp: "正面傷害增幅", backAmp: "背面傷害增幅",
-      calculate: "計算效率", calculating: "計算中…", resultKicker: "職業與技能分析", resultTitle: "屬性效率排名", waitingTitle: "正在收集樣本", waitingDescription: "累積足夠且可靠的資料後將開放結果。", resultGuide: "依目前輸入值顯示提升各項屬性時的效率。", easyTitle: "快速使用方法", easyOne: "在 NotMeter 討伐紀錄按下「複製我的屬性」。", easyTwo: "貼到本頁上方輸入框。", easyThree: "選擇代表技能與攻擊方向後進行計算。", pending: "尚未驗證", low: "低可信度", medium: "中可信度", high: "高可信度", invalid: "請確認輸入值。", unavailable: "無法連線至計算服務，請稍後再試。",
-      powerEffect: "威力 +1", destructionEffect: "破壞 +1", attackEffect: "攻擊力 +10", accuracyEffect: "命中 +10", pveAccuracyEffect: "PVE 命中 +10", criticalEffect: "暴擊 +10", penetrationEffect: "貫穿 +10", damageAmplificationEffect: "傷害增幅 +1%p", weaponDamageAmplificationEffect: "武器傷害增幅 +1%p", criticalDamageAmplificationEffect: "暴擊傷害增幅 +1%p", additionalHitAccuracyEffect: "多段命中 +1%p", perfectEffect: "完美 +1%p", hardHitEffect: "強擊 +1%p", cooldownTimeEffect: "再使用時間 -1%p", combatSpeedEffect: "戰鬥速度 +1%p", pveAttackEffect: "PVE 攻擊力 +10", pveDamageAmplificationEffect: "PVE 傷害增幅 +1%p", bossAttackEffect: "首領攻擊力 +10", bossDamageAmplificationEffect: "首領傷害增幅 +1%p", frontAttackEffect: "正面攻擊力 +10", backAttackEffect: "背面攻擊力 +10", frontDamageAmplificationEffect: "正面傷害增幅 +1%p", backDamageAmplificationEffect: "背面傷害增幅 +1%p",
+      combatProfile: "戰鬥條件", combatProfileHelp: "選擇職業、分析首領、代表技能與攻擊方向。", job: "職業", targetBoss: "分析首領", targetCollecting: "正在收集樣本", skill: "代表技能", overall: "職業綜合", skillLevel: "技能等級", direction: "攻擊方向", allDirections: "綜合", front: "正面", backDirection: "背面", specializations: "技能特性", passives: "被動與烙印等級", passiveHelp: "不選特性，只套用實際等級", noPassives: "目前沒有已驗證的被動或烙印。", passive: "被動", stigma: "烙印", level: "等級",
+      attackStats: "攻擊屬性", attackStatsHelp: "使用複製功能即可自動填入。", attack: "攻擊力", power: "威力", vitality: "體力", agility: "敏捷", knowledge: "知識", precision: "精準", will: "意志", justice: "正義", freedom: "自由", illusion: "幻象", life: "生命", time: "時間", destruction: "破壞", death: "死亡", wisdom: "智慧", destiny: "命運", space: "空間", accuracy: "命中", pveAccuracy: "PVE 命中", critical: "暴擊", penetration: "貫穿", pveAttack: "PVE 攻擊力", bossAttack: "首領攻擊力", frontAttack: "正面攻擊力", backAttack: "背面攻擊力", percentStats: "增幅與判定屬性", percentStatsHelp: "使用遊戲畫面顯示的原始數值。", damageAmp: "傷害增幅", weaponAmp: "武器傷害增幅", pveAmp: "PVE 傷害增幅", bossAmp: "首領傷害增幅", criticalAmp: "暴擊傷害增幅", additionalHit: "多段命中", perfect: "完美", hardHit: "強擊", cooldownTime: "再使用時間", combatSpeed: "戰鬥速度", frontAmp: "正面傷害增幅", backAmp: "背面傷害增幅",
+      calculate: "計算效率", calculating: "計算中…", resultKicker: "職業與技能分析", resultTitle: "屬性效率排名", waitingTitle: "正在收集樣本", waitingDescription: "累積足夠且可靠的資料後將開放結果。", resultGuide: "依目前輸入值顯示提升各項屬性時的效率。", easyTitle: "快速使用方法", easyOne: "在 NotMeter 討伐紀錄按下「複製我的屬性」。", easyTwo: "貼到本頁上方輸入框。", easyThree: "選擇分析首領、代表技能與攻擊方向後進行計算。", pending: "尚未驗證", low: "低可信度", medium: "中可信度", high: "高可信度", invalid: "請確認輸入值。", unavailable: "無法連線至計算服務，請稍後再試。",
+      powerEffect: "威力 +1", vitalityEffect: "體力 +1", agilityEffect: "敏捷 +1", knowledgeEffect: "知識 +1", precisionEffect: "精準 +1", willEffect: "意志 +1", justiceEffect: "正義 +1", freedomEffect: "自由 +1", illusionEffect: "幻象 +1", lifeEffect: "生命 +1", timeEffect: "時間 +1", destructionEffect: "破壞 +1", deathEffect: "死亡 +1", wisdomEffect: "智慧 +1", destinyEffect: "命運 +1", spaceEffect: "空間 +1", attackEffect: "攻擊力 +10", accuracyEffect: "命中 +10", pveAccuracyEffect: "PVE 命中 +10", criticalEffect: "暴擊 +10", penetrationEffect: "貫穿 +10", damageAmplificationEffect: "傷害增幅 +1%p", weaponDamageAmplificationEffect: "武器傷害增幅 +1%p", criticalDamageAmplificationEffect: "暴擊傷害增幅 +1%p", additionalHitAccuracyEffect: "多段命中 +1%p", perfectEffect: "完美 +1%p", hardHitEffect: "強擊 +1%p", cooldownTimeEffect: "再使用時間 -1%p", combatSpeedEffect: "戰鬥速度 +1%p", pveAttackEffect: "PVE 攻擊力 +10", pveDamageAmplificationEffect: "PVE 傷害增幅 +1%p", bossAttackEffect: "首領攻擊力 +10", bossDamageAmplificationEffect: "首領傷害增幅 +1%p", frontAttackEffect: "正面攻擊力 +10", backAttackEffect: "背面攻擊力 +10", frontDamageAmplificationEffect: "正面傷害增幅 +1%p", backDamageAmplificationEffect: "背面傷害增幅 +1%p",
     },
   };
   const EFFECT_KEYS = {
-    power: "powerEffect", destruction: "destructionEffect", attack: "attackEffect",
+    power: "powerEffect", vitality: "vitalityEffect", agility: "agilityEffect", knowledge: "knowledgeEffect", precision: "precisionEffect", will: "willEffect", justice: "justiceEffect", freedom: "freedomEffect", illusion: "illusionEffect", life: "lifeEffect", time: "timeEffect", destruction: "destructionEffect", death: "deathEffect", wisdom: "wisdomEffect", destiny: "destinyEffect", space: "spaceEffect", attack: "attackEffect",
     accuracy: "accuracyEffect", pveAccuracy: "pveAccuracyEffect", critical: "criticalEffect", penetration: "penetrationEffect",
     damageAmplification: "damageAmplificationEffect", weaponDamageAmplification: "weaponDamageAmplificationEffect",
     criticalDamageAmplification: "criticalDamageAmplificationEffect", additionalHitAccuracy: "additionalHitAccuracyEffect", perfect: "perfectEffect", hardHit: "hardHitEffect", cooldownTime: "cooldownTimeEffect", combatSpeed: "combatSpeedEffect",
     pveAttack: "pveAttackEffect", pveDamageAmplification: "pveDamageAmplificationEffect", bossAttack: "bossAttackEffect", bossDamageAmplification: "bossDamageAmplificationEffect", frontAttack: "frontAttackEffect", backAttack: "backAttackEffect", frontDamageAmplification: "frontDamageAmplificationEffect", backDamageAmplification: "backDamageAmplificationEffect",
   };
 
-  const state = { locale: resolveLocale(), catalog: null, catalogLoad: null, initialized: false, pendingJobName: "" };
+  const state = {
+    locale: resolveLocale(), catalog: null, catalogLoad: null, initialized: false,
+    pendingJobName: "", importedSkills: new Map(),
+  };
   const form = document.getElementById("efficiency-form");
   const jobSelect = document.getElementById("job");
+  const targetSelect = document.getElementById("target-boss");
   const skillSelect = document.getElementById("skill");
   const specializationField = document.getElementById("specialization-field");
   const passiveOptions = document.getElementById("passive-options");
@@ -97,6 +103,7 @@
 
   function updateSelectFixedLabels() {
     if (skillSelect.options.length) skillSelect.options[0].textContent = t("overall");
+    if (targetSelect.options.length && !targetSelect.options[0].value) targetSelect.options[0].textContent = t("targetCollecting");
     const direction = document.getElementById("direction");
     direction.options[0].textContent = t("allDirections");
     direction.options[1].textContent = t("front");
@@ -116,7 +123,19 @@
       option.value === requestedJob || option.textContent === requestedJob);
     if (match) jobSelect.value = match.value;
     if (state.pendingJobName && match) state.pendingJobName = "";
+    renderTargetOptions();
     renderSkillOptions();
+  }
+
+  function renderTargetOptions() {
+    const previousTarget = targetSelect.value;
+    const targets = state.catalog?.targets || [];
+    const options = targets.length
+      ? targets.map(target => new Option(`${target.name} · ${formatCount(target.sampleCount)}`, target.key))
+      : [new Option(t("targetCollecting"), "")];
+    targetSelect.replaceChildren(...options);
+    if ([...targetSelect.options].some(option => option.value === previousTarget)) targetSelect.value = previousTarget;
+    targetSelect.disabled = !targets.length;
   }
 
   function currentJob() {
@@ -131,13 +150,27 @@
     }
     skillSelect.replaceChildren(...options);
     if ([...skillSelect.options].some(option => option.value === previousSkill)) skillSelect.value = previousSkill;
-    const hasSkill = Number(skillSelect.value) > 0;
-    specializationField.disabled = !hasSkill;
+    const selectedSkill = currentJob()?.skills?.find(skill => skill.code === Number(skillSelect.value));
+    const hasSkill = Boolean(selectedSkill);
+    specializationField.disabled = !selectedSkill?.supportsSpecializations;
+    if (specializationField.disabled) {
+      specializationField.querySelectorAll("input:checked").forEach(input => { input.checked = false; });
+    }
     document.getElementById("skill-level").disabled = !hasSkill;
+    if (selectedSkill && state.importedSkills.has(selectedSkill.code)) {
+      document.getElementById("skill-level").value = String(state.importedSkills.get(selectedSkill.code).level);
+    }
     renderPassiveOptions();
   }
 
   function renderPassiveOptions() {
+    const selected = new Map([...passiveOptions.querySelectorAll(".passive-option")].map(option => [
+      Number(option.querySelector("input[type=checkbox]")?.dataset.passiveCode),
+      {
+        checked: Boolean(option.querySelector("input[type=checkbox]")?.checked),
+        level: Number(option.querySelector("input[type=number]")?.value) || 1,
+      },
+    ]));
     const passives = currentJob()?.passives || [];
     if (!passives.length) {
       const empty = document.createElement("p");
@@ -148,9 +181,11 @@
     }
     passiveOptions.replaceChildren(...passives.map(passive => {
       const label = document.createElement("label"); label.className = "passive-option";
-      const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.dataset.passiveCode = String(passive.code);
-      const name = document.createElement("span"); name.textContent = passive.name;
-      const level = document.createElement("input"); level.type = "number"; level.min = "1"; level.max = String(passive.maximumLevel); level.value = "1"; level.setAttribute("aria-label", `${passive.name} ${t("level")}`);
+      const imported = state.importedSkills.get(passive.code);
+      const previous = selected.get(passive.code);
+      const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.dataset.passiveCode = String(passive.code); checkbox.checked = previous?.checked ?? Boolean(imported);
+      const name = document.createElement("span"); name.textContent = `${passive.name} · ${t(passive.kind === "stigma" ? "stigma" : "passive")}`;
+      const level = document.createElement("input"); level.type = "number"; level.min = "1"; level.max = String(passive.maximumLevel); level.value = String(Math.min(passive.maximumLevel, previous?.level ?? imported?.level ?? 1)); level.setAttribute("aria-label", `${passive.name} ${t("level")}`);
       label.append(checkbox, name, level);
       return label;
     }));
@@ -194,12 +229,18 @@
       json = new TextDecoder().decode(bytes);
     }
     const profile = JSON.parse(json);
-    if (!profile || profile.schema !== CLIPBOARD_SCHEMA || profile.version !== 1 ||
+    if (!profile || profile.schema !== CLIPBOARD_SCHEMA || profile.version !== 2 ||
         typeof profile.jobName !== "string" || !profile.jobName.trim()) {
       throw new Error("invalid profile");
     }
     for (const field of PROFILE_FIELDS) {
       if (!Number.isFinite(Number(profile[field]))) throw new Error(`invalid ${field}`);
+    }
+    if (!Array.isArray(profile.skills) || profile.skills.some(skill =>
+        !Number.isInteger(Number(skill?.code)) || Number(skill.code) <= 0 ||
+        !Number.isInteger(Number(skill?.level)) || Number(skill.level) <= 0 ||
+        !["active", "stigma", "passive"].includes(String(skill?.category)))) {
+      throw new Error("invalid skills");
     }
     return profile;
   }
@@ -213,6 +254,9 @@
     try {
       const profile = decodeClipboardProfile(text);
       state.pendingJobName = profile.jobName.trim();
+      state.importedSkills = new Map(profile.skills.map(skill => [Number(skill.code), {
+        level: Number(skill.level), category: String(skill.category),
+      }]));
       renderCatalog();
       let filled = 0;
       for (const field of PROFILE_FIELDS) {
@@ -250,8 +294,8 @@
       return [{ code: Number(checkbox.dataset.passiveCode), level: Number(option.querySelector("input[type=number]").value) || 1 }];
     });
     return {
-      jobName: String(data.get("jobName") || ""), targetType: "boss", direction: String(data.get("direction") || "none"),
-      attack: number(data, "attack"), nakedAttack: number(data, "nakedAttack"), power: number(data, "power"), destruction: number(data, "destruction"), breakthroughParts: number(data, "breakthroughParts"),
+      jobName: String(data.get("jobName") || ""), targetType: "boss", targetKey: String(data.get("targetKey") || ""), direction: String(data.get("direction") || "none"),
+      attack: number(data, "attack"), power: number(data, "power"), vitality: number(data, "vitality"), agility: number(data, "agility"), knowledge: number(data, "knowledge"), precision: number(data, "precision"), will: number(data, "will"), justice: number(data, "justice"), freedom: number(data, "freedom"), illusion: number(data, "illusion"), life: number(data, "life"), time: number(data, "time"), destruction: number(data, "destruction"), death: number(data, "death"), wisdom: number(data, "wisdom"), destiny: number(data, "destiny"), space: number(data, "space"),
       accuracy: number(data, "accuracy"), pveAccuracy: number(data, "pveAccuracy"), critical: number(data, "critical"), penetration: number(data, "penetration"), pveAttack: number(data, "pveAttack"), bossAttack: number(data, "bossAttack"), frontAttack: number(data, "frontAttack"), backAttack: number(data, "backAttack"),
       damageAmplificationPercent: number(data, "damageAmplificationPercent"), weaponDamageAmplificationPercent: number(data, "weaponDamageAmplificationPercent"), pveDamageAmplificationPercent: number(data, "pveDamageAmplificationPercent"), bossDamageAmplificationPercent: number(data, "bossDamageAmplificationPercent"), criticalDamageAmplificationPercent: number(data, "criticalDamageAmplificationPercent"), additionalHitAccuracyPercent: number(data, "additionalHitAccuracyPercent"), perfectPercent: number(data, "perfectPercent"), hardHitPercent: number(data, "hardHitPercent"), cooldownTimePercent: number(data, "cooldownTimePercent"), combatSpeedPercent: number(data, "combatSpeedPercent"), frontDamageAmplificationPercent: number(data, "frontDamageAmplificationPercent"), backDamageAmplificationPercent: number(data, "backDamageAmplificationPercent"),
       skillCode: number(data, "skillCode"), skillLevel: number(data, "skillLevel"), specializationMask, passives,
