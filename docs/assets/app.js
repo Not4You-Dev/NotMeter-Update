@@ -331,6 +331,8 @@
       boss: "보스",
       bossResistanceStats: "보스 저항 통계",
       statEfficiencyCalculator: "스탯 효율 계산기",
+      statEfficiencyPageTitle: "NotMeter 스탯 효율 계산기",
+      statEfficiencyPageSubtitle: "내 캐릭터와 실전 표본을 기준으로 성장 효율을 비교합니다",
       bossResistancePageTitle: "NotMeter 보스 저항 통계",
       bossResistancePageSubtitle: "전체 기간 누적 표본으로 보스별 강타·완벽 저항을 추정합니다",
       bossResistanceStatsTitle: "보스 저항 통계",
@@ -673,6 +675,8 @@
       boss: "Boss",
       bossResistanceStats: "Boss resistance",
       statEfficiencyCalculator: "Stat efficiency",
+      statEfficiencyPageTitle: "NotMeter Stat Efficiency Calculator",
+      statEfficiencyPageSubtitle: "Compare upgrade efficiency for your character using live combat samples",
       bossResistancePageTitle: "NotMeter Boss Resistance Statistics",
       bossResistancePageSubtitle: "Estimate each boss's Power-hit and Perfect resistance from all-time samples",
       bossResistanceStatsTitle: "Boss Resistance Statistics",
@@ -859,6 +863,8 @@
     peopleValue: "{value} 人",
     bossResistanceStats: "首領抗性統計",
     statEfficiencyCalculator: "屬性效率計算器",
+    statEfficiencyPageTitle: "NotMeter 屬性效率計算器",
+    statEfficiencyPageSubtitle: "依目前角色與實戰樣本比較成長效率",
     bossResistancePageTitle: "NotMeter 首領抗性統計",
     bossResistancePageSubtitle: "依全期間累積樣本推估各首領的強擊與完美抗性",
     bossResistanceStatsTitle: "首領抗性統計",
@@ -970,6 +976,8 @@
       openContributionView();
     } else if (pageView === "boss-resistance") {
       openBossResistanceView();
+    } else if (pageView === "stat-efficiency") {
+      openStatEfficiencyView();
     } else if (pageView === "class-top10" || window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
@@ -1012,6 +1020,7 @@
       "boss-resistance-button", "boss-resistance-surface", "boss-resistance-back-button",
       "boss-resistance-tabs", "boss-resistance-content", "boss-resistance-dungeon-title",
       "boss-resistance-rows", "boss-resistance-empty",
+      "stat-efficiency-button", "stat-efficiency-surface", "stat-efficiency-back-button",
       "class-performance-button", "class-performance-surface",
       "class-performance-back-button", "class-performance-summary",
       "class-performance-metric-title", "class-performance-metric-description",
@@ -1280,11 +1289,16 @@
         openBossResistanceView();
         return;
       }
+      if (event.state?.notMeterStatsView === "stat-efficiency") {
+        openStatEfficiencyView();
+        return;
+      }
       closeFieldBossView();
       closeClassTop10View();
       closeClassPerformanceView();
       closeContributionView();
       closeBossResistanceView();
+      closeStatEfficiencyView();
       closeOptimizationView();
       const job = event.state?.notMeterStatsJob;
       if (event.state?.notMeterStatsView === "class" && job) {
@@ -1549,7 +1563,7 @@
     const view = new URLSearchParams(window.location.search).get("view");
     return view === "class-top10" || view === "field-boss" || view === "optimization" ||
       view === "class-performance" || view === "contribution" ||
-      view === "boss-resistance" ? view : "ranking";
+      view === "boss-resistance" || view === "stat-efficiency" ? view : "ranking";
   }
 
   function openOptimizationView() {
@@ -1558,6 +1572,7 @@
     closeClassPerformanceView();
     closeContributionView();
     closeBossResistanceView();
+    closeStatEfficiencyView();
     closeCombatDetail();
     state.surfaceMode = "optimization";
     document.body.classList.add("optimization-view");
@@ -1626,6 +1641,7 @@
     closeClassPerformanceView();
     closeContributionView();
     closeBossResistanceView();
+    closeStatEfficiencyView();
     closeCombatDetail();
     state.surfaceMode = "classTop10";
     document.body.classList.add("class-top10-view");
@@ -1674,6 +1690,7 @@
     closeClassTop10View();
     closeContributionView();
     closeBossResistanceView();
+    closeStatEfficiencyView();
     closeCombatDetail();
     state.surfaceMode = "classPerformance";
     document.body.classList.add("class-performance-view");
@@ -1711,6 +1728,7 @@
     }
     closeClassPerformanceView();
     closeBossResistanceView();
+    closeStatEfficiencyView();
     render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1721,6 +1739,7 @@
     closeClassTop10View();
     closeClassPerformanceView();
     closeBossResistanceView();
+    closeStatEfficiencyView();
     closeCombatDetail();
     state.surfaceMode = "contribution";
     document.body.classList.add("contribution-view");
@@ -1753,6 +1772,7 @@
     closeClassTop10View();
     closeClassPerformanceView();
     closeContributionView();
+    closeStatEfficiencyView();
     closeCombatDetail();
     state.surfaceMode = "bossResistance";
     document.body.classList.add("boss-resistance-view");
@@ -1776,11 +1796,40 @@
     updatePageIdentity();
   }
 
+  function openStatEfficiencyView() {
+    closeFieldBossView();
+    closeOptimizationView();
+    closeClassTop10View();
+    closeClassPerformanceView();
+    closeContributionView();
+    closeBossResistanceView();
+    closeCombatDetail();
+    state.surfaceMode = "statEfficiency";
+    document.body.classList.add("stat-efficiency-view");
+    elements["stat-efficiency-surface"].hidden = false;
+    elements["stat-efficiency-button"].classList.add("active");
+    elements["stat-efficiency-button"].setAttribute("aria-current", "page");
+    updatePageIdentity();
+    window.NotMeterStatEfficiency?.activate();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function closeStatEfficiencyView() {
+    if (state.surfaceMode !== "statEfficiency") return;
+    state.surfaceMode = "ranking";
+    document.body.classList.remove("stat-efficiency-view");
+    elements["stat-efficiency-surface"].hidden = true;
+    elements["stat-efficiency-button"].classList.remove("active");
+    elements["stat-efficiency-button"].setAttribute("aria-current", "false");
+    updatePageIdentity();
+  }
+
   function openFieldBossView() {
     closeClassTop10View();
     closeClassPerformanceView();
     closeContributionView();
     closeBossResistanceView();
+    closeStatEfficiencyView();
     closeOptimizationView();
     closeCombatDetail();
     state.surfaceMode = "fieldBoss";
@@ -3321,6 +3370,9 @@
       if (state.data) {
         renderBossResistanceView();
       }
+      return;
+    }
+    if (state.surfaceMode === "statEfficiency") {
       return;
     }
     if (!state.data) {
@@ -5691,6 +5743,7 @@
     syncCustomCpControls();
     renderDetailSettings();
     syncOptimizationFrameLocale();
+    window.NotMeterStatEfficiency?.setLocale(state.locale);
     if (state.surfaceMode === "fieldBoss" && state.fieldBossData) {
       renderFieldBoss();
     }
@@ -5706,12 +5759,15 @@
     const optimization = state.surfaceMode === "optimization";
     const contribution = state.surfaceMode === "contribution";
     const bossResistance = state.surfaceMode === "bossResistance";
+    const statEfficiency = state.surfaceMode === "statEfficiency";
     const title = t(optimization
       ? "optimizationPageTitle"
       : contribution
         ? "contributionPageTitle"
       : bossResistance
         ? "bossResistancePageTitle"
+      : statEfficiency
+        ? "statEfficiencyPageTitle"
       : fieldBoss
         ? "fieldBossPageTitle"
         : classTop10
@@ -5725,6 +5781,8 @@
         ? "contributionPageSubtitle"
       : bossResistance
         ? "bossResistancePageSubtitle"
+      : statEfficiency
+        ? "statEfficiencyPageSubtitle"
       : fieldBoss
         ? "fieldBossPageSubtitle"
         : classTop10

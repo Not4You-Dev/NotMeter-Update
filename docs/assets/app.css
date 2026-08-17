@@ -97,6 +97,14 @@ body.boss-resistance-view .ranking-panel {
   display: none !important;
 }
 
+body.stat-efficiency-view .filter-panel,
+body.stat-efficiency-view .custom-cp-panel,
+body.stat-efficiency-view .snapshot-bar,
+body.stat-efficiency-view .weekly-guide,
+body.stat-efficiency-view .ranking-panel {
+  display: none !important;
+}
+
 .contribution-surface {
   min-height: 620px;
   overflow: hidden;
