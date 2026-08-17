@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260818-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-5">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-6">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260818-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260818-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260818-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260818-6" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260818-7" defer></script>
   <script src="./assets/app.js?v=20260818-2" defer></script>
 </head>
 <body>
@@ -469,8 +469,9 @@
           <section class="efficiency-card">
             <header><span>02</span><div><h3 data-stat-i18n="attackStats">공격 스탯</h3><p data-stat-i18n="attackStatsHelp">복사 기능을 사용하면 자동 입력됩니다.</p></div></header>
             <div class="field-grid stat-grid">
-              <label><span data-stat-i18n="attack">공격력</span><input name="attack" type="number" min="1" max="10000000" required></label>
+			  <label><span data-stat-i18n="attack">기초 공격력</span><input name="attack" type="number" min="1" max="10000000" required></label>
 			  <label><span data-stat-i18n="additionalAttack">추가 공격력</span><input name="additionalAttack" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="minimumAttack">최소 공격력</span><input name="minimumAttack" type="number" min="0" max="10000000" required></label>
 			  <label><span data-stat-i18n="maximumAttack">최대 공격력</span><input name="maximumAttack" type="number" min="0" max="10000000" required></label>
 			  <label><span data-stat-i18n="criticalAttackPower">치명타 공격력</span><input name="criticalAttackPower" type="number" min="0" max="10000000" required></label>
 			  <label><span data-stat-i18n="sealstoneAdditionalDamage">봉혼석 추가 피해</span><input name="sealstoneAdditionalDamage" type="number" min="0" max="10000000" required></label>
@@ -491,7 +492,10 @@
               <label><span data-stat-i18n="destiny">운명</span><input name="destiny" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="space">공간</span><input name="space" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="accuracy">명중</span><input name="accuracy" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="weaponAccuracy">무기 명중</span><input name="weaponAccuracy" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="critical">치명타</span><input name="critical" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="defense">방어력</span><input name="defense" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="armorDefense">방어구 방어력</span><input name="armorDefense" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="penetration">관통</span><input name="penetration" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="pveAttack">PVE 공격력</span><input name="pveAttack" type="number" min="0" max="10000000" value="0"></label>
               <label><span data-stat-i18n="pveAccuracy">PVE 명중</span><input name="pveAccuracy" type="number" min="0" max="10000000" value="0"></label>
@@ -506,18 +510,22 @@
           <section class="efficiency-card">
             <header><span>03</span><div><h3 data-stat-i18n="percentStats">증폭·판정 스탯</h3><p data-stat-i18n="percentStatsHelp">화면에 표시된 값을 그대로 사용합니다.</p></div></header>
             <div class="field-grid stat-grid percent-grid">
-              <label><span data-stat-i18n="damageAmp">피해 증폭</span><input name="damageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="weaponAmp">무기 피해 증폭</span><input name="weaponDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="pveAmp">PVE 피해 증폭</span><input name="pveDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="bossAmp">보스 피해 증폭</span><input name="bossDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="criticalAmp">치명타 피해 증폭</span><input name="criticalDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="additionalHit">다단 히트 적중</span><input name="additionalHitAccuracyPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="perfect">완벽</span><input name="perfectPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="hardHit">강타</span><input name="hardHitPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="cooldownTime">재시전 시간</span><input name="cooldownTimePercent" type="number" min="-95" max="0" step="0.1" value="0" placeholder="-37.2"></label>
-              <label><span data-stat-i18n="combatSpeed">전투 속도</span><input name="combatSpeedPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="frontAmp">전방 피해 증폭</span><input name="frontDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
-              <label><span data-stat-i18n="backAmp">후방 피해 증폭</span><input name="backDamageAmplificationPercent" type="number" min="0" max="1000" step="0.1" value="0"></label>
+			  <label><span data-stat-i18n="attackIncrease">공격력 증가율</span><input name="attackIncreasePercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="accuracyIncrease">명중 증가율</span><input name="accuracyIncreasePercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="criticalIncrease">치명타 증가율</span><input name="criticalIncreasePercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="defenseIncrease">방어력 증가율</span><input name="defenseIncreasePercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="damageAmp">피해 증폭</span><input name="damageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="weaponAmp">무기 피해 증폭</span><input name="weaponDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="pveAmp">PVE 피해 증폭</span><input name="pveDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="bossAmp">보스 피해 증폭</span><input name="bossDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="criticalAmp">치명타 피해 증폭</span><input name="criticalDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="additionalHit">다단 히트 적중</span><input name="additionalHitAccuracyPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="perfect">완벽</span><input name="perfectPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="hardHit">강타</span><input name="hardHitPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="cooldownTime">재시전 시간</span><input name="cooldownTimePercent" type="number" min="-95" max="0" step="0.01" value="0" placeholder="-37.2"></label>
+              <label><span data-stat-i18n="combatSpeed">전투 속도</span><input name="combatSpeedPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="frontAmp">전방 피해 증폭</span><input name="frontDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+              <label><span data-stat-i18n="backAmp">후방 피해 증폭</span><input name="backDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
             </div>
           </section>
 
@@ -528,6 +536,15 @@
         <aside class="result-column">
           <section class="result-card" id="result-card">
             <header><div><span class="result-kicker" data-stat-i18n="resultKicker">직업·스킬별 분석</span><h3 data-stat-i18n="resultTitle">스탯 효율 순위</h3></div><span class="confidence pending" id="confidence">검증 전</span></header>
+			<div class="displayed-stats" id="displayed-stats" hidden>
+			  <div class="displayed-stats-heading"><strong data-stat-i18n="displayedStatsTitle">게임 표시 스탯 검산</strong><span data-stat-i18n="displayedStatsHelp">입력 원본을 게임과 같은 방식으로 합산한 값입니다.</span></div>
+			  <div class="displayed-stats-grid">
+				<div><span data-stat-i18n="displayedAttack">최종 공격력</span><strong id="displayed-attack">—</strong></div>
+				<div><span data-stat-i18n="displayedAccuracy">최종 명중</span><strong id="displayed-accuracy">—</strong></div>
+				<div><span data-stat-i18n="displayedCritical">최종 치명타</span><strong id="displayed-critical">—</strong></div>
+				<div><span data-stat-i18n="displayedDefense">최종 방어력</span><strong id="displayed-defense">—</strong></div>
+			  </div>
+			</div>
             <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong data-stat-i18n="waitingTitle">표본을 수집하고 있습니다</strong><p data-stat-i18n="waitingDescription">신뢰 기준을 충족할 만큼 데이터가 쌓이면 계산 결과가 열립니다.</p></div>
             <div class="result-list" id="result-list" hidden></div>
             <footer><span data-stat-i18n="resultGuide">+1, +10, +1%p 단위별 순위이며 서로 다른 단위끼리는 직접 비교하지 않습니다.</span><b id="formula-version">—</b></footer>

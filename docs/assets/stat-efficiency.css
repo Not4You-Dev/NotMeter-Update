@@ -89,6 +89,14 @@
 .confidence { padding: 5px 8px; border: 1px solid #5c506a; border-radius: 999px; color: #bda8ca; background: rgba(73, 54, 84, .23); font-size: 8px; }
 .confidence.medium, .confidence.high { border-color: #2e7772; color: #92eee5; background: rgba(31, 105, 101, .2); }
 .confidence.high { border-color: #47c9bd; color: #d5fffb; }
+.displayed-stats { margin: 11px 11px 0; padding: 12px; border: 1px solid #2b6f6b; border-radius: 10px; background: linear-gradient(135deg, rgba(41, 150, 141, .16), rgba(7, 24, 33, .84)); }
+.displayed-stats-heading { display: grid; gap: 3px; margin-bottom: 9px; }
+.displayed-stats-heading strong { color: #d8fffb; font-size: 11px; }
+.displayed-stats-heading span { color: #779da8; font-size: 8px; line-height: 1.45; }
+.displayed-stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.displayed-stats-grid > div { display: grid; gap: 3px; padding: 8px 9px; border: 1px solid #1c4650; border-radius: 7px; background: rgba(5, 20, 29, .84); }
+.displayed-stats-grid span { color: #7c9daa; font-size: 8px; }
+.displayed-stats-grid strong { color: #79eee3; font-size: 15px; font-variant-numeric: tabular-nums; }
 .result-empty { display: grid; min-height: 288px; place-items: center; align-content: center; gap: 8px; padding: 28px; text-align: center; }
 .result-empty-mark { display: grid; width: 46px; height: 46px; place-items: center; border: 1px solid #2c4d5e; border-radius: 12px; color: #55cfc7; background: #0a1b26; font-size: 24px; }
 .result-empty strong { color: #d5e5ea; font-size: 13px; }
