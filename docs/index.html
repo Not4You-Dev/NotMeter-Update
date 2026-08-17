@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260818-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-3">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-5">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260818-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260818-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260818-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260818-4" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260818-5" defer></script>
   <script src="./assets/app.js?v=20260818-2" defer></script>
 </head>
 <body>
@@ -447,10 +447,9 @@
       <div class="efficiency-layout">
         <form class="efficiency-form" id="efficiency-form" novalidate>
           <section class="efficiency-card">
-            <header><span>01</span><div><h3 data-stat-i18n="combatProfile">전투 조건</h3><p data-stat-i18n="combatProfileHelp">직업과 비교할 대표 스킬·방향을 선택합니다.</p></div></header>
+            <header><span>01</span><div><h3 data-stat-i18n="combatProfile">전투 조건</h3><p data-stat-i18n="combatProfileHelp">지원 던전 6개 보스를 동일 가중치로 종합하며 직업·대표 스킬·방향만 선택합니다.</p></div></header>
             <div class="field-grid profile-grid">
               <label><span data-stat-i18n="job">직업</span><select id="job" name="jobName" required></select></label>
-              <label><span data-stat-i18n="targetBoss">분석 보스</span><select id="target-boss" name="targetKey" required><option value="">표본 수집 중</option></select></label>
               <label><span data-stat-i18n="skill">대표 스킬</span><select id="skill" name="skillCode"><option value="0">직업 종합</option></select></label>
               <label><span data-stat-i18n="skillLevel">스킬 레벨</span><input id="skill-level" name="skillLevel" type="number" min="0" max="99" value="0" inputmode="numeric"></label>
               <label><span data-stat-i18n="direction">공격 방향</span><select id="direction" name="direction"><option value="none">종합</option><option value="front">전방</option><option value="back">후방</option></select></label>
@@ -471,6 +470,10 @@
             <header><span>02</span><div><h3 data-stat-i18n="attackStats">공격 스탯</h3><p data-stat-i18n="attackStatsHelp">복사 기능을 사용하면 자동 입력됩니다.</p></div></header>
             <div class="field-grid stat-grid">
               <label><span data-stat-i18n="attack">공격력</span><input name="attack" type="number" min="1" max="10000000" required></label>
+			  <label><span data-stat-i18n="additionalAttack">추가 공격력</span><input name="additionalAttack" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="maximumAttack">최대 공격력</span><input name="maximumAttack" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="criticalAttackPower">치명타 공격력</span><input name="criticalAttackPower" type="number" min="0" max="10000000" required></label>
+			  <label><span data-stat-i18n="sealstoneAdditionalDamage">봉혼석 추가 피해</span><input name="sealstoneAdditionalDamage" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="power">위력</span><input name="power" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="vitality">체력</span><input name="vitality" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="agility">민첩</span><input name="agility" type="number" min="0" max="10000" required></label>
@@ -495,6 +498,8 @@
               <label><span data-stat-i18n="bossAttack">보스 공격력</span><input name="bossAttack" type="number" min="0" max="10000000" value="0"></label>
               <label><span data-stat-i18n="frontAttack">전방 공격력</span><input name="frontAttack" type="number" min="0" max="10000000" value="0"></label>
               <label><span data-stat-i18n="backAttack">후방 공격력</span><input name="backAttack" type="number" min="0" max="10000000" value="0"></label>
+			  <label><span data-stat-i18n="frontCritical">전방 치명타</span><input name="frontCritical" type="number" min="0" max="10000000" value="0"></label>
+			  <label><span data-stat-i18n="backCritical">후방 치명타</span><input name="backCritical" type="number" min="0" max="10000000" value="0"></label>
             </div>
           </section>
 
@@ -525,14 +530,14 @@
             <header><div><span class="result-kicker" data-stat-i18n="resultKicker">직업·스킬별 분석</span><h3 data-stat-i18n="resultTitle">스탯 효율 순위</h3></div><span class="confidence pending" id="confidence">검증 전</span></header>
             <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong data-stat-i18n="waitingTitle">표본을 수집하고 있습니다</strong><p data-stat-i18n="waitingDescription">신뢰 기준을 충족할 만큼 데이터가 쌓이면 계산 결과가 열립니다.</p></div>
             <div class="result-list" id="result-list" hidden></div>
-            <footer><span data-stat-i18n="resultGuide">현재 입력값을 기준으로 각 스탯을 올렸을 때의 효율입니다.</span><b id="formula-version">—</b></footer>
+            <footer><span data-stat-i18n="resultGuide">+1, +10, +1%p 단위별 순위이며 서로 다른 단위끼리는 직접 비교하지 않습니다.</span><b id="formula-version">—</b></footer>
           </section>
           <section class="quality-card">
             <h3 data-stat-i18n="easyTitle">간편하게 사용하는 방법</h3>
             <ol>
               <li data-stat-i18n="easyOne">딜미터기 처치 기록에서 ‘내 스탯 복사’를 누릅니다.</li>
               <li data-stat-i18n="easyTwo">이 페이지 상단 입력칸에 붙여넣습니다.</li>
-              <li data-stat-i18n="easyThree">분석할 보스·대표 스킬·공격 방향을 선택하고 계산합니다.</li>
+              <li data-stat-i18n="easyThree">대표 스킬·공격 방향을 선택하면 지원 던전 6개 보스를 동일 가중치로 종합 계산합니다.</li>
             </ol>
           </section>
         </aside>
