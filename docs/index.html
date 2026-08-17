@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260818-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-2">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-3">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260818-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260818-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260818-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260818-2" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260818-4" defer></script>
   <script src="./assets/app.js?v=20260818-2" defer></script>
 </head>
 <body>
@@ -450,6 +450,7 @@
             <header><span>01</span><div><h3 data-stat-i18n="combatProfile">전투 조건</h3><p data-stat-i18n="combatProfileHelp">직업과 비교할 대표 스킬·방향을 선택합니다.</p></div></header>
             <div class="field-grid profile-grid">
               <label><span data-stat-i18n="job">직업</span><select id="job" name="jobName" required></select></label>
+              <label><span data-stat-i18n="targetBoss">분석 보스</span><select id="target-boss" name="targetKey" required><option value="">표본 수집 중</option></select></label>
               <label><span data-stat-i18n="skill">대표 스킬</span><select id="skill" name="skillCode"><option value="0">직업 종합</option></select></label>
               <label><span data-stat-i18n="skillLevel">스킬 레벨</span><input id="skill-level" name="skillLevel" type="number" min="0" max="99" value="0" inputmode="numeric"></label>
               <label><span data-stat-i18n="direction">공격 방향</span><select id="direction" name="direction"><option value="none">종합</option><option value="front">전방</option><option value="back">후방</option></select></label>
@@ -461,7 +462,7 @@
               </div>
             </fieldset>
             <details class="passive-panel" id="passive-panel">
-              <summary><span data-stat-i18n="passives">피해 관련 패시브</span><small data-stat-i18n="passiveHelp">검증된 패시브만 표시됩니다</small></summary>
+              <summary><span data-stat-i18n="passives">패시브·스티그마 레벨</span><small data-stat-i18n="passiveHelp">특성 선택 없이 실제 레벨만 반영합니다</small></summary>
               <div class="passive-options" id="passive-options"></div>
             </details>
           </section>
@@ -470,13 +471,25 @@
             <header><span>02</span><div><h3 data-stat-i18n="attackStats">공격 스탯</h3><p data-stat-i18n="attackStatsHelp">복사 기능을 사용하면 자동 입력됩니다.</p></div></header>
             <div class="field-grid stat-grid">
               <label><span data-stat-i18n="attack">공격력</span><input name="attack" type="number" min="1" max="10000000" required></label>
-              <label><span data-stat-i18n="nakedAttack">무기 해제 공격력</span><input name="nakedAttack" type="number" min="0" max="10000000" value="0"></label>
               <label><span data-stat-i18n="power">위력</span><input name="power" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="vitality">체력</span><input name="vitality" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="agility">민첩</span><input name="agility" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="knowledge">지식</span><input name="knowledge" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="precision">정확</span><input name="precision" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="will">의지</span><input name="will" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="justice">정의</span><input name="justice" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="freedom">자유</span><input name="freedom" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="illusion">환상</span><input name="illusion" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="life">생명</span><input name="life" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="time">시간</span><input name="time" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="destruction">파괴</span><input name="destruction" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="death">죽음</span><input name="death" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="wisdom">지혜</span><input name="wisdom" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="destiny">운명</span><input name="destiny" type="number" min="0" max="10000" required></label>
+              <label><span data-stat-i18n="space">공간</span><input name="space" type="number" min="0" max="10000" required></label>
               <label><span data-stat-i18n="accuracy">명중</span><input name="accuracy" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="critical">치명타</span><input name="critical" type="number" min="0" max="10000000" required></label>
               <label><span data-stat-i18n="penetration">관통</span><input name="penetration" type="number" min="0" max="10000000" required></label>
-              <label><span data-stat-i18n="breakthrough">돌파 장비 수</span><input name="breakthroughParts" type="number" min="0" max="20" value="0"></label>
               <label><span data-stat-i18n="pveAttack">PVE 공격력</span><input name="pveAttack" type="number" min="0" max="10000000" value="0"></label>
               <label><span data-stat-i18n="pveAccuracy">PVE 명중</span><input name="pveAccuracy" type="number" min="0" max="10000000" value="0"></label>
               <label><span data-stat-i18n="bossAttack">보스 공격력</span><input name="bossAttack" type="number" min="0" max="10000000" value="0"></label>
@@ -519,7 +532,7 @@
             <ol>
               <li data-stat-i18n="easyOne">딜미터기 처치 기록에서 ‘내 스탯 복사’를 누릅니다.</li>
               <li data-stat-i18n="easyTwo">이 페이지 상단 입력칸에 붙여넣습니다.</li>
-              <li data-stat-i18n="easyThree">대표 스킬과 공격 방향을 선택하고 계산합니다.</li>
+              <li data-stat-i18n="easyThree">분석할 보스·대표 스킬·공격 방향을 선택하고 계산합니다.</li>
             </ol>
           </section>
         </aside>
