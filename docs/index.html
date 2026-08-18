@@ -18,8 +18,8 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260818-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260818-8">
+  <link rel="stylesheet" href="./assets/app.css?v=20260819-1">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-1">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -57,7 +57,7 @@
           },
           "boss-resistance": {
             title: "NotMeter 보스 저항 통계",
-            description: "전체 기간 누적 전투 표본으로 보스별 강타 저항과 완벽 저항 예상치를 확인합니다."
+            description: "캐릭터의 명중·치명타와 전투 판정을 분석해 보스별 회피·치명타·강타·완벽 저항을 확인합니다."
           },
           "stat-efficiency": {
             title: "NotMeter 스탯 효율 계산기",
@@ -91,7 +91,7 @@
           },
           "boss-resistance": {
             title: "NotMeter Boss Resistance Statistics",
-            description: "Review estimated Power-hit and Perfect resistance for each boss using all-time combat samples."
+            description: "Estimate Evasion, Critical, Power-hit, and Perfect resistance for each boss from live stats and combat outcomes."
           },
           "stat-efficiency": {
             title: "NotMeter Stat Efficiency Calculator",
@@ -125,7 +125,7 @@
           },
           "boss-resistance": {
             title: "NotMeter 首領抗性統計",
-            description: "使用全期間累積戰鬥樣本，查看各首領的強擊抗性與完美抗性推估值。"
+            description: "結合角色屬性與戰鬥判定，查看各首領的迴避、暴擊抗性、強擊抗性與完美抗性推估值。"
           },
           "stat-efficiency": {
             title: "NotMeter 屬性效率計算器",
@@ -167,12 +167,12 @@
     })();
   </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
-  <script src="./assets/field-boss-catalog.js?v=20260818-2" defer></script>
-  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260818-2" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260818-2" defer></script>
-  <script src="./assets/stats-copy.zh-TW.js?v=20260818-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260818-10" defer></script>
-  <script src="./assets/app.js?v=20260818-2" defer></script>
+  <script src="./assets/field-boss-catalog.js?v=20260819-1" defer></script>
+  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-1" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260819-1" defer></script>
+  <script src="./assets/stats-copy.zh-TW.js?v=20260819-1" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-1" defer></script>
+  <script src="./assets/app.js?v=20260819-1" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -353,7 +353,7 @@
             </svg>
           </span>
           <div>
-            <span class="boss-resistance-page-kicker">ALL TIME · HARD HIT · PERFECT</span>
+            <span class="boss-resistance-page-kicker">ALL TIME · ACCURACY · CRITICAL · HARD HIT · PERFECT</span>
             <h2 data-i18n="bossResistanceStatsTitle">보스 저항 통계</h2>
             <p data-i18n="bossResistanceStatsDescription">전체 기간 누적 전투 표본으로 보스별 강타 저항과 완벽 저항 예상치를 확인합니다.</p>
           </div>
