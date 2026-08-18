@@ -535,6 +535,23 @@
             </div>
           </section>
 
+		  <section class="efficiency-card">
+			<header><span>05</span><div><h3 data-stat-i18n="attributeStats">속성·대상 증폭</h3></div></header>
+			<div class="field-grid stat-grid percent-grid">
+			  <label><span data-stat-i18n="waterAmp">물 속성 증폭</span><input name="waterDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="fireAmp">불 속성 증폭</span><input name="fireDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="windAmp">바람 속성 증폭</span><input name="windDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="earthAmp">땅 속성 증폭</span><input name="earthDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="holyAmp">신성 속성 증폭</span><input name="holyDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="darkAmp">암흑 속성 증폭</span><input name="darkDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="allElementAmp">모든 속성 증폭</span><input name="allElementDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="intellectAmp">지성형 피해 증폭</span><input name="intellectDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="feralAmp">야성형 피해 증폭</span><input name="feralDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="natureAmp">자연형 피해 증폭</span><input name="natureDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			  <label><span data-stat-i18n="transAmp">변이형 피해 증폭</span><input name="transDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
+			</div>
+		  </section>
+
           <button class="calculate-button" type="submit" data-stat-i18n="calculate">효율 계산</button>
           <p class="form-error" id="form-error" role="alert" hidden></p>
         </form>
