@@ -9,6 +9,7 @@
   const CLIPBOARD_SCHEMA = "notmeter-stat-efficiency-profile-v4";
   const SIMULATION_DEBOUNCE_MS = 450;
   const SIMULATION_CACHE_LIMIT = 48;
+  const CATALOG_REFRESH_MS = 60_000;
   const LOCALES = ["ko", "en", "zh-TW"];
   const FALLBACK_JOBS = [
     ["검성", "검성"], ["수호성", "수호성"], ["궁성", "궁성"],
@@ -87,7 +88,8 @@
   };
 
   const state = {
-    locale: resolveLocale(), catalog: null, catalogLoad: null, initialized: false,
+    locale: resolveLocale(), catalog: null, catalogLoad: null, catalogLoadedAt: 0,
+    catalogRefreshTimer: 0, initialized: false,
     pendingJobName: "", importedSkills: new Map(),
     simulationBaseline: null, simulationResult: null, simulationTimer: 0,
     simulationAbortController: null, simulationCache: new Map(), applyingStats: false,
@@ -214,24 +216,43 @@
     document.getElementById("model-sample-count").textContent = t("samples", { count: formatCount(sampleCount) });
   }
 
-  function loadCatalog() {
+  function loadCatalog(force = false) {
     if (state.catalogLoad) return state.catalogLoad;
-    state.catalogLoad = fetch(`${API_BASE}/catalog`, { headers: { Accept: "application/json" } })
+    if (!force && state.catalog && Date.now() - state.catalogLoadedAt < CATALOG_REFRESH_MS) {
+      return Promise.resolve(state.catalog);
+    }
+    const request = fetch(`${API_BASE}/catalog`, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    })
       .then(response => {
         if (!response.ok) throw new Error(String(response.status));
         return response.json();
       })
       .then(catalog => {
         state.catalog = catalog;
+        state.catalogLoadedAt = Date.now();
         setModelState(catalog.status, catalog.sampleCount);
         renderCatalog();
+        return catalog;
       })
       .catch(() => {
-        state.catalog = null;
-        setModelState("collecting", 0);
-        renderCatalog();
+        if (!state.catalog) {
+          setModelState("collecting", 0);
+          renderCatalog();
+        }
+        return state.catalog;
+      })
+      .finally(() => {
+        if (state.catalogLoad === request) state.catalogLoad = null;
       });
+    state.catalogLoad = request;
     return state.catalogLoad;
+  }
+
+  function refreshCatalogWhenVisible() {
+    if (document.visibilityState === "hidden" || surface.hidden) return;
+    void loadCatalog(true);
   }
 
   function decodeClipboardProfile(text) {
@@ -609,6 +630,10 @@
       const value = importInput.value.trim();
       if (value.startsWith(CLIPBOARD_PREFIX) || value.startsWith("{")) applyClipboardProfile(value);
     });
+    document.addEventListener("visibilitychange", refreshCatalogWhenVisible);
+    state.catalogRefreshTimer = window.setInterval(
+      refreshCatalogWhenVisible,
+      CATALOG_REFRESH_MS);
     showCollecting();
   }
 
