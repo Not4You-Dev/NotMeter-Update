@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260819-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-9">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-10">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260819-9" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-10" defer></script>
   <script src="./assets/app.js?v=20260819-2" defer></script>
 </head>
 <body>
@@ -470,7 +470,6 @@
           <section class="efficiency-card">
             <header><span>01</span><div><h3 data-stat-i18n="combatProfile">전투 조건</h3><p data-stat-i18n="combatProfileHelp">직업만 선택하면 검증된 보스의 전체 스킬·공격 방향 표본을 종합합니다.</p></div></header>
             <div class="field-grid profile-grid job-profile-grid">
-              <label><span data-stat-i18n="job">직업</span><select id="job" name="jobName" required></select></label>
               <div class="job-profile-summary">
                 <span data-stat-i18n="analysisScope">분석 범위</span>
                 <strong data-stat-i18n="jobOverallScope">직업 전체 전투 종합</strong>
@@ -569,6 +568,14 @@
         </form>
 
         <aside class="result-column">
+          <section class="result-job-picker" aria-labelledby="result-job-picker-title">
+            <div class="result-job-picker-heading">
+              <strong id="result-job-picker-title" data-stat-i18n="jobPickerTitle">비교할 직업 선택</strong>
+              <span data-stat-i18n="jobPickerHelp">직업 마크를 누르면 전체 효율 순위가 즉시 변경됩니다.</span>
+            </div>
+            <div class="result-job-options" id="result-job-options" role="group" aria-labelledby="result-job-picker-title"></div>
+            <select class="job-picker-native" id="job" name="jobName" form="efficiency-form" required tabindex="-1" aria-hidden="true"></select>
+          </section>
           <section class="result-card" id="result-card">
             <header><div><span class="result-kicker" data-stat-i18n="resultKicker">직업 전체 분석</span><h3 data-stat-i18n="resultTitle">스탯 효율 순위</h3><small class="result-source" id="result-source">직업 대표 표본 기준</small></div><span class="confidence pending" id="confidence">검증 전</span></header>
 			<div class="displayed-stats" id="displayed-stats" hidden>
