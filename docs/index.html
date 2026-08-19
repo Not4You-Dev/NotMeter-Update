@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260819-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-7">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-8">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260819-7" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-8" defer></script>
   <script src="./assets/app.js?v=20260819-2" defer></script>
 </head>
 <body>
@@ -557,7 +557,6 @@
 			  <label><span data-stat-i18n="earthAmp">땅 속성 증폭</span><input name="earthDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
 			  <label><span data-stat-i18n="holyAmp">신성 속성 증폭</span><input name="holyDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
 			  <label><span data-stat-i18n="darkAmp">암흑 속성 증폭</span><input name="darkDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
-			  <label><span data-stat-i18n="allElementAmp">모든 속성 증폭</span><input name="allElementDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
 			  <label><span data-stat-i18n="intellectAmp">지성형 피해 증폭</span><input name="intellectDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
 			  <label><span data-stat-i18n="feralAmp">야성형 피해 증폭</span><input name="feralDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
 			  <label><span data-stat-i18n="natureAmp">자연형 피해 증폭</span><input name="natureDamageAmplificationPercent" type="number" min="0" max="1000" step="0.01" value="0"></label>
@@ -589,6 +588,7 @@
             </div>
             <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong>직업 전체 통계를 불러오는 중입니다</strong><p>스탯 입력 없이도 직업별 집계 순위를 볼 수 있습니다.</p></div>
             <div class="result-summary" id="result-summary" hidden></div>
+            <section class="result-directional" id="result-directional" hidden></section>
             <details class="result-details" id="result-details" hidden>
               <summary id="result-details-label">전체 세부 순위 보기</summary>
               <div class="result-list" id="result-list" hidden></div>

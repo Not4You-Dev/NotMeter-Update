@@ -148,6 +148,15 @@
 .result-summary-card span { overflow: hidden; color: #7399a6; font-size: 8px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
 .result-summary-card strong { overflow: hidden; color: #d9f4f2; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .result-summary-card b { color: #68e1d7; font-size: 13px; font-variant-numeric: tabular-nums; }
+.result-directional { display: grid; gap: 8px; margin: 0 11px 11px; padding: 10px; border: 1px solid #31516e; border-radius: 8px; background: linear-gradient(135deg, rgba(41, 77, 116, .2), rgba(6, 21, 30, .88)); }
+.result-directional-heading { display: grid; gap: 2px; }
+.result-directional-heading strong { color: #a9d4ef; font-size: 9px; font-weight: 950; }
+.result-directional-heading span { color: #6f92a5; font-size: 8px; line-height: 1.45; }
+.result-directional-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.result-directional-card { display: grid; min-width: 0; gap: 3px; padding: 8px 9px; border: 1px solid #294b63; border-radius: 7px; background: rgba(7, 23, 34, .86); }
+.result-directional-card span { color: #c7dfeb; font-size: 9px; font-weight: 850; }
+.result-directional-card strong { color: #6fded6; font-size: 13px; font-variant-numeric: tabular-nums; }
+.result-directional-card small { color: #698998; font-size: 7px; }
 .result-details { margin: 0 11px 11px; border: 1px solid #1e414d; border-radius: 8px; background: rgba(5, 18, 27, .72); }
 .result-details > summary { padding: 10px 11px; color: #8dc5c4; cursor: pointer; font-size: 9px; font-weight: 900; list-style-position: inside; }
 .result-details[open] > summary { border-bottom: 1px solid #1e414d; }
