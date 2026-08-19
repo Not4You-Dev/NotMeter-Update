@@ -334,9 +334,9 @@
       statEfficiencyPageTitle: "NotMeter 스탯 효율 계산기",
       statEfficiencyPageSubtitle: "내 캐릭터와 실전 표본을 기준으로 성장 효율을 비교합니다",
       bossResistancePageTitle: "NotMeter 보스 저항 통계",
-      bossResistancePageSubtitle: "전체 기간 누적 표본으로 보스별 회피·치명타·강타·완벽 저항을 추정합니다",
+      bossResistancePageSubtitle: "전체 기간 누적 표본으로 보스별 강타·완벽 저항과 치명타·회피 판정을 분석합니다",
       bossResistanceStatsTitle: "보스 저항 통계",
-      bossResistanceStatsDescription: "캐릭터의 실시간 명중·치명타와 전투 판정을 함께 분석해 보스별 회피와 저항 수치를 추정합니다.",
+      bossResistanceStatsDescription: "강타·완벽 저항은 추정값을, 치명타·회피는 실제 공격 스탯과 관측 판정률을 함께 확인합니다.",
       bossResistanceDungeonAria: "보스 저항 통계 던전 선택",
       bossResistanceAllTime: "전체 기간 누적",
       hardHitResistance: "강타 저항",
@@ -345,12 +345,16 @@
       evasion: "회피",
       bossResistanceSettingEstimate: "게임 설정 추정",
       bossResistanceStatEstimate: "역산 추정 수치",
+      bossResistanceObservedAnalysis: "실전 관측 분석",
+      bossResistanceStatReview: "산식 재검증 중",
       bossResistanceMeasuredEstimate: "측정 추정값 {value}",
       bossResistanceDecisionSample: "판정 {hits}회 · 참여 {installations}명",
+      bossResistanceCriticalObservation: "평균 치명타 {stat} · 관측 치명 {rate} · 판정 {hits}회 · 참여 {installations}명",
+      bossResistanceEvasionObservation: "평균 명중 {stat} · 관측 회피 {rate} · 판정 {hits}회 · 참여 {installations}명",
       bossResistanceStatPending: "{hits}/{minimum}회 · {installations}/{minimumInstallations}명 수집",
       bossResistanceSample: "누적 표본 {records}회",
       bossResistancePending: "표본 수집 중",
-      bossResistanceSamplesGuide: "명중의 상대 수치는 회피이며, 페리·막기는 별도 판정입니다. 치명타 저항과 회피는 1,500회·25명 이상 표본부터 표시하고, 강타·완벽은 가장 가까운 5% 설정값을 함께 표시합니다.",
+      bossResistanceSamplesGuide: "명중의 상대 판정은 회피이며, 페리·막기는 별도입니다. 치명타·회피는 평균 공격 스탯과 실제 판정률을 표시하고, 강타·완벽은 가장 가까운 5% 설정값을 함께 표시합니다.",
       bossResistanceNoData: "표시할 보스 정보가 없습니다.",
       period: "기간",
       refresh: "새로고침",
@@ -683,9 +687,9 @@
       statEfficiencyPageTitle: "NotMeter Stat Efficiency Calculator",
       statEfficiencyPageSubtitle: "Compare upgrade efficiency for your character using live combat samples",
       bossResistancePageTitle: "NotMeter Boss Resistance Statistics",
-      bossResistancePageSubtitle: "Estimate each boss's Evasion, Critical, Power-hit, and Perfect resistance from all-time samples",
+      bossResistancePageSubtitle: "Analyze Power-hit and Perfect resistance plus observed Critical and Evasion outcomes from all-time samples",
       bossResistanceStatsTitle: "Boss Resistance Statistics",
-      bossResistanceStatsDescription: "Correlate live Accuracy and Critical stats with combat outcomes to estimate each boss's defensive values.",
+      bossResistanceStatsDescription: "Review estimated Power-hit and Perfect resistance alongside actual offensive stats and observed Critical and Evasion rates.",
       bossResistanceDungeonAria: "Select a dungeon for boss resistance statistics",
       bossResistanceAllTime: "All-time total",
       hardHitResistance: "Power-hit resistance",
@@ -694,12 +698,16 @@
       evasion: "Evasion",
       bossResistanceSettingEstimate: "Estimated game setting",
       bossResistanceStatEstimate: "Estimated stat",
+      bossResistanceObservedAnalysis: "Observed combat analysis",
+      bossResistanceStatReview: "Formula under review",
       bossResistanceMeasuredEstimate: "Measured estimate {value}",
       bossResistanceDecisionSample: "{hits} outcomes · {installations} players",
+      bossResistanceCriticalObservation: "Avg Critical {stat} · observed Critical {rate} · {hits} outcomes · {installations} players",
+      bossResistanceEvasionObservation: "Avg Accuracy {stat} · observed Evasion {rate} · {hits} outcomes · {installations} players",
       bossResistanceStatPending: "{hits}/{minimum} outcomes · {installations}/{minimumInstallations} players",
       bossResistanceSample: "Cumulative samples: {records}",
       bossResistancePending: "Collecting samples",
-      bossResistanceSamplesGuide: "Accuracy is opposed by Evasion; Parry and Block are separate outcomes. Critical resistance and Evasion appear after 1,500 outcomes from 25 players. Power-hit and Perfect also show the nearest likely 5% setting.",
+      bossResistanceSamplesGuide: "Accuracy is opposed by Evasion; Parry and Block are separate outcomes. Critical and Evasion show average offensive stats with observed rates. Power-hit and Perfect also show the nearest likely 5% setting.",
       bossResistanceNoData: "No boss information is available.",
       period: "Period",
       refresh: "Refresh",
@@ -876,9 +884,9 @@
     statEfficiencyPageTitle: "NotMeter 屬性效率計算器",
     statEfficiencyPageSubtitle: "依目前角色與實戰樣本比較成長效率",
     bossResistancePageTitle: "NotMeter 首領抗性統計",
-    bossResistancePageSubtitle: "依全期間累積樣本推估各首領的迴避、暴擊抗性、強擊與完美抗性",
+    bossResistancePageSubtitle: "依全期間累積樣本分析各首領的強擊、完美抗性及暴擊、迴避判定",
     bossResistanceStatsTitle: "首領抗性統計",
-    bossResistanceStatsDescription: "結合角色即時命中、暴擊屬性與戰鬥判定，推估各首領的防禦數值。",
+    bossResistanceStatsDescription: "顯示強擊、完美抗性推估，以及實際攻擊屬性與暴擊、迴避觀測率。",
     bossResistanceDungeonAria: "選擇首領抗性統計副本",
     bossResistanceAllTime: "全期間累積",
     hardHitResistance: "強擊抗性",
@@ -887,12 +895,16 @@
     evasion: "迴避",
     bossResistanceSettingEstimate: "遊戲設定推估",
     bossResistanceStatEstimate: "反推屬性值",
+    bossResistanceObservedAnalysis: "實戰觀測分析",
+    bossResistanceStatReview: "公式重新驗證中",
     bossResistanceMeasuredEstimate: "實測推估值 {value}",
     bossResistanceDecisionSample: "判定 {hits} 次 · {installations} 人",
+    bossResistanceCriticalObservation: "平均暴擊 {stat} · 觀測暴擊 {rate} · 判定 {hits} 次 · {installations} 人",
+    bossResistanceEvasionObservation: "平均命中 {stat} · 觀測迴避 {rate} · 判定 {hits} 次 · {installations} 人",
     bossResistanceStatPending: "{hits}/{minimum} 次 · {installations}/{minimumInstallations} 人收集中",
     bossResistanceSample: "累積樣本 {records} 場",
     bossResistancePending: "樣本收集中",
-    bossResistanceSamplesGuide: "命中的相對屬性為迴避，招架與格擋屬於其他判定。暴擊抗性與迴避需累積 1,500 次判定及 25 名玩家後顯示；強擊與完美另顯示最接近 5% 的設定推估。",
+    bossResistanceSamplesGuide: "命中的相對判定為迴避，招架與格擋另行計算。暴擊與迴避顯示平均攻擊屬性及實際觀測率；強擊與完美另顯示最接近 5% 的設定推估。",
     bossResistanceNoData: "目前沒有可顯示的首領資訊。",
   };
 
@@ -3490,6 +3502,9 @@
             installations: stats?.criticalInstallationCount,
             minimum: stats?.statMinimumTrials,
             minimumInstallations: stats?.statMinimumInstallationCount,
+            averageStat: stats?.averageEffectiveCritical,
+            observedPercent: stats?.observedCriticalPercent,
+            observationKey: "bossResistanceCriticalObservation",
           }),
         createBossResistanceMetric(
           "evasion",
@@ -3501,6 +3516,9 @@
             installations: stats?.accuracyInstallationCount,
             minimum: stats?.statMinimumTrials,
             minimumInstallations: stats?.statMinimumInstallationCount,
+            averageStat: stats?.averageEffectiveAccuracy,
+            observedPercent: stats?.observedEvasionPercent,
+            observationKey: "bossResistanceEvasionObservation",
           }));
       rows.append(row);
     });
@@ -3529,16 +3547,33 @@
     const installationCount = Math.max(0, Math.trunc(Number(options.installations) || 0));
     const minimum = Math.max(1, Math.trunc(Number(options.minimum) || 1_500));
     const minimumInstallations = Math.max(1, Math.trunc(Number(options.minimumInstallations) || 25));
+    const averageStat = Number(options.averageStat);
+    const observedPercent = Number(options.observedPercent);
+    const hasObservedStatSample = isRawStat &&
+      hitCount > 0 &&
+      Number.isFinite(averageStat) &&
+      Number.isFinite(observedPercent) &&
+      typeof options.observationKey === "string";
     if (value === null || value === undefined || !Number.isFinite(numericValue) || hitCount <= 0) {
-      settingValue.textContent = "—";
-      measuredValue.textContent = isRawStat && hitCount > 0
-        ? t("bossResistanceStatPending", {
+      if (hasObservedStatSample) {
+        settingLabel.textContent = t("bossResistanceObservedAnalysis");
+      }
+      settingValue.textContent = hasObservedStatSample ? t("bossResistanceStatReview") : "—";
+      measuredValue.textContent = hasObservedStatSample
+        ? t(options.observationKey, {
+          stat: formatInteger(Math.max(0, Math.round(averageStat))),
+          rate: formatPercent(Math.max(0, Math.min(100, observedPercent)), 2),
+          hits: formatInteger(hitCount),
+          installations: formatInteger(installationCount),
+        })
+        : isRawStat && hitCount > 0
+          ? t("bossResistanceStatPending", {
           hits: formatInteger(hitCount),
           minimum: formatInteger(minimum),
           installations: formatInteger(installationCount),
           minimumInstallations: formatInteger(minimumInstallations),
         })
-        : t("bossResistancePending");
+          : t("bossResistancePending");
       metric.classList.add("pending");
     } else if (isRawStat) {
       settingValue.textContent = formatInteger(Math.max(0, Math.round(numericValue)));

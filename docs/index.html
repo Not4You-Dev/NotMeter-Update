@@ -18,8 +18,8 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260819-1">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-1">
+  <link rel="stylesheet" href="./assets/app.css?v=20260819-2">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-2">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -57,7 +57,7 @@
           },
           "boss-resistance": {
             title: "NotMeter 보스 저항 통계",
-            description: "캐릭터의 명중·치명타와 전투 판정을 분석해 보스별 회피·치명타·강타·완벽 저항을 확인합니다."
+            description: "전체 기간 누적 표본으로 보스별 강타·완벽 저항과 치명타·회피 판정을 분석합니다."
           },
           "stat-efficiency": {
             title: "NotMeter 스탯 효율 계산기",
@@ -167,12 +167,12 @@
     })();
   </script>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
-  <script src="./assets/field-boss-catalog.js?v=20260819-1" defer></script>
-  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-1" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260819-1" defer></script>
-  <script src="./assets/stats-copy.zh-TW.js?v=20260819-1" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260819-1" defer></script>
-  <script src="./assets/app.js?v=20260819-1" defer></script>
+  <script src="./assets/field-boss-catalog.js?v=20260819-2" defer></script>
+  <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
+  <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-2" defer></script>
+  <script src="./assets/app.js?v=20260819-2" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -355,7 +355,7 @@
           <div>
             <span class="boss-resistance-page-kicker">ALL TIME · ACCURACY · CRITICAL · HARD HIT · PERFECT</span>
             <h2 data-i18n="bossResistanceStatsTitle">보스 저항 통계</h2>
-            <p data-i18n="bossResistanceStatsDescription">전체 기간 누적 전투 표본으로 보스별 강타 저항과 완벽 저항 예상치를 확인합니다.</p>
+            <p data-i18n="bossResistanceStatsDescription">강타·완벽 저항은 추정값을, 치명타·회피는 실제 공격 스탯과 관측 판정률을 함께 확인합니다.</p>
           </div>
         </div>
         <a class="ranking-back-button" id="boss-resistance-back-button" href="./">
