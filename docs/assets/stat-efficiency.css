@@ -68,7 +68,7 @@
 .field-grid small { color: #5f8294; font-size: 8px; }
 .field-grid input, .field-grid select { width: 100%; height: 39px; min-width: 0; padding: 0 10px; border: 1px solid #294657; border-radius: 8px; outline: 0; background: #071722; color: #edf7fa; font-size: 12px; font-variant-numeric: tabular-nums; }
 .field-grid input:focus, .field-grid select:focus { border-color: #42cfc3; box-shadow: 0 0 0 2px rgba(66, 207, 195, .11); }
-.field-grid input:invalid:not(:placeholder-shown) { border-color: #a34f5b; }
+.efficiency-form.was-submitted .field-grid input:invalid { border-color: #a34f5b; }
 .stat-input-control { display: grid; grid-template-columns: 27px minmax(0, 1fr) 27px; }
 .stat-input-control input { position: relative; z-index: 1; border-radius: 0; text-align: center; }
 .stat-step-button { min-width: 0; padding: 0; border: 1px solid #294657; background: #0b202c; color: #70c9c3; cursor: pointer; font-size: 15px; font-weight: 900; }

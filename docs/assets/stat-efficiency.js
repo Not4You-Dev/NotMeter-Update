@@ -62,6 +62,7 @@
   const TEXT = {
     ko: {
       title: "스탯 효율 계산기", subtitle: "내 캐릭터에서 무엇을 올려야 가장 강해지는지 비교합니다.",
+      inputWaitingTitle: "내 스탯을 붙여넣어 주세요", inputWaitingDescription: "딜미터기에서 복사한 스탯을 붙여넣으면 계산할 수 있습니다.", readyToCalculateTitle: "입력이 완료되었습니다", readyToCalculateDescription: "효율 계산을 누르면 직업 전체 전투 기준 순위가 표시됩니다.",
       importTitle: "딜미터기에서 복사한 내 스탯 붙여넣기", importDescription: "딜미터기 처치 기록 상단의 ‘내 스탯 복사’를 누른 뒤 아래 칸에 붙여넣으면 현재 캐릭터 스탯이 자동 입력됩니다.", importPlaceholder: "여기를 누르고 Ctrl+V로 붙여넣기", importWaiting: "복사한 값을 기다리고 있습니다", importSuccess: "내 스탯 {count}개를 자동 입력했습니다", importInvalid: "딜미터기에서 복사한 올바른 스탯 값이 아닙니다",
       noticeTitle: "테스트 기능 안내", notice: "이 기능은 테스트 기능이며, 신뢰 테스트가 진행전 입니다.", heroKicker: "실전 데이터 기반", heroTitle: "직업 전체 전투 기준 성장 우선순위를 확인하세요", heroDescription: "주신 스탯과 PVE·보스 스탯을 함께 비교하며, 던전에서 받은 정상적인 파티 버프도 분석에 반영합니다.",
       collecting: "표본 수집 중 · 준비 중", ready: "계산 준비 완료", samples: "{count} 표본", samplesChecking: "표본 수 확인 중", samplesUnavailable: "표본 수 확인 지연", sourceOnly: "분석 대상", deus: "잠식된 데우스 연구기지(어려움)", noiran: "노이란의 숨겨진 유산(4단계)",
@@ -76,6 +77,7 @@
     },
     en: {
 	  minimumAttackEffect: "Minimum Attack +10",
+      inputWaitingTitle: "Paste your stats to begin", inputWaitingDescription: "Paste stats copied from NotMeter to enable calculation.", readyToCalculateTitle: "Stats are ready", readyToCalculateDescription: "Press Calculate efficiency to show the full-class ranking.",
       title: "Stat Efficiency Calculator", subtitle: "Compare which upgrade makes your character stronger.", importTitle: "Paste stats copied from NotMeter", importDescription: "Press ‘Copy my stats’ at the top of Kill Records, then paste below to fill the current character's stats automatically.", importPlaceholder: "Click here and press Ctrl+V", importWaiting: "Waiting for copied stats", importSuccess: "Filled {count} stats automatically", importInvalid: "This is not a valid stat value copied from NotMeter", noticeTitle: "Test feature", notice: "This is a test feature and reliability validation has not started yet.", heroKicker: "LIVE COMBAT DATA", heroTitle: "Find your upgrade priority across all combat for your class", heroDescription: "Compare divine, PVE, and boss stats together. Verified party buffs received in dungeons are included in the analysis.", collecting: "Collecting samples · Coming soon", ready: "Ready to calculate", samples: "{count} samples", samplesChecking: "Checking sample count", samplesUnavailable: "Sample count delayed", sourceOnly: "Analysis sources", deus: "Corrupted Deus Research Base (Hard)", noiran: "Noiran's Hidden Legacy (Stage 4)",
       combatProfile: "Combat profile", combatProfileHelp: "Choose only a class to combine all skill and attack-direction samples from validated bosses.", job: "Class", analysisScope: "Scope", jobOverallScope: "All class combat", jobOverallHelp: "Uses the complete collected combat sample without separate skill, level, or trait choices.",
       divineStats: "Divine stats", divineStatsHelp: "Shows the confirmed increase provided by each point.", growthPending: "Offensive link under verification", powerGrowth: "+0.1%p Attack per point", precisionGrowth: "+0.1%p Accuracy and Critical per point", justiceGrowth: "+0.2%p Perfect per point", freedomGrowth: "+0.2%p Accuracy per point", illusionGrowth: "−0.2%p Cooldown Time per point", timeGrowth: "+0.2%p Combat Speed per point", destructionGrowth: "+0.2%p Attack per point", deathGrowth: "+0.2%p Critical per point", wisdomGrowth: "+0.2%p Power Hit per point",
@@ -86,6 +88,7 @@
     },
     "zh-TW": {
 	  minimumAttackEffect: "最小攻擊力 +10",
+      inputWaitingTitle: "請先貼上角色屬性", inputWaitingDescription: "貼上從 NotMeter 複製的屬性後即可開始計算。", readyToCalculateTitle: "屬性已輸入完成", readyToCalculateDescription: "按下計算效率即可顯示職業整體戰鬥排名。",
       title: "屬性效率計算器", subtitle: "比較哪一項提升最能強化目前角色。", importTitle: "貼上從 NotMeter 複製的角色屬性", importDescription: "在討伐紀錄上方按下「複製我的屬性」，再貼到下方即可自動填入目前角色的數值。", importPlaceholder: "點擊此處並按 Ctrl+V 貼上", importWaiting: "等待貼上已複製的屬性", importSuccess: "已自動填入 {count} 項屬性", importInvalid: "這不是從 NotMeter 複製的有效屬性", noticeTitle: "測試功能說明", notice: "此功能目前為測試功能，尚未開始可信度驗證。", heroKicker: "實戰資料分析", heroTitle: "確認職業整體戰鬥的成長優先順序", heroDescription: "同時比較主神、PVE 與首領屬性，副本中已確認的隊伍增益也會納入分析。", collecting: "正在收集樣本 · 準備中", ready: "可開始計算", samples: "{count} 筆樣本", samplesChecking: "正在確認樣本數", samplesUnavailable: "樣本數確認延遲", sourceOnly: "分析對象", deus: "受侵蝕的德烏斯研究基地（困難）", noiran: "諾伊蘭的隱藏遺產（第4階段）",
       combatProfile: "戰鬥條件", combatProfileHelp: "只需選擇職業，即可綜合通過驗證首領的全部技能與攻擊方向樣本。", job: "職業", analysisScope: "分析範圍", jobOverallScope: "職業整體戰鬥", jobOverallHelp: "不需另外選擇技能、等級或特性，直接使用完整收集的戰鬥樣本。",
       divineStats: "主神屬性", divineStatsHelp: "同時顯示每 1 點已確認的提升效果。", growthPending: "攻擊連動效果確認中", powerGrowth: "每點攻擊力增加 +0.1%p", precisionGrowth: "每點命中與暴擊增加 +0.1%p", justiceGrowth: "每點完美 +0.2%p", freedomGrowth: "每點命中增加 +0.2%p", illusionGrowth: "每點再使用時間 −0.2%p", timeGrowth: "每點戰鬥速度 +0.2%p", destructionGrowth: "每點攻擊力增加 +0.2%p", deathGrowth: "每點暴擊增加 +0.2%p", wisdomGrowth: "每點強擊 +0.2%p",
@@ -108,7 +111,7 @@
   const state = {
     locale: resolveLocale(), catalog: null, catalogLoad: null, catalogLoadedAt: 0,
     catalogRefreshTimer: 0, catalogUnavailable: false, initialized: false,
-    pendingJobName: "",
+    pendingJobName: "", emptyState: "input",
     simulationBaseline: null, simulationResult: null, simulationTimer: 0,
     simulationAbortController: null, simulationCache: new Map(), applyingStats: false,
   };
@@ -144,6 +147,7 @@
     if (state.catalog) setModelState(state.catalog.status, state.catalog.sampleCount);
     else setModelNotice(state.catalogUnavailable ? "samplesUnavailable" : "samplesChecking");
     if (state.simulationResult) renderSimulation(state.simulationResult);
+    if (state.emptyState) showEmptyState(state.emptyState);
   }
 
   function jobs() {
@@ -266,9 +270,11 @@
       importInput.value = "";
       importStatus.className = "stat-import-status success";
       importStatus.textContent = t("importSuccess", { count: filled });
+      form.classList.remove("was-submitted");
       form.classList.add("stats-imported");
       window.setTimeout(() => form.classList.remove("stats-imported"), 900);
 	  establishSimulationBaseline();
+      showEmptyState("ready");
       return true;
     } catch {
       state.applyingStats = false;
@@ -295,18 +301,32 @@
     };
   }
 
+  function showEmptyState(kind) {
+	state.emptyState = kind;
+	const copy = kind === "ready"
+		? ["readyToCalculateTitle", "readyToCalculateDescription"]
+		: kind === "collecting"
+			? ["waitingTitle", "waitingDescription"]
+			: ["inputWaitingTitle", "inputWaitingDescription"];
+	const empty = document.getElementById("result-empty");
+	empty.querySelector("strong").textContent = t(copy[0]);
+	empty.querySelector("p").textContent = t(copy[1]);
+	empty.hidden = false;
+    document.getElementById("result-list").hidden = true;
+    document.getElementById("confidence").className = "confidence pending";
+    document.getElementById("confidence").textContent = t("pending");
+    document.getElementById("formula-version").textContent = "—";
+  }
+
   function showCollecting(result) {
 	if (!state.simulationBaseline) renderDisplayedStats(result?.displayedStats);
     const sampleCount = result?.sampleCount ?? state.catalog?.sampleCount;
     if (sampleCount === undefined) {
       setModelNotice(state.catalogUnavailable ? "samplesUnavailable" : "samplesChecking");
     } else {
-      setModelState("collecting", sampleCount);
+      setModelState(state.catalog?.status || "collecting", sampleCount);
     }
-    document.getElementById("result-empty").hidden = false;
-    document.getElementById("result-list").hidden = true;
-    document.getElementById("confidence").className = "confidence pending";
-    document.getElementById("confidence").textContent = t("pending");
+    showEmptyState("collecting");
     document.getElementById("formula-version").textContent = result?.formulaVersion || "—";
   }
 
@@ -492,6 +512,7 @@
 
   function renderResults(result) {
     if (result.status !== "ready") { showCollecting(result); return; }
+	state.emptyState = "";
 	if (!state.simulationBaseline) renderDisplayedStats(result.displayedStats);
     setModelState("ready", result.sampleCount);
     const list = document.getElementById("result-list");
@@ -526,7 +547,11 @@
     event.preventDefault();
     const error = document.getElementById("form-error");
     error.hidden = true;
-    if (!form.reportValidity()) return;
+    form.classList.add("was-submitted");
+    if (!form.reportValidity()) {
+      showEmptyState("input");
+      return;
+    }
     if (!state.simulationBaseline) establishSimulationBaseline();
     submitButton.disabled = true;
     submitButton.textContent = t("calculating");
@@ -558,7 +583,10 @@
       if (state.applyingStats || !(event.target instanceof HTMLInputElement) ||
           !PROFILE_FIELDS.includes(event.target.name)) return;
       if (!state.simulationBaseline) {
-        if (form.checkValidity()) establishSimulationBaseline();
+        if (form.checkValidity()) {
+          establishSimulationBaseline();
+          showEmptyState("ready");
+        }
         return;
       }
       scheduleSimulation();
@@ -591,7 +619,7 @@
     state.catalogRefreshTimer = window.setInterval(
       refreshCatalogWhenVisible,
       CATALOG_REFRESH_MS);
-    showCollecting();
+    showEmptyState("input");
   }
 
   function activate() {
