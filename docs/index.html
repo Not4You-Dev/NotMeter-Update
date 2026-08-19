@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260819-4" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-5" defer></script>
   <script src="./assets/app.js?v=20260819-2" defer></script>
 </head>
 <body>
@@ -425,7 +425,7 @@
       <section class="efficiency-hero">
         <div>
           <span class="efficiency-kicker" data-stat-i18n="heroKicker">실전 데이터 기반</span>
-          <h3 data-stat-i18n="heroTitle">직업·스킬과 공격 방향에 맞는 성장 우선순위를 확인하세요</h3>
+          <h3 data-stat-i18n="heroTitle">직업 전체 전투 기준 성장 우선순위를 확인하세요</h3>
           <p data-stat-i18n="heroDescription">주신 스탯과 PVE·보스 스탯을 함께 비교하며, 던전에서 받은 정상적인 파티 버프도 분석에 반영합니다.</p>
         </div>
         <div class="model-state collecting" id="model-state" aria-live="polite">
@@ -447,23 +447,15 @@
       <div class="efficiency-layout">
         <form class="efficiency-form" id="efficiency-form" novalidate>
           <section class="efficiency-card">
-            <header><span>01</span><div><h3 data-stat-i18n="combatProfile">전투 조건</h3><p data-stat-i18n="combatProfileHelp">검증을 통과한 지원 보스를 동일 가중치로 종합하며 직업·대표 스킬·방향만 선택합니다.</p></div></header>
-            <div class="field-grid profile-grid">
+            <header><span>01</span><div><h3 data-stat-i18n="combatProfile">전투 조건</h3><p data-stat-i18n="combatProfileHelp">직업만 선택하면 검증된 보스의 전체 스킬·공격 방향 표본을 종합합니다.</p></div></header>
+            <div class="field-grid profile-grid job-profile-grid">
               <label><span data-stat-i18n="job">직업</span><select id="job" name="jobName" required></select></label>
-              <label><span data-stat-i18n="skill">대표 스킬</span><select id="skill" name="skillCode"><option value="0">직업 종합</option></select></label>
-              <label><span data-stat-i18n="skillLevel">스킬 레벨</span><input id="skill-level" name="skillLevel" type="number" min="0" max="99" value="0" inputmode="numeric"></label>
-              <label><span data-stat-i18n="direction">공격 방향</span><select id="direction" name="direction"><option value="none">종합</option><option value="front">전방</option><option value="back">후방</option></select></label>
-            </div>
-            <fieldset class="specialization-field" id="specialization-field" disabled>
-              <legend data-stat-i18n="specializations">스킬 특성</legend>
-              <div class="specialization-options">
-                <label><input type="checkbox" value="1"><span>1</span></label><label><input type="checkbox" value="2"><span>2</span></label><label><input type="checkbox" value="4"><span>3</span></label><label><input type="checkbox" value="8"><span>4</span></label><label><input type="checkbox" value="16"><span>5</span></label>
+              <div class="job-profile-summary">
+                <span data-stat-i18n="analysisScope">분석 범위</span>
+                <strong data-stat-i18n="jobOverallScope">직업 전체 전투 종합</strong>
+                <small data-stat-i18n="jobOverallHelp">스킬·레벨·특성을 따로 고르지 않고 실제 수집된 전체 전투 표본으로 계산합니다.</small>
               </div>
-            </fieldset>
-            <details class="passive-panel" id="passive-panel">
-              <summary><span data-stat-i18n="passives">패시브·스티그마 레벨</span><small data-stat-i18n="passiveHelp">특성 선택 없이 실제 레벨만 반영합니다</small></summary>
-              <div class="passive-options" id="passive-options"></div>
-            </details>
+            </div>
           </section>
 
           <section class="efficiency-card divine-card">
@@ -558,7 +550,7 @@
 
         <aside class="result-column">
           <section class="result-card" id="result-card">
-            <header><div><span class="result-kicker" data-stat-i18n="resultKicker">직업·스킬별 분석</span><h3 data-stat-i18n="resultTitle">스탯 효율 순위</h3></div><span class="confidence pending" id="confidence">검증 전</span></header>
+            <header><div><span class="result-kicker" data-stat-i18n="resultKicker">직업 전체 분석</span><h3 data-stat-i18n="resultTitle">스탯 효율 순위</h3></div><span class="confidence pending" id="confidence">검증 전</span></header>
 			<div class="displayed-stats" id="displayed-stats" hidden>
 			  <div class="displayed-stats-heading">
 				<div><strong data-stat-i18n="displayedStatsTitle">실시간 스탯 시뮬레이션</strong><span data-stat-i18n="displayedStatsHelp">복사 기준에서 입력값을 바꾸면 게임 표시 최종 스탯이 바로 갱신됩니다.</span></div>
@@ -574,7 +566,7 @@
 			  </div>
 			  <div class="simulation-damage"><span data-stat-i18n="simulationDamage">예상 종합 피해 변화</span><strong id="simulation-damage-gain">—</strong><small id="simulation-damage-state" data-stat-i18n="simulationWaiting">기준 스탯을 붙여넣으면 자동 계산됩니다.</small></div>
 			</div>
-            <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong data-stat-i18n="waitingTitle">표본을 수집하고 있습니다</strong><p data-stat-i18n="waitingDescription">신뢰 기준을 충족할 만큼 데이터가 쌓이면 계산 결과가 열립니다.</p></div>
+            <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong data-stat-i18n="waitingTitle">선택한 직업의 표본을 수집하고 있습니다</strong><p data-stat-i18n="waitingDescription">선택한 직업과 충분한 지원 보스가 높은 신뢰 기준을 통과하면 결과가 열립니다.</p></div>
             <div class="result-list" id="result-list" hidden></div>
             <footer><span data-stat-i18n="resultGuide">+1, +10, +1%p 단위별 순위이며 서로 다른 단위끼리는 직접 비교하지 않습니다.</span><b id="formula-version">—</b></footer>
           </section>
@@ -583,7 +575,7 @@
             <ol>
               <li data-stat-i18n="easyOne">딜미터기 처치 기록 상단에서 ‘내 스탯 복사’를 누릅니다.</li>
               <li data-stat-i18n="easyTwo">이 페이지 상단 입력칸에 붙여넣습니다.</li>
-              <li data-stat-i18n="easyThree">대표 스킬·공격 방향을 선택하면 검증을 통과한 지원 보스를 동일 가중치로 종합 계산합니다.</li>
+              <li data-stat-i18n="easyThree">직업만 확인하고 계산하면 전체 스킬·공격 방향 표본을 종합한 순위가 표시됩니다.</li>
             </ol>
           </section>
         </aside>
