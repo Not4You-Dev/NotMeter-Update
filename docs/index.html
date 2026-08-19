@@ -19,7 +19,7 @@
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260819-2">
-  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-8">
+  <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260819-9">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260819-8" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-9" defer></script>
   <script src="./assets/app.js?v=20260819-2" defer></script>
 </head>
 <body>
@@ -589,8 +589,8 @@
             <div class="result-empty" id="result-empty"><span class="result-empty-mark" aria-hidden="true">∿</span><strong>직업 전체 통계를 불러오는 중입니다</strong><p>스탯 입력 없이도 직업별 집계 순위를 볼 수 있습니다.</p></div>
             <div class="result-summary" id="result-summary" hidden></div>
             <section class="result-directional" id="result-directional" hidden></section>
-            <details class="result-details" id="result-details" hidden>
-              <summary id="result-details-label">전체 세부 순위 보기</summary>
+            <details class="result-details" id="result-details" open hidden>
+              <summary id="result-details-label">전체 효율 순위</summary>
               <div class="result-list" id="result-list" hidden></div>
             </details>
             <footer><span data-stat-i18n="resultGuide">+1, +10, +1%p 단위별 순위이며 서로 다른 단위끼리는 직접 비교하지 않습니다.</span><b id="formula-version">—</b></footer>
