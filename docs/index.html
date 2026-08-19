@@ -171,7 +171,7 @@
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
   <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
-  <script src="./assets/stat-efficiency.js?v=20260819-2" defer></script>
+  <script src="./assets/stat-efficiency.js?v=20260819-3" defer></script>
   <script src="./assets/app.js?v=20260819-2" defer></script>
 </head>
 <body>
@@ -355,7 +355,7 @@
           <div>
             <span class="boss-resistance-page-kicker">ALL TIME · ACCURACY · CRITICAL · HARD HIT · PERFECT</span>
             <h2 data-i18n="bossResistanceStatsTitle">보스 저항 통계</h2>
-            <p data-i18n="bossResistanceStatsDescription">강타·완벽 저항은 추정값을, 치명타·회피는 실제 공격 스탯과 관측 판정률을 함께 확인합니다.</p>
+            <p data-i18n="bossResistanceStatsDescription">강타·완벽 저항은 추정값을 표시하고, 치명타·회피는 수치 구간별 판정 표본으로 환산식을 검증합니다.</p>
           </div>
         </div>
         <a class="ranking-back-button" id="boss-resistance-back-button" href="./">
@@ -365,7 +365,7 @@
       </div>
       <div class="boss-resistance-guide">
         <span data-i18n="bossResistanceAllTime">전체 기간 누적</span>
-        <p data-i18n="bossResistanceSamplesGuide">원본 추정값은 그대로 표시하고, 게임 설정 추정치는 가장 가까운 5% 단위로 함께 표시합니다. 보스 표본 수가 많을수록 값이 안정됩니다.</p>
+        <p data-i18n="bossResistanceSamplesGuide">치명타·회피는 유효 스탯 구간별 성공·실패를 분리해 수집하며, 검증된 환산식이 나오기 전에는 저항 수치를 표시하지 않습니다. 페리·막기는 회피와 별도 판정입니다.</p>
       </div>
       <nav class="boss-resistance-tabs" id="boss-resistance-tabs" aria-label="보스 저항 통계 던전 선택" data-i18n-aria-label="bossResistanceDungeonAria"></nav>
       <div class="boss-resistance-content" id="boss-resistance-content" hidden>
@@ -583,7 +583,7 @@
             <ol>
               <li data-stat-i18n="easyOne">딜미터기 처치 기록 상단에서 ‘내 스탯 복사’를 누릅니다.</li>
               <li data-stat-i18n="easyTwo">이 페이지 상단 입력칸에 붙여넣습니다.</li>
-              <li data-stat-i18n="easyThree">대표 스킬·공격 방향을 선택하면 지원 던전 6개 보스를 동일 가중치로 종합 계산합니다.</li>
+              <li data-stat-i18n="easyThree">대표 스킬·공격 방향을 선택하면 검증을 통과한 지원 보스를 동일 가중치로 종합 계산합니다.</li>
             </ol>
           </section>
         </aside>
