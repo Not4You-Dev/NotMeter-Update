@@ -50,10 +50,13 @@
 		"freedom", "illusion", "life", "time", "destruction", "death", "wisdom",
 		"destiny", "space",
 	]);
-	const INTEGER_EFFECTS = new Set([
-		"additionalAttack", "minimumAttack", "maximumAttack", "criticalAttackPower", "sealstoneAdditionalDamage",
-		"accuracy", "pveAccuracy", "critical", "penetration", "pveAttack", "bossAttack",
-		"frontAttack", "backAttack", "frontCritical", "backCritical",
+	const ATTACK_VALUE_EFFECTS = new Set([
+		"additionalAttack", "minimumAttack", "maximumAttack", "criticalAttackPower",
+		"sealstoneAdditionalDamage", "penetration", "pveAttack", "bossAttack",
+		"frontAttack", "backAttack",
+	]);
+	const JUDGMENT_VALUE_EFFECTS = new Set([
+		"accuracy", "pveAccuracy", "critical", "frontCritical", "backCritical",
 	]);
   const DISPLAYED_STAT_FIELDS = [
     ["attack", false], ["accuracy", false], ["critical", false], ["defense", false],
@@ -62,7 +65,8 @@
   const TEXT = {
     ko: {
       title: "스탯 효율 계산기", subtitle: "내 캐릭터에서 무엇을 올려야 가장 강해지는지 비교합니다.",
-      inputWaitingTitle: "내 스탯을 붙여넣어 주세요", inputWaitingDescription: "딜미터기에서 복사한 스탯을 붙여넣으면 계산할 수 있습니다.", readyToCalculateTitle: "입력이 완료되었습니다", readyToCalculateDescription: "효율 계산을 누르면 직업 전체 전투 기준 순위가 표시됩니다.",
+      guideTitle: "어떤 결과가 표시되나요?", guideDescription: "스탯을 넣지 않아도 통계를 볼 수 있고, 내 스탯을 붙여넣으면 개인 기준으로 자동 보정됩니다.", guideOverviewTitle: "스탯 미입력 · 전체 통계", guideOverviewDescription: "선택한 직업의 실제 표본 중 대표 스탯을 기준으로 전체 전투 효율 순위를 바로 보여줍니다.", guidePersonalTitle: "내 스탯 붙여넣기 · 개인 보정", guidePersonalDescription: "현재 공격력·증폭·판정 수치를 반영해 내 캐릭터에서 실제로 더 유리한 순위로 자동 변경합니다.",
+      inputWaitingTitle: "직업 전체 통계를 불러오는 중입니다", inputWaitingDescription: "스탯 입력 없이도 직업별 집계 순위를 볼 수 있습니다.", readyToCalculateTitle: "내 스탯이 적용되었습니다", readyToCalculateDescription: "개인 스탯을 반영한 효율 순위로 자동 갱신합니다.",
       importTitle: "딜미터기에서 복사한 내 스탯 붙여넣기", importDescription: "딜미터기 처치 기록 상단의 ‘내 스탯 복사’를 누른 뒤 아래 칸에 붙여넣으면 현재 캐릭터 스탯이 자동 입력됩니다.", importPlaceholder: "여기를 누르고 Ctrl+V로 붙여넣기", importWaiting: "복사한 값을 기다리고 있습니다", importSuccess: "내 스탯 {count}개를 자동 입력했습니다", importInvalid: "딜미터기에서 복사한 올바른 스탯 값이 아닙니다",
       noticeTitle: "테스트 기능 안내", notice: "이 기능은 테스트 기능이며, 신뢰 테스트가 진행전 입니다.", heroKicker: "실전 데이터 기반", heroTitle: "직업 전체 전투 기준 성장 우선순위를 확인하세요", heroDescription: "주신 스탯과 PVE·보스 스탯을 함께 비교하며, 던전에서 받은 정상적인 파티 버프도 분석에 반영합니다.",
       collecting: "표본 수집 중 · 준비 중", ready: "계산 준비 완료", samples: "{count} 표본", samplesChecking: "표본 수 확인 중", samplesUnavailable: "표본 수 확인 지연", sourceOnly: "분석 대상", deus: "잠식된 데우스 연구기지(어려움)", noiran: "노이란의 숨겨진 유산(4단계)",
@@ -70,30 +74,32 @@
       divineStats: "주신 스탯", divineStatsHelp: "각 스탯 1당 확인된 상승 효과를 함께 표시합니다.", growthPending: "공격 연동 효과 확인 중", powerGrowth: "1당 공격력 증가 +0.1%p", precisionGrowth: "1당 명중·치명타 증가 +0.1%p", justiceGrowth: "1당 완벽 +0.2%p", freedomGrowth: "1당 명중 증가 +0.2%p", illusionGrowth: "1당 재시전 시간 −0.2%p", timeGrowth: "1당 전투 속도 +0.2%p", destructionGrowth: "1당 공격력 증가 +0.2%p", deathGrowth: "1당 치명타 증가 +0.2%p", wisdomGrowth: "1당 강타 +0.2%p",
       attackStats: "공격 스탯", attackStatsHelp: "복사 기능을 사용하면 자동 입력됩니다.", attack: "기초 공격력", additionalAttack: "추가 공격력", minimumAttack: "최소 공격력", maximumAttack: "최대 공격력", criticalAttackPower: "치명타 공격력", sealstoneAdditionalDamage: "봉혼석 추가 피해", power: "위력", vitality: "체력", agility: "민첩", knowledge: "지식", precision: "정확", will: "의지", justice: "정의", freedom: "자유", illusion: "환상", life: "생명", time: "시간", destruction: "파괴", death: "죽음", wisdom: "지혜", destiny: "운명", space: "공간", accuracy: "명중", weaponAccuracy: "무기 명중", pveAccuracy: "PVE 명중", critical: "치명타", defense: "방어력", armorDefense: "방어구 방어력", penetration: "관통", pveAttack: "PVE 공격력", bossAttack: "보스 공격력", frontAttack: "전방 공격력", backAttack: "후방 공격력", frontCritical: "전방 치명타", backCritical: "후방 치명타",
       percentStats: "증폭·판정 스탯", percentStatsHelp: "화면에 표시된 값을 그대로 사용합니다.", attackIncrease: "공격력 증가율", accuracyIncrease: "명중 증가율", criticalIncrease: "치명타 증가율", defenseIncrease: "방어력 증가율", damageAmp: "피해 증폭", weaponAmp: "무기 피해 증폭", pveAmp: "PVE 피해 증폭", bossAmp: "보스 피해 증폭", criticalAmp: "치명타 피해 증폭", additionalHit: "다단 히트 적중", perfect: "완벽", hardHit: "강타", cooldownTime: "재시전 시간", combatSpeed: "전투 속도", frontAmp: "전방 피해 증폭", backAmp: "후방 피해 증폭",
-      calculate: "효율 계산", calculating: "계산 중…", resultKicker: "직업 전체 분석", resultTitle: "스탯 효율 순위", displayedStatsTitle: "실시간 스탯 시뮬레이션", displayedStatsHelp: "복사 기준에서 입력값을 바꾸면 게임 표시 최종 스탯이 바로 갱신됩니다.", displayedAttack: "최종 공격력", displayedAccuracy: "최종 명중", displayedCritical: "최종 치명타", displayedDefense: "최종 방어력", displayedCooldownTime: "재시전 시간", displayedCombatSpeed: "전투 속도", simulationReset: "복사 기준으로 초기화", simulationDamage: "예상 종합 피해 변화", simulationWaiting: "기준 스탯을 붙여넣으면 자동 계산됩니다.", simulationCalculating: "변경값을 계산하고 있습니다.", simulationCollecting: "선택한 직업은 아직 검증 표본을 수집 중이며 최종 스탯은 정상 계산되었습니다.", simulationReady: "직업 전체 전투와 검증 완료 보스를 종합 계산한 결과입니다.", waitingTitle: "선택한 직업의 표본을 수집하고 있습니다", waitingDescription: "선택한 직업과 충분한 지원 보스가 높은 신뢰 기준을 통과하면 결과가 열립니다.", resultGuide: "+1, +10, +1%p 단위별 순위이며 서로 다른 단위끼리는 직접 비교하지 않습니다.", growthGroup: "주신 스탯 · +1 기준", integerGroup: "전투 수치 · +10 기준", percentGroup: "퍼센트 스탯 · +1%p 기준", easyTitle: "간편하게 사용하는 방법", easyOne: "딜미터기 처치 기록 상단에서 ‘내 스탯 복사’를 누릅니다.", easyTwo: "이 페이지 상단 입력칸에 붙여넣습니다.", easyThree: "직업만 확인하고 계산하면 전체 스킬·공격 방향 표본을 종합한 순위가 표시됩니다.",
+      calculate: "내 스탯으로 다시 계산", calculating: "계산 중…", resultKicker: "직업 전체 분석", resultTitle: "스탯 효율 순위", displayedStatsTitle: "실시간 스탯 시뮬레이션", displayedStatsHelp: "복사 기준에서 입력값을 바꾸면 게임 표시 최종 스탯이 바로 갱신됩니다.", displayedAttack: "최종 공격력", displayedAccuracy: "최종 명중", displayedCritical: "최종 치명타", displayedDefense: "최종 방어력", displayedCooldownTime: "재시전 시간", displayedCombatSpeed: "전투 속도", simulationReset: "복사 기준으로 초기화", simulationDamage: "예상 종합 피해 변화", simulationWaiting: "기준 스탯을 붙여넣으면 자동 계산됩니다.", simulationCalculating: "변경값을 계산하고 있습니다.", simulationCollecting: "선택한 직업은 아직 검증 표본을 수집 중이며 최종 스탯은 정상 계산되었습니다.", simulationReady: "직업 전체 전투와 검증 완료 보스를 종합 계산한 결과입니다.", waitingTitle: "선택한 직업의 표본을 수집하고 있습니다", waitingDescription: "선택한 직업과 충분한 지원 보스가 높은 신뢰 기준을 통과하면 결과가 열립니다.", resultGuide: "+1, +10, +1%p 단위별 순위이며 서로 다른 단위끼리는 직접 비교하지 않습니다.", overviewSource: "직업 대표 표본 기준", personalSource: "내 캐릭터 스탯 기준", growthGroup: "주신 스탯 · +1 기준", attackGroup: "공격 수치 · +10 기준", judgmentGroup: "판정 수치 · +10 기준", percentGroup: "퍼센트 스탯 · +1%p 기준", detailRanking: "전체 세부 순위 보기 · {count}개", easyTitle: "간편하게 사용하는 방법", easyOne: "직업을 선택하면 스탯 입력 없이 전체 표본 통계가 바로 표시됩니다.", easyTwo: "내 캐릭터에 맞추려면 딜미터기에서 ‘내 스탯 복사’ 후 붙여넣습니다.", easyThree: "붙여넣은 스탯은 자동 계산되며 입력값을 바꾸면 실시간으로 다시 보정됩니다.",
       pending: "검증 전", low: "낮은 신뢰", medium: "중간 신뢰", high: "높은 신뢰", invalid: "입력값을 확인해 주세요.", unavailable: "계산 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.",
       powerEffect: "위력 +1", vitalityEffect: "체력 +1", agilityEffect: "민첩 +1", knowledgeEffect: "지식 +1", precisionEffect: "정확 +1", willEffect: "의지 +1", justiceEffect: "정의 +1", freedomEffect: "자유 +1", illusionEffect: "환상 +1", lifeEffect: "생명 +1", timeEffect: "시간 +1", destructionEffect: "파괴 +1", deathEffect: "죽음 +1", wisdomEffect: "지혜 +1", destinyEffect: "운명 +1", spaceEffect: "공간 +1", additionalAttackEffect: "추가 공격력 +10", minimumAttackEffect: "최소 공격력 +10", maximumAttackEffect: "최대 공격력 +10", criticalAttackPowerEffect: "치명타 공격력 +10", sealstoneAdditionalDamageEffect: "봉혼석 추가 피해 +10", accuracyEffect: "명중 +10", pveAccuracyEffect: "PVE 명중 +10", criticalEffect: "치명타 +10", penetrationEffect: "관통 +10", damageAmplificationEffect: "피해 증폭 +1%p", weaponDamageAmplificationEffect: "무기 피해 증폭 +1%p", criticalDamageAmplificationEffect: "치명타 피해 증폭 +1%p", additionalHitAccuracyEffect: "다단 히트 적중 +1%p", perfectEffect: "완벽 +1%p", hardHitEffect: "강타 +1%p", cooldownTimeEffect: "재시전 시간 -1%p", combatSpeedEffect: "전투 속도 +1%p", pveAttackEffect: "PVE 공격력 +10", pveDamageAmplificationEffect: "PVE 피해 증폭 +1%p", bossAttackEffect: "보스 공격력 +10", bossDamageAmplificationEffect: "보스 피해 증폭 +1%p", frontAttackEffect: "전방 공격력 +10", backAttackEffect: "후방 공격력 +10", frontCriticalEffect: "전방 치명타 +10", backCriticalEffect: "후방 치명타 +10", frontDamageAmplificationEffect: "전방 피해 증폭 +1%p", backDamageAmplificationEffect: "후방 피해 증폭 +1%p",
 	  attributeStats: "속성·대상 증폭", waterAmp: "물 속성 증폭", fireAmp: "불 속성 증폭", windAmp: "바람 속성 증폭", earthAmp: "땅 속성 증폭", holyAmp: "신성 속성 증폭", darkAmp: "암흑 속성 증폭", allElementAmp: "모든 속성 증폭", intellectAmp: "지성형 피해 증폭", feralAmp: "야성형 피해 증폭", natureAmp: "자연형 피해 증폭", transAmp: "변이형 피해 증폭", waterDamageAmplificationEffect: "물 속성 증폭 +1%p", fireDamageAmplificationEffect: "불 속성 증폭 +1%p", windDamageAmplificationEffect: "바람 속성 증폭 +1%p", earthDamageAmplificationEffect: "땅 속성 증폭 +1%p", holyDamageAmplificationEffect: "신성 속성 증폭 +1%p", darkDamageAmplificationEffect: "암흑 속성 증폭 +1%p", allElementDamageAmplificationEffect: "모든 속성 증폭 +1%p", intellectDamageAmplificationEffect: "지성형 피해 증폭 +1%p", transDamageAmplificationEffect: "변이형 피해 증폭 +1%p",
     },
     en: {
 	  minimumAttackEffect: "Minimum Attack +10",
-      inputWaitingTitle: "Paste your stats to begin", inputWaitingDescription: "Paste stats copied from NotMeter to enable calculation.", readyToCalculateTitle: "Stats are ready", readyToCalculateDescription: "Press Calculate efficiency to show the full-class ranking.",
+      guideTitle: "What does this result mean?", guideDescription: "See aggregate rankings without stats, or paste your stats for an automatic personal adjustment.", guideOverviewTitle: "No stats · Class overview", guideOverviewDescription: "Shows the full-combat ranking from a representative real sample for the selected class.", guidePersonalTitle: "Paste stats · Personal result", guidePersonalDescription: "Uses your current attack, amplification, and hit values to reorder efficiency for your character.",
+      inputWaitingTitle: "Loading class-wide statistics", inputWaitingDescription: "View aggregate class rankings without entering stats.", readyToCalculateTitle: "Your stats are applied", readyToCalculateDescription: "The ranking updates automatically for your character.",
       title: "Stat Efficiency Calculator", subtitle: "Compare which upgrade makes your character stronger.", importTitle: "Paste stats copied from NotMeter", importDescription: "Press ‘Copy my stats’ at the top of Kill Records, then paste below to fill the current character's stats automatically.", importPlaceholder: "Click here and press Ctrl+V", importWaiting: "Waiting for copied stats", importSuccess: "Filled {count} stats automatically", importInvalid: "This is not a valid stat value copied from NotMeter", noticeTitle: "Test feature", notice: "This is a test feature and reliability validation has not started yet.", heroKicker: "LIVE COMBAT DATA", heroTitle: "Find your upgrade priority across all combat for your class", heroDescription: "Compare divine, PVE, and boss stats together. Verified party buffs received in dungeons are included in the analysis.", collecting: "Collecting samples · Coming soon", ready: "Ready to calculate", samples: "{count} samples", samplesChecking: "Checking sample count", samplesUnavailable: "Sample count delayed", sourceOnly: "Analysis sources", deus: "Corrupted Deus Research Base (Hard)", noiran: "Noiran's Hidden Legacy (Stage 4)",
       combatProfile: "Combat profile", combatProfileHelp: "Choose only a class to combine all skill and attack-direction samples from validated bosses.", job: "Class", analysisScope: "Scope", jobOverallScope: "All class combat", jobOverallHelp: "Uses the complete collected combat sample without separate skill, level, or trait choices.",
       divineStats: "Divine stats", divineStatsHelp: "Shows the confirmed increase provided by each point.", growthPending: "Offensive link under verification", powerGrowth: "+0.1%p Attack per point", precisionGrowth: "+0.1%p Accuracy and Critical per point", justiceGrowth: "+0.2%p Perfect per point", freedomGrowth: "+0.2%p Accuracy per point", illusionGrowth: "−0.2%p Cooldown Time per point", timeGrowth: "+0.2%p Combat Speed per point", destructionGrowth: "+0.2%p Attack per point", deathGrowth: "+0.2%p Critical per point", wisdomGrowth: "+0.2%p Power Hit per point",
       attackStats: "Attack stats", attackStatsHelp: "Use copied stats to fill these automatically.", attack: "Base Attack", additionalAttack: "Additional Attack", minimumAttack: "Minimum Attack", maximumAttack: "Maximum Attack", criticalAttackPower: "Critical Attack Power", sealstoneAdditionalDamage: "Sealstone Additional Damage", power: "Power", vitality: "Vitality", agility: "Agility", knowledge: "Knowledge", precision: "Precision", will: "Will", justice: "Justice", freedom: "Freedom", illusion: "Illusion", life: "Life", time: "Time", destruction: "Destruction", death: "Death", wisdom: "Wisdom", destiny: "Destiny", space: "Space", accuracy: "Accuracy", weaponAccuracy: "Weapon Accuracy", pveAccuracy: "PVE Accuracy", critical: "Critical", defense: "Defense", armorDefense: "Armor Defense", penetration: "Penetration", pveAttack: "PVE Attack", bossAttack: "Boss Attack", frontAttack: "Front Attack", backAttack: "Back Attack", frontCritical: "Front Critical", backCritical: "Back Critical", percentStats: "Amplification and hit stats", percentStatsHelp: "Use the exact values displayed in game.", attackIncrease: "Attack Increase", accuracyIncrease: "Accuracy Increase", criticalIncrease: "Critical Increase", defenseIncrease: "Defense Increase", damageAmp: "Damage Amp", weaponAmp: "Weapon Damage Amp", pveAmp: "PVE Damage Amp", bossAmp: "Boss Damage Amp", criticalAmp: "Critical Damage Amp", additionalHit: "Multi-hit Accuracy", perfect: "Perfect", hardHit: "Power Hit", cooldownTime: "Cooldown Time", combatSpeed: "Combat Speed", frontAmp: "Front Damage Amp", backAmp: "Back Damage Amp",
-      calculate: "Calculate efficiency", calculating: "Calculating…", resultKicker: "FULL CLASS ANALYSIS", resultTitle: "Stat efficiency ranking", displayedStatsTitle: "Live stat simulation", displayedStatsHelp: "Change an input to update the final in-game totals from the copied baseline.", displayedAttack: "Total Attack", displayedAccuracy: "Total Accuracy", displayedCritical: "Total Critical", displayedDefense: "Total Defense", displayedCooldownTime: "Cooldown Time", displayedCombatSpeed: "Combat Speed", simulationReset: "Reset to copied stats", simulationDamage: "Estimated overall damage change", simulationWaiting: "Paste copied stats to start automatic calculation.", simulationCalculating: "Calculating the changed values.", simulationCollecting: "The selected class is still collecting validated samples; final stats were calculated normally.", simulationReady: "Calculated across all class combat and validated bosses.", waitingTitle: "Collecting samples for the selected class", waitingDescription: "Results unlock after the selected class and enough supported bosses pass high-confidence validation.", resultGuide: "Rankings use +1, +10, and +1%p groups; do not compare different units directly.", growthGroup: "DIVINE STATS · PER +1", integerGroup: "COMBAT VALUES · PER +10", percentGroup: "PERCENT STATS · PER +1%p", easyTitle: "Quick start", easyOne: "Press ‘Copy my stats’ at the top of NotMeter Kill Records.", easyTwo: "Paste into the box at the top of this page.", easyThree: "Confirm the class and calculate to rank stats across all skills and attack directions.", pending: "Unverified", low: "Low confidence", medium: "Medium confidence", high: "High confidence", invalid: "Check the entered values.", unavailable: "Could not reach the calculator. Try again shortly.",
+      calculate: "Recalculate for my stats", calculating: "Calculating…", resultKicker: "FULL CLASS ANALYSIS", resultTitle: "Stat efficiency ranking", displayedStatsTitle: "Live stat simulation", displayedStatsHelp: "Change an input to update the final in-game totals from the copied baseline.", displayedAttack: "Total Attack", displayedAccuracy: "Total Accuracy", displayedCritical: "Total Critical", displayedDefense: "Total Defense", displayedCooldownTime: "Cooldown Time", displayedCombatSpeed: "Combat Speed", simulationReset: "Reset to copied stats", simulationDamage: "Estimated overall damage change", simulationWaiting: "Paste copied stats to start automatic calculation.", simulationCalculating: "Calculating the changed values.", simulationCollecting: "The selected class is still collecting validated samples; final stats were calculated normally.", simulationReady: "Calculated across all class combat and validated bosses.", waitingTitle: "Collecting samples for the selected class", waitingDescription: "Results unlock after the selected class and enough supported bosses pass high-confidence validation.", resultGuide: "Rankings use +1, +10, and +1%p groups; do not compare different units directly.", overviewSource: "Representative class samples", personalSource: "Your character stats", growthGroup: "DIVINE STATS · PER +1", attackGroup: "ATTACK VALUES · PER +10", judgmentGroup: "HIT VALUES · PER +10", percentGroup: "PERCENT STATS · PER +1%p", detailRanking: "View all detailed rankings · {count}", easyTitle: "Quick start", easyOne: "Choose a class to see aggregate rankings without entering stats.", easyTwo: "For a personal result, copy your stats in NotMeter and paste them here.", easyThree: "Pasted stats calculate automatically and live changes are re-evaluated.", pending: "Unverified", low: "Low confidence", medium: "Medium confidence", high: "High confidence", invalid: "Check the entered values.", unavailable: "Could not reach the calculator. Try again shortly.",
       powerEffect: "Power +1", vitalityEffect: "Vitality +1", agilityEffect: "Agility +1", knowledgeEffect: "Knowledge +1", precisionEffect: "Precision +1", willEffect: "Will +1", justiceEffect: "Justice +1", freedomEffect: "Freedom +1", illusionEffect: "Illusion +1", lifeEffect: "Life +1", timeEffect: "Time +1", destructionEffect: "Destruction +1", deathEffect: "Death +1", wisdomEffect: "Wisdom +1", destinyEffect: "Destiny +1", spaceEffect: "Space +1", additionalAttackEffect: "Additional Attack +10", maximumAttackEffect: "Maximum Attack +10", criticalAttackPowerEffect: "Critical Attack Power +10", sealstoneAdditionalDamageEffect: "Sealstone Additional Damage +10", accuracyEffect: "Accuracy +10", pveAccuracyEffect: "PVE Accuracy +10", criticalEffect: "Critical +10", penetrationEffect: "Penetration +10", damageAmplificationEffect: "Damage Amp +1%p", weaponDamageAmplificationEffect: "Weapon Damage Amp +1%p", criticalDamageAmplificationEffect: "Critical Damage Amp +1%p", additionalHitAccuracyEffect: "Multi-hit Accuracy +1%p", perfectEffect: "Perfect +1%p", hardHitEffect: "Power Hit +1%p", cooldownTimeEffect: "Cooldown Time -1%p", combatSpeedEffect: "Combat Speed +1%p", pveAttackEffect: "PVE Attack +10", pveDamageAmplificationEffect: "PVE Damage Amp +1%p", bossAttackEffect: "Boss Attack +10", bossDamageAmplificationEffect: "Boss Damage Amp +1%p", frontAttackEffect: "Front Attack +10", backAttackEffect: "Back Attack +10", frontCriticalEffect: "Front Critical +10", backCriticalEffect: "Back Critical +10", frontDamageAmplificationEffect: "Front Damage Amp +1%p", backDamageAmplificationEffect: "Back Damage Amp +1%p",
 	  attributeStats: "Element and target amps", waterAmp: "Water Damage Amp", fireAmp: "Fire Damage Amp", windAmp: "Wind Damage Amp", earthAmp: "Earth Damage Amp", holyAmp: "Holy Damage Amp", darkAmp: "Dark Damage Amp", allElementAmp: "All Element Amp", intellectAmp: "Intellect Damage Amp", feralAmp: "Feral Damage Amp", natureAmp: "Nature Damage Amp", transAmp: "Trans Damage Amp", waterDamageAmplificationEffect: "Water Damage Amp +1%p", fireDamageAmplificationEffect: "Fire Damage Amp +1%p", windDamageAmplificationEffect: "Wind Damage Amp +1%p", earthDamageAmplificationEffect: "Earth Damage Amp +1%p", holyDamageAmplificationEffect: "Holy Damage Amp +1%p", darkDamageAmplificationEffect: "Dark Damage Amp +1%p", allElementDamageAmplificationEffect: "All Element Amp +1%p", intellectDamageAmplificationEffect: "Intellect Damage Amp +1%p", transDamageAmplificationEffect: "Trans Damage Amp +1%p",
     },
     "zh-TW": {
 	  minimumAttackEffect: "最小攻擊力 +10",
-      inputWaitingTitle: "請先貼上角色屬性", inputWaitingDescription: "貼上從 NotMeter 複製的屬性後即可開始計算。", readyToCalculateTitle: "屬性已輸入完成", readyToCalculateDescription: "按下計算效率即可顯示職業整體戰鬥排名。",
+      guideTitle: "結果代表什麼？", guideDescription: "不用輸入屬性即可查看整體統計；貼上角色屬性後會自動調整為個人結果。", guideOverviewTitle: "未輸入屬性 · 職業統計", guideOverviewDescription: "依所選職業的真實代表樣本，立即顯示整體戰鬥效率排名。", guidePersonalTitle: "貼上屬性 · 個人調整", guidePersonalDescription: "套用目前攻擊、增幅與判定數值，自動改為適合目前角色的效率排名。",
+      inputWaitingTitle: "正在載入職業整體統計", inputWaitingDescription: "不輸入屬性也能查看職業彙總排名。", readyToCalculateTitle: "已套用角色屬性", readyToCalculateDescription: "排名會自動依目前角色重新計算。",
       title: "屬性效率計算器", subtitle: "比較哪一項提升最能強化目前角色。", importTitle: "貼上從 NotMeter 複製的角色屬性", importDescription: "在討伐紀錄上方按下「複製我的屬性」，再貼到下方即可自動填入目前角色的數值。", importPlaceholder: "點擊此處並按 Ctrl+V 貼上", importWaiting: "等待貼上已複製的屬性", importSuccess: "已自動填入 {count} 項屬性", importInvalid: "這不是從 NotMeter 複製的有效屬性", noticeTitle: "測試功能說明", notice: "此功能目前為測試功能，尚未開始可信度驗證。", heroKicker: "實戰資料分析", heroTitle: "確認職業整體戰鬥的成長優先順序", heroDescription: "同時比較主神、PVE 與首領屬性，副本中已確認的隊伍增益也會納入分析。", collecting: "正在收集樣本 · 準備中", ready: "可開始計算", samples: "{count} 筆樣本", samplesChecking: "正在確認樣本數", samplesUnavailable: "樣本數確認延遲", sourceOnly: "分析對象", deus: "受侵蝕的德烏斯研究基地（困難）", noiran: "諾伊蘭的隱藏遺產（第4階段）",
       combatProfile: "戰鬥條件", combatProfileHelp: "只需選擇職業，即可綜合通過驗證首領的全部技能與攻擊方向樣本。", job: "職業", analysisScope: "分析範圍", jobOverallScope: "職業整體戰鬥", jobOverallHelp: "不需另外選擇技能、等級或特性，直接使用完整收集的戰鬥樣本。",
       divineStats: "主神屬性", divineStatsHelp: "同時顯示每 1 點已確認的提升效果。", growthPending: "攻擊連動效果確認中", powerGrowth: "每點攻擊力增加 +0.1%p", precisionGrowth: "每點命中與暴擊增加 +0.1%p", justiceGrowth: "每點完美 +0.2%p", freedomGrowth: "每點命中增加 +0.2%p", illusionGrowth: "每點再使用時間 −0.2%p", timeGrowth: "每點戰鬥速度 +0.2%p", destructionGrowth: "每點攻擊力增加 +0.2%p", deathGrowth: "每點暴擊增加 +0.2%p", wisdomGrowth: "每點強擊 +0.2%p",
       attackStats: "攻擊屬性", attackStatsHelp: "使用複製功能即可自動填入。", attack: "基礎攻擊力", additionalAttack: "追加攻擊力", minimumAttack: "最小攻擊力", maximumAttack: "最大攻擊力", criticalAttackPower: "暴擊攻擊力", sealstoneAdditionalDamage: "封魂石追加傷害", power: "威力", vitality: "體力", agility: "敏捷", knowledge: "知識", precision: "精準", will: "意志", justice: "正義", freedom: "自由", illusion: "幻象", life: "生命", time: "時間", destruction: "破壞", death: "死亡", wisdom: "智慧", destiny: "命運", space: "空間", accuracy: "命中", weaponAccuracy: "武器命中", pveAccuracy: "PVE 命中", critical: "暴擊", defense: "防禦力", armorDefense: "防具防禦力", penetration: "貫穿", pveAttack: "PVE 攻擊力", bossAttack: "首領攻擊力", frontAttack: "正面攻擊力", backAttack: "背面攻擊力", frontCritical: "正面暴擊", backCritical: "背面暴擊", percentStats: "增幅與判定屬性", percentStatsHelp: "使用遊戲畫面顯示的原始數值。", attackIncrease: "攻擊力增加率", accuracyIncrease: "命中增加率", criticalIncrease: "暴擊增加率", defenseIncrease: "防禦力增加率", damageAmp: "傷害增幅", weaponAmp: "武器傷害增幅", pveAmp: "PVE 傷害增幅", bossAmp: "首領傷害增幅", criticalAmp: "暴擊傷害增幅", additionalHit: "多段命中", perfect: "完美", hardHit: "強擊", cooldownTime: "再使用時間", combatSpeed: "戰鬥速度", frontAmp: "正面傷害增幅", backAmp: "後方傷害增幅",
-      calculate: "計算效率", calculating: "計算中…", resultKicker: "職業整體分析", resultTitle: "屬性效率排名", displayedStatsTitle: "即時屬性模擬", displayedStatsHelp: "變更輸入值後，會從複製基準即時更新遊戲最終屬性。", displayedAttack: "最終攻擊力", displayedAccuracy: "最終命中", displayedCritical: "最終暴擊", displayedDefense: "最終防禦力", displayedCooldownTime: "再使用時間", displayedCombatSpeed: "戰鬥速度", simulationReset: "重設為複製基準", simulationDamage: "預估綜合傷害變化", simulationWaiting: "貼上複製的屬性後即可自動計算。", simulationCalculating: "正在計算變更後的數值。", simulationCollecting: "所選職業仍在收集驗證樣本，最終屬性已正常計算。", simulationReady: "已綜合職業整體戰鬥與通過驗證的首領。", waitingTitle: "正在收集所選職業的樣本", waitingDescription: "所選職業與足夠的支援首領通過高可信度驗證後才會顯示結果。", resultGuide: "排名分為 +1、+10、+1%p 三種單位，不可跨單位直接比較。", growthGroup: "主神屬性 · 每 +1", integerGroup: "戰鬥數值 · 每 +10", percentGroup: "百分比屬性 · 每 +1%p", easyTitle: "快速使用方法", easyOne: "在 NotMeter 討伐紀錄上方按下「複製我的屬性」。", easyTwo: "貼到本頁上方輸入框。", easyThree: "確認職業後直接計算，即可顯示全部技能與攻擊方向的綜合排名。", pending: "尚未驗證", low: "低可信度", medium: "中可信度", high: "高可信度", invalid: "請確認輸入值。", unavailable: "無法連線至計算服務，請稍後再試。",
+      calculate: "依我的屬性重新計算", calculating: "計算中…", resultKicker: "職業整體分析", resultTitle: "屬性效率排名", displayedStatsTitle: "即時屬性模擬", displayedStatsHelp: "變更輸入值後，會從複製基準即時更新遊戲最終屬性。", displayedAttack: "最終攻擊力", displayedAccuracy: "最終命中", displayedCritical: "最終暴擊", displayedDefense: "最終防禦力", displayedCooldownTime: "再使用時間", displayedCombatSpeed: "戰鬥速度", simulationReset: "重設為複製基準", simulationDamage: "預估綜合傷害變化", simulationWaiting: "貼上複製的屬性後即可自動計算。", simulationCalculating: "正在計算變更後的數值。", simulationCollecting: "所選職業仍在收集驗證樣本，最終屬性已正常計算。", simulationReady: "已綜合職業整體戰鬥與通過驗證的首領。", waitingTitle: "正在收集所選職業的樣本", waitingDescription: "所選職業與足夠的支援首領通過高可信度驗證後才會顯示結果。", resultGuide: "排名分為 +1、+10、+1%p 三種單位，不可跨單位直接比較。", overviewSource: "職業代表樣本基準", personalSource: "目前角色屬性基準", growthGroup: "主神屬性 · 每 +1", attackGroup: "攻擊數值 · 每 +10", judgmentGroup: "判定數值 · 每 +10", percentGroup: "百分比屬性 · 每 +1%p", detailRanking: "查看全部詳細排名 · {count}項", easyTitle: "快速使用方法", easyOne: "選擇職業後，不需輸入屬性即可查看整體樣本統計。", easyTwo: "若要個人結果，請在 NotMeter 複製角色屬性後貼到這裡。", easyThree: "貼上後會自動計算，變更輸入值時也會即時重新調整。", pending: "尚未驗證", low: "低可信度", medium: "中可信度", high: "高可信度", invalid: "請確認輸入值。", unavailable: "無法連線至計算服務，請稍後再試。",
       powerEffect: "威力 +1", vitalityEffect: "體力 +1", agilityEffect: "敏捷 +1", knowledgeEffect: "知識 +1", precisionEffect: "精準 +1", willEffect: "意志 +1", justiceEffect: "正義 +1", freedomEffect: "自由 +1", illusionEffect: "幻象 +1", lifeEffect: "生命 +1", timeEffect: "時間 +1", destructionEffect: "破壞 +1", deathEffect: "死亡 +1", wisdomEffect: "智慧 +1", destinyEffect: "命運 +1", spaceEffect: "空間 +1", additionalAttackEffect: "追加攻擊力 +10", maximumAttackEffect: "最大攻擊力 +10", criticalAttackPowerEffect: "暴擊攻擊力 +10", sealstoneAdditionalDamageEffect: "封魂石追加傷害 +10", accuracyEffect: "命中 +10", pveAccuracyEffect: "PVE 命中 +10", criticalEffect: "暴擊 +10", penetrationEffect: "貫穿 +10", damageAmplificationEffect: "傷害增幅 +1%p", weaponDamageAmplificationEffect: "武器傷害增幅 +1%p", criticalDamageAmplificationEffect: "暴擊傷害增幅 +1%p", additionalHitAccuracyEffect: "多段命中 +1%p", perfectEffect: "完美 +1%p", hardHitEffect: "強擊 +1%p", cooldownTimeEffect: "再使用時間 -1%p", combatSpeedEffect: "戰鬥速度 +1%p", pveAttackEffect: "PVE 攻擊力 +10", pveDamageAmplificationEffect: "PVE 傷害增幅 +1%p", bossAttackEffect: "首領攻擊力 +10", bossDamageAmplificationEffect: "首領傷害增幅 +1%p", frontAttackEffect: "正面攻擊力 +10", backAttackEffect: "背面攻擊力 +10", frontCriticalEffect: "正面暴擊 +10", backCriticalEffect: "背面暴擊 +10", frontDamageAmplificationEffect: "正面傷害增幅 +1%p", backDamageAmplificationEffect: "後方傷害增幅 +1%p",
 	  attributeStats: "屬性與目標增幅", waterAmp: "水屬性增幅", fireAmp: "火屬性增幅", windAmp: "風屬性增幅", earthAmp: "地屬性增幅", holyAmp: "神聖屬性增幅", darkAmp: "黑暗屬性增幅", allElementAmp: "所有屬性增幅", intellectAmp: "知性型傷害增幅", feralAmp: "野性型傷害增幅", natureAmp: "自然型傷害增幅", transAmp: "變異型傷害增幅", waterDamageAmplificationEffect: "水屬性增幅 +1%p", fireDamageAmplificationEffect: "火屬性增幅 +1%p", windDamageAmplificationEffect: "風屬性增幅 +1%p", earthDamageAmplificationEffect: "땅屬性增幅 +1%p", holyDamageAmplificationEffect: "神聖屬性增幅 +1%p", darkDamageAmplificationEffect: "黑暗屬性增幅 +1%p", allElementDamageAmplificationEffect: "所有屬性增幅 +1%p", intellectDamageAmplificationEffect: "知性型傷害增幅 +1%p", transDamageAmplificationEffect: "變異型傷害增幅 +1%p",
     },
@@ -111,7 +117,7 @@
   const state = {
     locale: resolveLocale(), catalog: null, catalogLoad: null, catalogLoadedAt: 0,
     catalogRefreshTimer: 0, catalogUnavailable: false, initialized: false,
-    pendingJobName: "", emptyState: "input",
+    pendingJobName: "", emptyState: "input", lastResult: null, resultMode: "overview",
     simulationBaseline: null, simulationResult: null, simulationTimer: 0,
     simulationAbortController: null, simulationCache: new Map(), applyingStats: false,
   };
@@ -147,7 +153,8 @@
     if (state.catalog) setModelState(state.catalog.status, state.catalog.sampleCount);
     else setModelNotice(state.catalogUnavailable ? "samplesUnavailable" : "samplesChecking");
     if (state.simulationResult) renderSimulation(state.simulationResult);
-    if (state.emptyState) showEmptyState(state.emptyState);
+    if (state.lastResult) renderResults(state.lastResult, state.resultMode);
+    else if (state.emptyState) showEmptyState(state.emptyState);
   }
 
   function jobs() {
@@ -199,6 +206,7 @@
         state.catalogLoadedAt = Date.now();
         setModelState(catalog.status, catalog.sampleCount);
         renderCatalog();
+        if (!state.simulationBaseline) renderCatalogOverview();
         return catalog;
       })
       .catch(() => {
@@ -275,6 +283,7 @@
       window.setTimeout(() => form.classList.remove("stats-imported"), 900);
 	  establishSimulationBaseline();
       showEmptyState("ready");
+      window.setTimeout(() => form.requestSubmit(), 0);
       return true;
     } catch {
       state.applyingStats = false;
@@ -303,6 +312,7 @@
 
   function showEmptyState(kind) {
 	state.emptyState = kind;
+	state.lastResult = null;
 	const copy = kind === "ready"
 		? ["readyToCalculateTitle", "readyToCalculateDescription"]
 		: kind === "collecting"
@@ -313,9 +323,34 @@
 	empty.querySelector("p").textContent = t(copy[1]);
 	empty.hidden = false;
     document.getElementById("result-list").hidden = true;
+    document.getElementById("result-summary").hidden = true;
+    document.getElementById("result-details").hidden = true;
+    document.getElementById("result-source").textContent = t(
+      state.simulationBaseline ? "personalSource" : "overviewSource");
     document.getElementById("confidence").className = "confidence pending";
     document.getElementById("confidence").textContent = t("pending");
     document.getElementById("formula-version").textContent = "—";
+  }
+
+  function renderCatalogOverview() {
+    if (!state.catalog || state.catalog.status !== "ready") {
+      showCollecting();
+      return false;
+    }
+    const selected = state.catalog.jobs?.find(job =>
+      job.key === jobSelect.value || job.name === jobSelect.value);
+    if (!selected || !Array.isArray(selected.effects) || selected.effects.length === 0) {
+      showCollecting({ sampleCount: state.catalog.sampleCount, formulaVersion: state.catalog.formulaVersion });
+      return false;
+    }
+    renderResults({
+      status: "ready",
+      sampleCount: state.catalog.sampleCount,
+      formulaVersion: state.catalog.formulaVersion,
+      confidence: "high",
+      effects: selected.effects,
+    }, "overview");
+    return true;
   }
 
   function showCollecting(result) {
@@ -510,19 +545,22 @@
     input.dispatchEvent(new Event("input", { bubbles: true }));
   }
 
-  function renderResults(result) {
+  function renderResults(result, mode = "personal") {
     if (result.status !== "ready") { showCollecting(result); return; }
 	state.emptyState = "";
+	state.lastResult = result;
+	state.resultMode = mode;
 	if (!state.simulationBaseline) renderDisplayedStats(result.displayedStats);
     setModelState("ready", result.sampleCount);
     const list = document.getElementById("result-list");
     const effects = Array.isArray(result.effects) ? result.effects : [];
 	const groups = [
 		["growthGroup", effects.filter(effect => GROWTH_EFFECTS.has(effect.key))],
-		["integerGroup", effects.filter(effect => INTEGER_EFFECTS.has(effect.key))],
-		["percentGroup", effects.filter(effect => !GROWTH_EFFECTS.has(effect.key) && !INTEGER_EFFECTS.has(effect.key))],
-	];
-	list.replaceChildren(...groups.filter(([, items]) => items.length).map(([titleKey, items]) => {
+		["attackGroup", effects.filter(effect => ATTACK_VALUE_EFFECTS.has(effect.key))],
+		["judgmentGroup", effects.filter(effect => JUDGMENT_VALUE_EFFECTS.has(effect.key))],
+		["percentGroup", effects.filter(effect => !GROWTH_EFFECTS.has(effect.key) && !ATTACK_VALUE_EFFECTS.has(effect.key) && !JUDGMENT_VALUE_EFFECTS.has(effect.key))],
+	].filter(([, items]) => items.length);
+	list.replaceChildren(...groups.map(([titleKey, items]) => {
 		const group = document.createElement("section"); group.className = "result-group";
 		const title = document.createElement("h4"); title.className = "result-group-title"; title.textContent = t(titleKey);
 		group.append(title, ...items.map((effect, index) => {
@@ -535,8 +573,25 @@
 		}));
 		return group;
 	}));
+    const summary = document.getElementById("result-summary");
+    summary.replaceChildren(...groups.map(([titleKey, items]) => {
+      const effect = items[0];
+      const card = document.createElement("div"); card.className = "result-summary-card";
+      const category = document.createElement("span"); category.textContent = t(titleKey);
+      const name = document.createElement("strong"); name.textContent = t(EFFECT_KEYS[effect.key] || effect.key);
+      const gain = document.createElement("b"); gain.textContent = `+${Number(effect.gainPercent).toFixed(4)}%`;
+      card.append(category, name, gain);
+      return card;
+    }));
+    summary.hidden = groups.length === 0;
+    const details = document.getElementById("result-details");
+    details.hidden = effects.length === 0;
+    details.open = false;
+    document.getElementById("result-details-label").textContent = t("detailRanking", { count: effects.length });
     document.getElementById("result-empty").hidden = true;
     list.hidden = false;
+    document.getElementById("result-source").textContent = t(
+      mode === "overview" ? "overviewSource" : "personalSource");
     const confidence = document.getElementById("confidence");
     confidence.className = `confidence ${result.confidence}`;
     confidence.textContent = t(result.confidence);
@@ -549,7 +604,7 @@
     error.hidden = true;
     form.classList.add("was-submitted");
     if (!form.reportValidity()) {
-      showEmptyState("input");
+      renderCatalogOverview();
       return;
     }
     if (!state.simulationBaseline) establishSimulationBaseline();
@@ -579,6 +634,9 @@
     state.initialized = true;
     installStatStepControls();
     form.addEventListener("submit", submit);
+    jobSelect.addEventListener("change", () => {
+      if (!state.simulationBaseline) renderCatalogOverview();
+    });
     form.addEventListener("input", event => {
       if (state.applyingStats || !(event.target instanceof HTMLInputElement) ||
           !PROFILE_FIELDS.includes(event.target.name)) return;
