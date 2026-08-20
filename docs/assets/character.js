@@ -417,16 +417,24 @@
       refreshButton.textContent = copy.refreshingProfile;
       refreshStatus.textContent = copy.refreshingProfile;
       const succeeded = await loadProfile(true, true);
+      const visibleRefresh = elements["character-profile-content"]
+        ?.querySelector(".character-profile-refresh");
+      const visibleStatus = visibleRefresh?.querySelector("span");
+      const visibleButton = visibleRefresh?.querySelector("button");
+      if (visibleButton) {
+        visibleButton.disabled = false;
+        visibleButton.textContent = copy.refreshProfile;
+      }
       if (!succeeded) {
-        refreshButton.disabled = false;
-        refreshButton.textContent = copy.refreshProfile;
-        refreshStatus.textContent = copy.refreshFailed;
+        if (visibleStatus) visibleStatus.textContent = copy.refreshFailed;
         return;
       }
       const refreshedAt = state.profile?.fetchedAt || "";
-      refreshStatus.textContent = refreshedAt === previousFetchedAt
-        ? copy.refreshCooldown
-        : copy.refreshComplete;
+      if (visibleStatus) {
+        visibleStatus.textContent = refreshedAt === previousFetchedAt
+          ? copy.refreshCooldown
+          : copy.refreshComplete;
+      }
     });
     refresh.append(refreshStatus, refreshButton);
     cp.append(refresh);
