@@ -545,9 +545,9 @@
       renderSectionNav(),
       renderCharacterRankings(profile),
       renderEquipment(regularEquipment, itemDetails),
+      renderSkills(data?.equipment?.skill?.skillList || []),
       renderStats(statList),
       renderArcana(arcana, itemDetails),
-      renderSkills(data?.equipment?.skill?.skillList || []),
       textNode("p", copy.officialNote, "character-data-note"),
     );
   }
@@ -650,8 +650,8 @@
     for (const [id, label] of [
       ["character-rankings", copy.ranking],
       ["character-equipment", copy.equipment],
-      ["character-stats", copy.stats], ["character-arcana", copy.arcana],
       ["character-skills", copy.skills],
+      ["character-stats", copy.stats], ["character-arcana", copy.arcana],
     ]) {
       const link = textNode("a", label);
       link.href = `#${id}`;
