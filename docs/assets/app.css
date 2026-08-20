@@ -3837,6 +3837,8 @@ tr:nth-child(3) .rank-badge {
 }
 
 .class-table .class-dps {
+  width: 146px;
+  min-width: 146px;
   vertical-align: middle;
 }
 
@@ -3849,9 +3851,9 @@ tr:nth-child(3) .rank-badge {
 }
 
 .class-dps-adjusted {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+  display: grid;
+  justify-items: end;
+  gap: 1px;
   margin-top: 3px;
   color: #7797aa;
   font-size: 9.5px;
@@ -3859,6 +3861,25 @@ tr:nth-child(3) .rank-badge {
   font-weight: 800;
   line-height: 1.15;
   white-space: nowrap;
+}
+
+.class-dps-metric {
+  display: grid;
+  width: 100%;
+  min-width: 96px;
+  grid-template-columns: auto minmax(62px, 1fr);
+  align-items: baseline;
+  gap: 5px;
+}
+
+.class-dps-metric-label {
+  color: #66879b;
+  font-size: 0.92em;
+}
+
+.class-dps-metric-value {
+  overflow: visible;
+  text-align: right;
 }
 
 .class-dps-metric.raid {
@@ -5769,7 +5790,7 @@ tr:nth-child(3) .rank-badge {
   .class-table tbody tr {
     display: grid;
     min-height: 94px;
-    grid-template-columns: 46px minmax(0, 1fr) 88px;
+    grid-template-columns: 46px minmax(0, 1fr) 104px;
     grid-template-rows: minmax(50px, auto) 28px;
     gap: 0 7px;
     padding: 7px 9px;
@@ -5828,6 +5849,8 @@ tr:nth-child(3) .rank-badge {
 
   .class-table .class-dps {
     display: flex;
+    width: auto;
+    min-width: 0;
     grid-column: 3;
     grid-row: 1;
     align-items: flex-end;
@@ -5839,10 +5862,18 @@ tr:nth-child(3) .rank-badge {
 
   .class-table .class-dps-adjusted {
     display: grid;
+    width: 100%;
     justify-items: end;
     gap: 1px;
     margin-top: 2px;
     font-size: 8.5px;
+  }
+
+  .class-table .class-dps-metric {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 4px;
   }
 
   .class-table .detail-column {
