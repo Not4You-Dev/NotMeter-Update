@@ -33,7 +33,7 @@
       skills: "스킬", activeSkills: "스킬", stigmaSkills: "스티그마", passiveSkills: "패시브",
       collection: "탈것 · 날개 · 타이틀",
       ranking: "랭킹", rankingEyebrow: "NOTMETER PUBLIC RANKING", rankingTitle: "구간별 TOP 20",
-      rankingNote: "공개 닉네임으로 등록된 전체 기간 직업별 TOP 20 기록입니다.",
+      rankingNote: "공개 닉네임으로 등록된 전체 기간 기록 중 던전별 최고 DPS 한 건만 표시합니다.",
       rankingLoading: "공개 랭킹을 확인하고 있습니다.",
       rankingEmpty: "공개 닉네임으로 등록된 구간별 TOP 20 기록이 없습니다.",
       rankingError: "랭킹 정보를 불러오지 못했습니다.", rank: "순위", dungeon: "던전", boss: "보스", dps: "DPS",
@@ -70,7 +70,7 @@
       arcana: "Arcana", skills: "Skills", activeSkills: "Skills", stigmaSkills: "Stigma", passiveSkills: "Passive",
       collection: "Mount · Wings · Titles",
       ranking: "Ranking", rankingEyebrow: "NOTMETER PUBLIC RANKING", rankingTitle: "Top 20 by CP bracket",
-      rankingNote: "All-time class Top 20 records registered with a public nickname.",
+      rankingNote: "Shows only the highest-DPS all-time public Top 20 record for each dungeon.",
       rankingLoading: "Checking public rankings.", rankingEmpty: "No public Top 20 bracket record was found.",
       rankingError: "Could not load ranking data.", rank: "Rank", dungeon: "Dungeon", boss: "Boss", dps: "DPS",
       combatPower: "Combat Power", itemLevel: "Item Level", legion: "Legion", none: "None",
@@ -103,7 +103,7 @@
       equipment: "裝備", arcana: "阿爾卡納", skills: "技能", activeSkills: "技能", stigmaSkills: "烙印技能",
       passiveSkills: "被動技能",
       ranking: "排名", rankingEyebrow: "NOTMETER PUBLIC RANKING", rankingTitle: "區間 TOP 20",
-      rankingNote: "以公開暱稱登錄的全期間職業 TOP 20 紀錄。",
+      rankingNote: "每個副本僅顯示公開暱稱的全期間最高 DPS TOP 20 紀錄。",
       rankingLoading: "正在確認公開排名。", rankingEmpty: "沒有公開暱稱的區間 TOP 20 紀錄。",
       rankingError: "無法載入排名資料。", rank: "名次", dungeon: "副本", boss: "首領", dps: "DPS",
       collection: "坐騎 · 翅膀 · 稱號", combatPower: "戰鬥力", itemLevel: "道具等級",
@@ -516,7 +516,7 @@
     for (const [dungeonKey, ranking] of Object.entries(cache.classRankings || {})) {
       const views = Array.isArray(ranking?.views) ? ranking.views : [];
       for (const view of views) {
-        if (view.period !== "All" || Number(view.cpTierIndex) <= 0) continue;
+        if (view.period !== "All" || Number(view.cpTierIndex) <= 0 || Number(view.bossIndex) !== 0) continue;
         const group = (Array.isArray(view.rows) ? view.rows : [])
           .find(row => row.jobName === jobName);
         const player = (Array.isArray(group?.players) ? group.players : []).find(candidate => {
@@ -528,13 +528,16 @@
         const key = `${dungeonKey}|${view.bossIndex}|${view.cpTierIndex}|${view.period}`;
         const meta = metadata.get(key) || {};
         const dungeon = dungeonIndex.get(dungeonKey) || {};
+        const recordedBossIndex = Number(player.B ?? player.bossIndex) || 0;
+        const recordedBossName = recordedBossIndex > 0
+          ? dungeon.bossNames?.[recordedBossIndex - 1]
+          : player.bossName;
         results.push({
           rank: Number(player.rank),
           dps: number(player.dps),
+          dungeonKey,
           dungeonName: String(meta.dungeonName || dungeon.displayName || dungeonKey),
-          bossName: String(meta.bossName || (Number(view.bossIndex) === 0
-            ? "전체 보스"
-            : dungeon.bossNames?.[Number(view.bossIndex) - 1] || "—")),
+          bossName: cleanBossName(recordedBossName || meta.bossName || "—"),
           cpTierLabel: String(meta.cpTierLabel || cache.cpTiers?.find(tier =>
             Number(tier.index) === Number(view.cpTierIndex))?.label || ""),
           dungeonOrder: Number(dungeon.index) || 0,
@@ -543,9 +546,21 @@
         });
       }
     }
-    return results.sort((left, right) =>
-      left.dungeonOrder - right.dungeonOrder || left.bossIndex - right.bossIndex ||
-      left.cpTierIndex - right.cpTierIndex || left.rank - right.rank);
+    const bestByDungeon = new Map();
+    for (const row of results) {
+      const current = bestByDungeon.get(row.dungeonKey);
+      if (!current || row.dps > current.dps || (row.dps === current.dps && row.rank < current.rank)) {
+        bestByDungeon.set(row.dungeonKey, row);
+      }
+    }
+    return [...bestByDungeon.values()].sort((left, right) =>
+      left.dungeonOrder - right.dungeonOrder || right.dps - left.dps);
+  }
+
+  function cleanBossName(value) {
+    return String(value || "—")
+      .replace(/^\s*\d+\s*(?:네임드|보스)\s*(?:[·:：-]\s*)?/i, "")
+      .trim() || "—";
   }
 
   function renderStats(statList) {
