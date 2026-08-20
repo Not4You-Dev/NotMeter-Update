@@ -19,6 +19,8 @@
     "./data/notmeter-ranking-custom-cp.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
   ];
+  const VPS_FIELD_BOSS_CACHE_URL =
+    "https://notmeter.112-168-140-142.sslip.io/field-boss/v1/public";
   const FIELD_BOSS_CACHE_URLS = [
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/presence/notmeter-field-boss-public.json",
     "https://cdn.jsdelivr.net/gh/Not4You-Dev/NotMeter-Update@main/presence/notmeter-field-boss-public.json",
@@ -2009,6 +2011,20 @@
   async function fetchFieldBossCache(force) {
     const errors = [];
     try {
+      const separator = VPS_FIELD_BOSS_CACHE_URL.includes("?") ? "&" : "?";
+      const cache = await fetchFieldBossCacheJson(
+        `${VPS_FIELD_BOSS_CACHE_URL}${separator}v=${Date.now()}`,
+        force ? "reload" : "no-cache");
+      validateFieldBossCache(cache);
+      if (!Array.isArray(cache.servers) || cache.servers.length === 0) {
+        throw new Error("empty VPS cache");
+      }
+      return { cache, revision: `vps:${Number(cache.generatedAt) || 0}` };
+    } catch (error) {
+      errors.push(`${VPS_FIELD_BOSS_CACHE_URL}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    try {
       const refResponse = await fetch(`${FIELD_BOSS_CACHE_REF_URL}?v=${Date.now()}`, {
         cache: "no-store",
         headers: { Accept: "application/vnd.github+json" },
@@ -2053,18 +2069,29 @@
   }
 
   async function fetchFieldBossCacheJson(url, cacheMode) {
-    const response = await fetch(url, {
-      cache: cacheMode,
-      headers: { Accept: "application/json" },
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    const controller = typeof AbortController === "function" ? new AbortController() : null;
+    const timeoutId = controller
+      ? window.setTimeout(() => controller.abort(), CACHE_REQUEST_TIMEOUT_MS)
+      : 0;
+    try {
+      const response = await fetch(url, {
+        cache: cacheMode,
+        headers: { Accept: "application/json" },
+        signal: controller?.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const contentLength = Number(response.headers.get("content-length")) || 0;
+      if (contentLength > 1_500_000) {
+        throw new Error("cache is too large");
+      }
+      return await response.json();
+    } finally {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+      }
     }
-    const contentLength = Number(response.headers.get("content-length")) || 0;
-    if (contentLength > 1_500_000) {
-      throw new Error("cache is too large");
-    }
-    return await response.json();
   }
 
   function shouldApplyFieldBossCache(cache, current, revision = "", currentRevision = "") {
