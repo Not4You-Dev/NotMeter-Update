@@ -1449,6 +1449,7 @@
     async load(force = false) {
       const cache = await fetchRankingCache(Boolean(force));
       validateCache(cache);
+      updateDailyUsers(cache);
       return cache;
     },
   });
@@ -5784,8 +5785,8 @@
     return `${formatInteger(state.customCpMinK)}K~${formatInteger(state.customCpMaxK)}K`;
   }
 
-  function updateDailyUsers() {
-    const view = state.data?.views?.find(item => item.dungeonKey === DAILY_USER_KEY);
+  function updateDailyUsers(data = state.data) {
+    const view = data?.views?.find(item => item.dungeonKey === DAILY_USER_KEY);
     elements["daily-user-count"].textContent = view
       ? t("peopleValue", { value: formatInteger(view.recordCount) })
       : "—";
