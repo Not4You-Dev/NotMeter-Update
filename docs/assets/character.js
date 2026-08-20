@@ -20,7 +20,8 @@
   const COPY = {
     ko: {
       placeholder: "캐릭터 이름을 입력하세요", search: "검색", recent: "최근 검색한 캐릭터",
-      recentGuide: "최대 10개까지 저장됩니다", results: "검색 결과 · CP 높은 순",
+      recentGuide: "최대 10개까지 저장됩니다", results: "검색 결과 · CP 높은 순 · 50레벨만 표시",
+      searchAll: "전체", searchElyos: "천족", searchAsmodian: "마족", searchRaceFilter: "종족 필터",
       searching: "공식 캐릭터를 검색하고 있습니다", noRecent: "최근 검색한 캐릭터가 없습니다.",
       noResults: "검색 결과가 없습니다.", searchError: "검색 서버에 연결하지 못했습니다.",
       invalidName: "캐릭터 이름을 입력해 주세요.", pageTitle: "NotMeter 캐릭터 정보",
@@ -58,7 +59,8 @@
     },
     en: {
       placeholder: "Enter a character name", search: "Search", recent: "Recent characters",
-      recentGuide: "Up to 10 are stored", results: "Results · Highest CP first",
+      recentGuide: "Up to 10 are stored", results: "Results · Highest CP first · Level 50 only",
+      searchAll: "All", searchElyos: "Elyos", searchAsmodian: "Asmodian", searchRaceFilter: "Race filter",
       searching: "Searching official character data", noRecent: "No recent characters.",
       noResults: "No characters found.", searchError: "Could not reach the search service.",
       invalidName: "Enter a character name.", pageTitle: "NotMeter Character Profile",
@@ -94,7 +96,8 @@
     },
     "zh-TW": {
       placeholder: "輸入角色名稱", search: "搜尋", recent: "最近搜尋角色", recentGuide: "最多保留 10 個",
-      results: "搜尋結果 · 戰鬥力由高至低", searching: "正在搜尋官方角色資料", noRecent: "沒有最近搜尋角色。",
+      results: "搜尋結果 · 戰鬥力由高至低 · 僅顯示 50 級", searching: "正在搜尋官方角色資料", noRecent: "沒有最近搜尋角色。",
+      searchAll: "全部", searchElyos: "天族", searchAsmodian: "魔族", searchRaceFilter: "種族篩選",
       noResults: "找不到角色。", searchError: "無法連線搜尋服務。", invalidName: "請輸入角色名稱。",
       pageTitle: "NotMeter 角色資料", pageSubtitle: "裝備 · 靈魂刻印 · 魔石 · 技能", heading: "角色資料",
       headingDescription: "在同一畫面比較裝備選項、靈魂刻印與魔石。", back: "返回排名",
@@ -125,7 +128,7 @@
     },
   };
 
-  const state = { locale: readLocale(), searchResults: [], profile: null, profileLoad: null };
+  const state = { locale: readLocale(), searchResults: [], searchRace: "all", profile: null, profileLoad: null };
   const elements = {};
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -139,7 +142,7 @@
     for (const id of [
       "character-search-form", "character-search-input", "character-search-submit",
       "character-search-popover", "character-search-popover-title", "character-search-status",
-      "character-search-results", "character-surface", "character-page-title",
+      "character-search-results", "character-search-race-filters", "character-surface", "character-page-title",
       "character-page-description", "character-back-button", "character-loading-state",
       "character-error-state", "character-error-title", "character-error-message",
       "character-retry-button", "character-profile-content",
@@ -160,6 +163,12 @@
     elements["character-search-input"]?.addEventListener("input", () => {
       if (!elements["character-search-input"].value.trim()) renderRecent();
     });
+    elements["character-search-race-filters"]?.addEventListener("click", event => {
+      const button = event.target.closest("[data-search-race]");
+      if (!button) return;
+      state.searchRace = button.dataset.searchRace || "all";
+      renderSearchRows(state.searchResults, false);
+    });
     elements["character-retry-button"]?.addEventListener("click", () => void loadProfile(true, false));
     document.addEventListener("pointerdown", event => {
       if (!event.target.closest("#global-character-search")) setPopover(false);
@@ -173,6 +182,14 @@
     const copy = currentCopy();
     elements["character-search-input"]?.setAttribute("placeholder", copy.placeholder);
     if (elements["character-search-submit"]) elements["character-search-submit"].textContent = copy.search;
+    const raceFilters = elements["character-search-race-filters"];
+    if (raceFilters) {
+      raceFilters.setAttribute("aria-label", copy.searchRaceFilter);
+      const labels = { all: copy.searchAll, elyos: copy.searchElyos, asmodian: copy.searchAsmodian };
+      for (const button of raceFilters.querySelectorAll("[data-search-race]")) {
+        button.textContent = labels[button.dataset.searchRace] || copy.searchAll;
+      }
+    }
     if (elements["character-page-title"]) elements["character-page-title"].textContent = copy.heading;
     if (elements["character-page-description"]) elements["character-page-description"].textContent = copy.headingDescription;
     const backLabel = elements["character-back-button"]?.querySelector("span:last-child");
@@ -201,6 +218,8 @@
     elements["character-search-submit"].disabled = true;
     elements["character-search-popover-title"].textContent = copy.results;
     elements["character-search-status"].textContent = copy.searching;
+    state.searchRace = "all";
+    setRaceFiltersVisible(true);
     renderLoadingRows();
     setPopover(true);
     try {
@@ -208,9 +227,9 @@
       state.searchResults = Array.isArray(data.results)
         ? data.results.slice().sort((a, b) => Number(b.combatPower) - Number(a.combatPower))
         : [];
-      elements["character-search-status"].textContent = `${formatNumber(state.searchResults.length)}개`;
       renderSearchRows(state.searchResults, false);
     } catch {
+      setRaceFiltersVisible(false);
       elements["character-search-status"].textContent = copy.searchError;
       renderMessage(copy.searchError);
     } finally {
@@ -222,17 +241,37 @@
     const copy = currentCopy();
     elements["character-search-popover-title"].textContent = copy.recent;
     elements["character-search-status"].textContent = copy.recentGuide;
+    setRaceFiltersVisible(false);
     renderSearchRows(readRecent(), true);
   }
 
   function renderSearchRows(rows, recent) {
     const container = elements["character-search-results"];
     container.replaceChildren();
-    if (!rows.length) {
+    const filteredRows = recent || state.searchRace === "all"
+      ? rows
+      : rows.filter(item => state.searchRace === "elyos"
+        ? String(item.raceName || "").includes("천")
+        : String(item.raceName || "").includes("마"));
+    if (!recent) {
+      elements["character-search-status"].textContent = state.searchRace === "all"
+        ? `${formatNumber(filteredRows.length)}개`
+        : `${formatNumber(filteredRows.length)} / ${formatNumber(rows.length)}개`;
+      for (const button of elements["character-search-race-filters"]?.querySelectorAll("[data-search-race]") || []) {
+        button.setAttribute("aria-pressed", String(button.dataset.searchRace === state.searchRace));
+      }
+    }
+    if (!filteredRows.length) {
       renderMessage(recent ? currentCopy().noRecent : currentCopy().noResults);
       return;
     }
-    for (const item of rows) container.append(createSearchRow(item));
+    for (const item of filteredRows) container.append(createSearchRow(item));
+  }
+
+  function setRaceFiltersVisible(visible) {
+    if (elements["character-search-race-filters"]) {
+      elements["character-search-race-filters"].hidden = !visible;
+    }
   }
 
   function createSearchRow(item) {

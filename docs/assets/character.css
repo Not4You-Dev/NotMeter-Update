@@ -94,6 +94,23 @@
 
 .character-search-popover-head strong { color: #eaf9fb; font-size: 13px; }
 .character-search-popover-head span { color: var(--muted); font-size: 11px; }
+.character-search-popover-heading { display: flex; min-width: 0; align-items: center; gap: 12px; }
+.character-search-race-filters { display: inline-flex; gap: 4px; }
+.character-search-race-filters[hidden] { display: none; }
+.character-search-race-filters button {
+  min-width: 43px;
+  height: 25px;
+  padding: 0 9px;
+  border: 1px solid #294f62;
+  border-radius: 7px;
+  color: #8eabb9;
+  background: #0b202c;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.character-search-race-filters button[aria-pressed="true"] { color: #04181d; border-color: #4adfd7; background: #4adfd7; }
 
 .character-search-results {
   display: grid;
@@ -825,6 +842,8 @@ body.character-view .ranking-panel { display: none !important; }
   .character-search-form { grid-template-columns: 20px minmax(0, 1fr) auto; padding-left: 11px; }
   .character-search-form button { padding: 0 14px; }
   .character-search-popover-head span { display: none; }
+  .character-search-popover-head { align-items: flex-start; }
+  .character-search-popover-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
   .character-page-heading { display: grid; }
   .character-page-heading .ranking-back-button { width: fit-content; }
   .character-hero-name h3 { font-size: 23px; }

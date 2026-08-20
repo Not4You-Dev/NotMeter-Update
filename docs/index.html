@@ -20,7 +20,7 @@
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
   <link rel="stylesheet" href="./assets/app.css?v=20260820-3">
   <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260820-02">
-  <link rel="stylesheet" href="./assets/character.css?v=20260820-18">
+  <link rel="stylesheet" href="./assets/character.css?v=20260820-19">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
@@ -185,7 +185,7 @@
   <script src="./assets/combat-detail-buffs.js?v=20260820-3" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
   <script src="./assets/stat-efficiency.js?v=20260820-02" defer></script>
-  <script src="./assets/character.js?v=20260820-18" defer></script>
+  <script src="./assets/character.js?v=20260820-19" defer></script>
   <script src="./assets/app.js?v=20260820-3" defer></script>
 </head>
 <body>
@@ -300,7 +300,15 @@
       </form>
       <div class="character-search-popover" id="character-search-popover" hidden>
         <div class="character-search-popover-head">
-          <strong id="character-search-popover-title">최근 검색한 캐릭터</strong>
+          <div class="character-search-popover-heading">
+            <strong id="character-search-popover-title">최근 검색한 캐릭터</strong>
+            <div class="character-search-race-filters" id="character-search-race-filters" role="group"
+              aria-label="종족 필터" hidden>
+              <button type="button" data-search-race="all" aria-pressed="true">전체</button>
+              <button type="button" data-search-race="elyos" aria-pressed="false">천족</button>
+              <button type="button" data-search-race="asmodian" aria-pressed="false">마족</button>
+            </div>
+          </div>
           <span id="character-search-status" aria-live="polite">최대 10개까지 저장됩니다</span>
         </div>
         <div class="character-search-results" id="character-search-results"></div>
