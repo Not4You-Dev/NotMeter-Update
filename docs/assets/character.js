@@ -5,7 +5,9 @@
     ? "http://127.0.0.1:5080/character/v1"
     : "https://notmeter.112-168-140-142.sslip.io/character/v1";
   const RECENT_KEY = "notmeter-character-recent-v1";
+  const FAVORITE_KEY = "notmeter-character-favorites-v1";
   const RECENT_LIMIT = 10;
+  const FAVORITE_LIMIT = 30;
   const REQUEST_TIMEOUT_MS = 30_000;
   const CORE_STAT_TYPES = new Set(["STR", "DEX", "INT", "CON", "AGI", "WIS"]);
   const DIVINE_STAT_TYPES = new Set([
@@ -19,10 +21,13 @@
   const ITEM_GRADE_PRIORITY = Object.freeze({ Mythic: 6, Epic: 5, Unique: 4, Legend: 3, Rare: 2, Common: 1 });
   const COPY = {
     ko: {
-      placeholder: "캐릭터 이름을 입력하세요", search: "검색", recent: "최근 검색한 캐릭터",
-      recentGuide: "최대 10개까지 저장됩니다", results: "검색 결과 · CP 높은 순 · 50레벨만 표시",
+      placeholder: "캐릭터 이름을 입력하세요", search: "검색", saved: "즐겨찾기 · 최근 검색",
+      favorites: "즐겨찾기", recent: "최근 검색", recentGuide: "즐겨찾기는 고정 · 최근 검색은 최대 10개",
+      addFavorite: "즐겨찾기에 추가", removeFavorite: "즐겨찾기에서 제거", deleteRecent: "최근 검색에서 삭제",
+      results: "검색 결과 · CP 높은 순 · 50레벨만 표시",
       searchAll: "전체", searchElyos: "천족", searchAsmodian: "마족", searchRaceFilter: "종족 필터",
-      searching: "공식 캐릭터를 검색하고 있습니다", noRecent: "최근 검색한 캐릭터가 없습니다.",
+      searching: "공식 캐릭터를 검색하고 있습니다", sortingCp: "CP 확인 후 자동 정렬 중",
+      cpPending: "확인 중", noRecent: "즐겨찾기 또는 최근 검색한 캐릭터가 없습니다.",
       noResults: "검색 결과가 없습니다.", searchError: "검색 서버에 연결하지 못했습니다.",
       invalidName: "캐릭터 이름을 입력해 주세요.", pageTitle: "NotMeter 캐릭터 정보",
       pageSubtitle: "장비 · 영혼 각인 · 마석 · 스킬", heading: "캐릭터 정보",
@@ -58,10 +63,13 @@
       officialNote: "캐릭터 정보는 아이온2 공식 공개 정보 기준이며, 게임 내 정보 공개 상태와 갱신 시점에 따라 일부 항목이 비어 있을 수 있습니다.",
     },
     en: {
-      placeholder: "Enter a character name", search: "Search", recent: "Recent characters",
-      recentGuide: "Up to 10 are stored", results: "Results · Highest CP first · Level 50 only",
+      placeholder: "Enter a character name", search: "Search", saved: "Favorites · Recent",
+      favorites: "Favorites", recent: "Recent", recentGuide: "Favorites stay pinned · Up to 10 recent characters",
+      addFavorite: "Add to favorites", removeFavorite: "Remove from favorites", deleteRecent: "Remove from recent",
+      results: "Results · Highest CP first · Level 50 only",
       searchAll: "All", searchElyos: "Elyos", searchAsmodian: "Asmodian", searchRaceFilter: "Race filter",
-      searching: "Searching official character data", noRecent: "No recent characters.",
+      searching: "Searching official character data", sortingCp: "Checking CP and sorting automatically",
+      cpPending: "Checking", noRecent: "No recent characters.",
       noResults: "No characters found.", searchError: "Could not reach the search service.",
       invalidName: "Enter a character name.", pageTitle: "NotMeter Character Profile",
       pageSubtitle: "Gear · Soul Engraving · Manastones · Skills", heading: "Character profile",
@@ -95,8 +103,11 @@
       officialNote: "Character data comes from AION2's official public profile. Some fields can be empty depending on visibility and refresh time.",
     },
     "zh-TW": {
-      placeholder: "輸入角色名稱", search: "搜尋", recent: "最近搜尋角色", recentGuide: "最多保留 10 個",
-      results: "搜尋結果 · 戰鬥力由高至低 · 僅顯示 50 級", searching: "正在搜尋官方角色資料", noRecent: "沒有最近搜尋角色。",
+      placeholder: "輸入角色名稱", search: "搜尋", saved: "我的最愛 · 最近搜尋",
+      favorites: "我的最愛", recent: "最近搜尋", recentGuide: "我的最愛固定顯示 · 最近搜尋最多 10 個",
+      addFavorite: "加入我的最愛", removeFavorite: "從我的最愛移除", deleteRecent: "從最近搜尋刪除",
+      results: "搜尋結果 · 戰鬥力由高至低 · 僅顯示 50 級", searching: "正在搜尋官方角色資料",
+      sortingCp: "正在確認戰鬥力並自動排序", cpPending: "確認中", noRecent: "沒有最近搜尋角色。",
       searchAll: "全部", searchElyos: "天族", searchAsmodian: "魔族", searchRaceFilter: "種族篩選",
       noResults: "找不到角色。", searchError: "無法連線搜尋服務。", invalidName: "請輸入角色名稱。",
       pageTitle: "NotMeter 角色資料", pageSubtitle: "裝備 · 靈魂刻印 · 魔石 · 技能", heading: "角色資料",
@@ -128,7 +139,10 @@
     },
   };
 
-  const state = { locale: readLocale(), searchResults: [], searchRace: "all", profile: null, profileLoad: null };
+  const state = {
+    locale: readLocale(), searchResults: [], searchRace: "all", searchComplete: true,
+    searchRequest: 0, profile: null, profileLoad: null,
+  };
   const elements = {};
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -219,15 +233,16 @@
     elements["character-search-popover-title"].textContent = copy.results;
     elements["character-search-status"].textContent = copy.searching;
     state.searchRace = "all";
+    state.searchComplete = true;
+    const requestId = ++state.searchRequest;
     setRaceFiltersVisible(true);
     renderLoadingRows();
     setPopover(true);
     try {
       const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}`);
-      state.searchResults = Array.isArray(data.results)
-        ? data.results.slice().sort((a, b) => Number(b.combatPower) - Number(a.combatPower))
-        : [];
-      renderSearchRows(state.searchResults, false);
+      if (requestId !== state.searchRequest) return;
+      applySearchPayload(data);
+      if (!state.searchComplete) void pollSearchResults(name, requestId);
     } catch {
       setRaceFiltersVisible(false);
       elements["character-search-status"].textContent = copy.searchError;
@@ -237,12 +252,59 @@
     }
   }
 
+  function applySearchPayload(data) {
+    state.searchComplete = data?.complete !== false;
+    state.searchResults = Array.isArray(data?.results)
+      ? data.results.slice().sort((a, b) =>
+        Number(b.combatPower) - Number(a.combatPower) ||
+        String(a.name || "").localeCompare(String(b.name || ""), "ko"))
+      : [];
+    renderSearchRows(state.searchResults, false);
+  }
+
+  async function pollSearchResults(name, requestId) {
+    for (let attempt = 0; attempt < 90 && requestId === state.searchRequest; attempt += 1) {
+      await new Promise(resolve => window.setTimeout(resolve, attempt < 8 ? 750 : 1500));
+      if (requestId !== state.searchRequest) return;
+      try {
+        const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}&_=${Date.now()}`);
+        if (requestId !== state.searchRequest) return;
+        applySearchPayload(data);
+        if (state.searchComplete) return;
+      } catch {
+        // The first result list remains usable while a background CP lookup is retried.
+      }
+    }
+  }
+
   function renderRecent() {
     const copy = currentCopy();
-    elements["character-search-popover-title"].textContent = copy.recent;
+    elements["character-search-popover-title"].textContent = copy.saved;
     elements["character-search-status"].textContent = copy.recentGuide;
     setRaceFiltersVisible(false);
-    renderSearchRows(readRecent(), true);
+    renderSavedRows();
+  }
+
+  function renderSavedRows() {
+    const container = elements["character-search-results"];
+    container.replaceChildren();
+    const favorites = readFavorites();
+    const favoriteKeys = new Set(favorites.map(characterKey));
+    const recent = readRecent().filter(item => !favoriteKeys.has(characterKey(item)));
+    if (!favorites.length && !recent.length) {
+      renderMessage(currentCopy().noRecent);
+      return;
+    }
+    appendSavedGroup(container, currentCopy().favorites, favorites, "favorite");
+    appendSavedGroup(container, currentCopy().recent, recent, "recent");
+  }
+
+  function appendSavedGroup(container, title, rows, context) {
+    if (!rows.length) return;
+    const heading = node("div", "character-search-group-head");
+    heading.append(textNode("strong", title), textNode("span", formatNumber(rows.length)));
+    container.append(heading);
+    for (const item of rows) container.append(createSearchRow(item, context));
   }
 
   function renderSearchRows(rows, recent) {
@@ -254,9 +316,12 @@
         ? String(item.raceName || "").includes("천")
         : String(item.raceName || "").includes("마"));
     if (!recent) {
-      elements["character-search-status"].textContent = state.searchRace === "all"
+      const count = state.searchRace === "all"
         ? `${formatNumber(filteredRows.length)}개`
         : `${formatNumber(filteredRows.length)} / ${formatNumber(rows.length)}개`;
+      elements["character-search-status"].textContent = state.searchComplete
+        ? count
+        : `${count} · ${currentCopy().sortingCp}`;
       for (const button of elements["character-search-race-filters"]?.querySelectorAll("[data-search-race]") || []) {
         button.setAttribute("aria-pressed", String(button.dataset.searchRace === state.searchRace));
       }
@@ -265,7 +330,7 @@
       renderMessage(recent ? currentCopy().noRecent : currentCopy().noResults);
       return;
     }
-    for (const item of filteredRows) container.append(createSearchRow(item));
+    for (const item of filteredRows) container.append(createSearchRow(item, "search"));
   }
 
   function setRaceFiltersVisible(visible) {
@@ -274,24 +339,57 @@
     }
   }
 
-  function createSearchRow(item) {
-    const button = node("button", "character-search-row");
+  function createSearchRow(item, context = "search") {
+    const row = node("div", "character-search-row");
+    const button = node("button", "character-search-open");
     button.type = "button";
     const avatar = node("span", "character-search-avatar");
     avatar.append(createImage(item.profileImage, item.name));
     const identity = node("span", "character-search-name");
     const serverName = item.serverName || String(item.serverId || "—");
-    identity.append(textNode("strong", item.name || "—"),
-      textNode("span", `${serverName} - ${item.raceName || "—"}`, "character-search-meta"));
+    const nameLine = node("span", "character-search-name-line");
+    nameLine.append(textNode("strong", item.name || "—"));
+    const cp = node("strong", "character-search-cp cp-badge");
+    const hasCp = Number(item.combatPower) > 0;
+    cp.title = hasCp ? `${formatNumber(item.combatPower)} CP` : currentCopy().sortingCp;
+    cp.append(createImage("./assets/combat-power.png", ""),
+      textNode("span", hasCp ? formatCompactCombatPower(item.combatPower) : currentCopy().cpPending));
+    nameLine.append(cp);
+    identity.append(nameLine, textNode("span", `${serverName} - ${item.raceName || "—"}`, "character-search-meta"));
     const job = node("span", "character-search-job");
     job.append(createImage(jobIcon(item.className), ""), document.createTextNode(item.className || "—"));
-    const cp = node("strong", "character-search-cp cp-badge");
-    cp.title = `${formatNumber(item.combatPower)} CP`;
-    cp.append(createImage("./assets/combat-power.png", ""),
-      textNode("span", formatCompactCombatPower(item.combatPower)));
-    button.append(avatar, identity, job, cp);
+    button.append(avatar, identity, job);
     button.addEventListener("click", () => openCharacter(item));
-    return button;
+    const actions = node("span", "character-search-actions");
+    const favorite = node("button", "character-search-action character-favorite-button");
+    const favoriteActive = isFavorite(item);
+    favorite.type = "button";
+    favorite.textContent = favoriteActive ? "★" : "☆";
+    favorite.title = favoriteActive ? currentCopy().removeFavorite : currentCopy().addFavorite;
+    favorite.setAttribute("aria-label", favorite.title);
+    favorite.setAttribute("aria-pressed", String(favoriteActive));
+    favorite.addEventListener("click", event => {
+      event.stopPropagation();
+      toggleFavorite(item);
+      if (context === "search") renderSearchRows(state.searchResults, false);
+      else renderRecent();
+    });
+    actions.append(favorite);
+    if (context === "recent") {
+      const remove = node("button", "character-search-action character-recent-delete");
+      remove.type = "button";
+      remove.textContent = "×";
+      remove.title = currentCopy().deleteRecent;
+      remove.setAttribute("aria-label", remove.title);
+      remove.addEventListener("click", event => {
+        event.stopPropagation();
+        removeRecent(item);
+        renderRecent();
+      });
+      actions.append(remove);
+    }
+    row.append(button, actions);
+    return row;
   }
 
   function renderLoadingRows() {
@@ -317,7 +415,36 @@
   }
 
   function activate() {
+    const params = new URLSearchParams(window.location.search);
+    const serverId = Number(params.get("serverId"));
+    const characterId = params.get("characterId") || "";
+    const name = String(params.get("name") || "").trim();
+    if (!characterId && serverId > 0 && name) {
+      void resolveLinkedCharacter(name, serverId);
+      return;
+    }
     void loadProfile(false, false);
+  }
+
+  async function resolveLinkedCharacter(name, serverId) {
+    showProfileState("loading");
+    try {
+      const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}`);
+      const candidates = Array.isArray(data.results) ? data.results : [];
+      const normalizedName = name.normalize("NFC").toLocaleLowerCase();
+      const match = candidates.find(item =>
+        Number(item.serverId) === Number(serverId) &&
+        String(item.name || "").normalize("NFC").toLocaleLowerCase() === normalizedName) ||
+        candidates.find(item => Number(item.serverId) === Number(serverId));
+      if (!match?.characterId) throw new Error(currentCopy().noResults);
+      const url = new URL(window.location.href);
+      url.searchParams.set("characterId", String(match.characterId));
+      url.searchParams.set("name", String(match.name || name));
+      window.history.replaceState({}, "", url.href);
+      await loadProfile(true, false);
+    } catch (error) {
+      showProfileState("error", error?.message || currentCopy().loadError);
+    }
   }
 
   async function loadProfile(force, refreshOfficial) {
@@ -976,7 +1103,9 @@
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
-      const response = await fetch(url, { headers: { Accept: "application/json" }, signal: controller.signal });
+      const response = await fetch(url, {
+        cache: "no-store", headers: { Accept: "application/json" }, signal: controller.signal,
+      });
       if (!response.ok) throw new Error(response.status === 404 ? currentCopy().noResults : currentCopy().loadError);
       return await response.json();
     } finally {
@@ -991,18 +1120,65 @@
     } catch { return []; }
   }
 
+  function readFavorites() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(FAVORITE_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed.slice(0, FAVORITE_LIMIT) : [];
+    } catch { return []; }
+  }
+
+  function characterKey(item) {
+    return `${Number(item?.serverId) || 0}:${String(item?.characterId || "")}`;
+  }
+
+  function savedCharacter(item) {
+    return {
+      characterId: String(item?.characterId || ""), name: String(item?.name || ""),
+      serverId: Number(item?.serverId), serverName: String(item?.serverName || ""),
+      className: String(item?.className || ""), raceName: String(item?.raceName || ""),
+      level: number(item?.level), combatPower: number(item?.combatPower),
+      profileImage: String(item?.profileImage || ""),
+    };
+  }
+
+  function writeFavorites(items) {
+    try { localStorage.setItem(FAVORITE_KEY, JSON.stringify(items.slice(0, FAVORITE_LIMIT))); } catch { /* ignored */ }
+  }
+
+  function isFavorite(item) {
+    const key = characterKey(item);
+    return readFavorites().some(entry => characterKey(entry) === key);
+  }
+
+  function toggleFavorite(item) {
+    if (!item?.characterId || !item?.serverId) return;
+    const key = characterKey(item);
+    const favorites = readFavorites();
+    const existing = favorites.findIndex(entry => characterKey(entry) === key);
+    if (existing >= 0) favorites.splice(existing, 1);
+    else favorites.unshift(savedCharacter(item));
+    writeFavorites(favorites);
+  }
+
+  function removeRecent(item) {
+    const key = characterKey(item);
+    const recent = readRecent().filter(entry => characterKey(entry) !== key);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(recent)); } catch { /* ignored */ }
+  }
+
   function saveRecent(item) {
     if (!item?.characterId || !item?.serverId) return;
-    const recent = readRecent().filter(entry =>
-      !(entry.characterId === item.characterId && Number(entry.serverId) === Number(item.serverId)));
-    recent.unshift({
-      characterId: String(item.characterId), name: String(item.name || ""),
-      serverId: Number(item.serverId), serverName: String(item.serverName || ""),
-      className: String(item.className || ""), raceName: String(item.raceName || ""),
-      level: number(item.level), combatPower: number(item.combatPower),
-      profileImage: String(item.profileImage || ""),
-    });
+    const saved = savedCharacter(item);
+    const key = characterKey(saved);
+    const recent = readRecent().filter(entry => characterKey(entry) !== key);
+    recent.unshift(saved);
     try { localStorage.setItem(RECENT_KEY, JSON.stringify(recent.slice(0, RECENT_LIMIT))); } catch { /* ignored */ }
+    const favorites = readFavorites();
+    const favoriteIndex = favorites.findIndex(entry => characterKey(entry) === key);
+    if (favoriteIndex >= 0) {
+      favorites[favoriteIndex] = saved;
+      writeFavorites(favorites);
+    }
   }
 
   function setPopover(open) {
