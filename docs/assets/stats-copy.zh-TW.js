@@ -1,6 +1,8 @@
 globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   title: "NotMeter 副本統計",
   subtitle: "依各職業前 25% DPS 排序",
+  characterPageTitle: "NotMeter 角色搜尋",
+  characterPageSubtitle: "一次查看裝備、靈魂刻印、魔石與技能",
   dailyUsers: "每日使用者",
   classPerformance: "職業實戰",
   newFeature: "新功能",

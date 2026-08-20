@@ -172,6 +172,8 @@
     ko: {
       title: "NotMeter 던전 통계",
       subtitle: "직업별 상위 25% DPS 기준으로 정렬합니다",
+      characterPageTitle: "NotMeter 캐릭터 검색",
+      characterPageSubtitle: "장비 · 영혼 각인 · 마석 · 스킬을 한눈에 확인합니다",
       dailyUsers: "일일 사용자",
       classPerformance: "직업 성능",
       newFeature: "새로 추가된 기능",
@@ -522,6 +524,8 @@
     en: {
       title: "NotMeter Dungeon Statistics",
       subtitle: "Classes are ranked by top-quartile DPS",
+      characterPageTitle: "NotMeter Character Search",
+      characterPageSubtitle: "Equipment · Soul Engravings · Manastones · Skills",
       dailyUsers: "Daily users",
       classPerformance: "Class Performance",
       newFeature: "Newly added feature",
@@ -981,10 +985,14 @@
         render();
       }
     });
-    void loadIconAtlases();
-    void loadCache();
     const pageView = initialPageView();
-    if (pageView === "optimization") {
+    if (pageView !== "character") {
+      void loadIconAtlases();
+      void loadCache();
+    }
+    if (pageView === "character") {
+      openCharacterView();
+    } else if (pageView === "optimization") {
       openOptimizationView();
     } else if (pageView === "field-boss") {
       openFieldBossView();
@@ -1027,6 +1035,7 @@
   function bindElements() {
     for (const id of [
       "page-title", "page-subtitle", "daily-user-count", "language-button",
+      "character-surface", "character-back-button",
       "optimization-button", "optimization-surface", "optimization-back-button",
       "optimization-frame",
       "contribution-button", "contribution-surface", "contribution-back-button",
@@ -1436,6 +1445,14 @@
     gameName: localizeGameName,
   });
 
+  globalThis.NotMeterPublicRankingCache = Object.freeze({
+    async load(force = false) {
+      const cache = await fetchRankingCache(Boolean(force));
+      validateCache(cache);
+      return cache;
+    },
+  });
+
   function applyDungeonSelection(dungeonKey) {
     state.dungeonKey = dungeonKey;
     state.bossIndex = 0;
@@ -1581,7 +1598,23 @@
     const view = new URLSearchParams(window.location.search).get("view");
     return view === "class-top10" || view === "field-boss" || view === "optimization" ||
       view === "class-performance" || view === "contribution" ||
-      view === "boss-resistance" || view === "stat-efficiency" ? view : "ranking";
+      view === "boss-resistance" || view === "stat-efficiency" || view === "character" ? view : "ranking";
+  }
+
+  function openCharacterView() {
+    closeFieldBossView();
+    closeOptimizationView();
+    closeClassTop10View();
+    closeClassPerformanceView();
+    closeContributionView();
+    closeBossResistanceView();
+    closeStatEfficiencyView();
+    closeCombatDetail();
+    state.surfaceMode = "character";
+    document.body.classList.add("character-view");
+    elements["character-surface"].hidden = false;
+    updatePageIdentity();
+    window.NotMeterCharacter?.activate();
   }
 
   function openOptimizationView() {
@@ -3360,6 +3393,9 @@
   }
 
   function render() {
+    if (state.surfaceMode === "character") {
+      return;
+    }
     if (state.surfaceMode === "optimization") {
       ensureOptimizationFrame();
       return;
@@ -5805,6 +5841,7 @@
     renderDetailSettings();
     syncOptimizationFrameLocale();
     window.NotMeterStatEfficiency?.setLocale(state.locale);
+    window.NotMeterCharacter?.setLocale(state.locale);
     if (state.surfaceMode === "fieldBoss" && state.fieldBossData) {
       renderFieldBoss();
     }
@@ -5821,7 +5858,10 @@
     const contribution = state.surfaceMode === "contribution";
     const bossResistance = state.surfaceMode === "bossResistance";
     const statEfficiency = state.surfaceMode === "statEfficiency";
-    const title = t(optimization
+    const character = state.surfaceMode === "character";
+    const title = t(character
+      ? "characterPageTitle"
+      : optimization
       ? "optimizationPageTitle"
       : contribution
         ? "contributionPageTitle"
@@ -5836,7 +5876,9 @@
           : classPerformance
             ? "classPerformancePageTitle"
           : "title");
-    const subtitle = t(optimization
+    const subtitle = t(character
+      ? "characterPageSubtitle"
+      : optimization
       ? "optimizationPageSubtitle"
       : contribution
         ? "contributionPageSubtitle"

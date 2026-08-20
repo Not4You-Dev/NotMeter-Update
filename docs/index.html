@@ -18,12 +18,13 @@
   <title>NotMeter 던전 통계</title>
   <link rel="canonical" href="https://notmeter.com/">
   <link rel="icon" type="image/png" href="./assets/notmeter-icon.png">
-  <link rel="stylesheet" href="./assets/app.css?v=20260819-2">
+  <link rel="stylesheet" href="./assets/app.css?v=20260820-3">
   <link rel="stylesheet" href="./assets/stat-efficiency.css?v=20260820-02">
+  <link rel="stylesheet" href="./assets/character.css?v=20260820-13">
   <script>
     (() => {
       const requestedView = new URLSearchParams(window.location.search).get("view") || "ranking";
-      const pageView = ["ranking", "class-top10", "class-performance", "contribution", "boss-resistance", "stat-efficiency", "field-boss", "optimization"]
+      const pageView = ["ranking", "class-top10", "class-performance", "contribution", "boss-resistance", "stat-efficiency", "field-boss", "optimization", "character"]
         .includes(requestedView) ? requestedView : "ranking";
       let savedLocale = "";
       try {
@@ -70,6 +71,10 @@
           "optimization": {
             title: "NotMeter 아이온2 그래픽 최적화",
             description: "PC 사양과 증상에 맞는 안전한 아이온2 Unreal Engine 5 설정을 생성합니다."
+          },
+          "character": {
+            title: "NotMeter 캐릭터 검색",
+            description: "아이온2 캐릭터의 장비, 영혼 각인, 마석, 스킬과 성장 정보를 한눈에 확인하세요."
           }
         },
         en: {
@@ -104,6 +109,10 @@
           "optimization": {
             title: "NotMeter AION2 Graphics Optimizer",
             description: "Generate safe AION2 Unreal Engine 5 settings for your PC and performance issues."
+          },
+          "character": {
+            title: "NotMeter Character Search",
+            description: "View AION2 equipment, soul engravings, manastones, skills, and progression in one place."
           }
         },
         "zh-TW": {
@@ -138,6 +147,10 @@
           "optimization": {
             title: "NotMeter AION2 圖形最佳化",
             description: "依照電腦配備與問題，產生安全的 AION2 Unreal Engine 5 設定。"
+          },
+          "character": {
+            title: "NotMeter 角色搜尋",
+            description: "一次查看 AION2 角色的裝備、靈魂刻印、魔石、技能與成長資訊。"
           }
         }
       };
@@ -169,10 +182,11 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7318383767094918" crossorigin="anonymous"></script>
   <script src="./assets/field-boss-catalog.js?v=20260819-2" defer></script>
   <script src="./assets/field-boss-kibelisk-catalog.js?v=20260819-2" defer></script>
-  <script src="./assets/combat-detail-buffs.js?v=20260819-2" defer></script>
+  <script src="./assets/combat-detail-buffs.js?v=20260820-3" defer></script>
   <script src="./assets/stats-copy.zh-TW.js?v=20260819-2" defer></script>
   <script src="./assets/stat-efficiency.js?v=20260820-02" defer></script>
-  <script src="./assets/app.js?v=20260819-2" defer></script>
+  <script src="./assets/character.js?v=20260820-13" defer></script>
+  <script src="./assets/app.js?v=20260820-3" defer></script>
 </head>
 <body>
   <div class="ambient ambient-one" aria-hidden="true"></div>
@@ -273,6 +287,26 @@
       </div>
     </header>
 
+    <section class="global-character-search" id="global-character-search" aria-label="캐릭터 검색">
+      <form class="character-search-form" id="character-search-form" role="search" autocomplete="off">
+        <span class="character-search-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m15.5 15.5 5 5"></path></svg>
+        </span>
+        <label class="sr-only" for="character-search-input">캐릭터 이름</label>
+        <input id="character-search-input" name="character" type="search" maxlength="20"
+          placeholder="캐릭터 이름을 입력하세요" aria-controls="character-search-popover"
+          aria-expanded="false" spellcheck="false">
+        <button id="character-search-submit" type="submit">검색</button>
+      </form>
+      <div class="character-search-popover" id="character-search-popover" hidden>
+        <div class="character-search-popover-head">
+          <strong id="character-search-popover-title">최근 검색한 캐릭터</strong>
+          <span id="character-search-status" aria-live="polite">최대 10개까지 저장됩니다</span>
+        </div>
+        <div class="character-search-results" id="character-search-results"></div>
+      </div>
+    </section>
+
     <aside class="sponsor-mobile" aria-label="광고" data-i18n-aria-label="advertisementAria">
       <a class="sponsor-mobile-link" href="https://buly.kr/8IySyKj" target="_blank"
         rel="sponsored noopener noreferrer" aria-label="사종키나 광고 페이지 열기" data-i18n-aria-label="sponsorOpenAria">
@@ -302,6 +336,32 @@
           allow="clipboard-write"
           loading="eager"></iframe>
       </div>
+    </section>
+
+    <section class="character-surface" id="character-surface" hidden>
+      <header class="character-page-heading">
+        <div>
+          <span class="character-page-kicker">AION2 CHARACTER · OFFICIAL DATA</span>
+          <h2 id="character-page-title">캐릭터 정보</h2>
+          <p id="character-page-description">장비 옵션과 영혼 각인, 마석을 한 화면에서 비교할 수 있습니다.</p>
+        </div>
+        <a class="ranking-back-button" id="character-back-button" href="./">
+          <span class="ranking-back-button-icon" aria-hidden="true">←</span>
+          <span>랭킹으로 돌아가기</span>
+        </a>
+      </header>
+      <div class="character-page-state" id="character-loading-state">
+        <div class="spinner" aria-hidden="true"></div>
+        <strong>공식 캐릭터 정보를 불러오는 중입니다</strong>
+        <span>장비별 영혼 각인과 마석을 함께 확인하고 있습니다.</span>
+      </div>
+      <div class="character-page-state character-page-error" id="character-error-state" hidden>
+        <div class="error-mark" aria-hidden="true">!</div>
+        <strong id="character-error-title">캐릭터 정보를 불러오지 못했습니다</strong>
+        <span id="character-error-message">잠시 후 다시 시도해 주세요.</span>
+        <button class="refresh-button compact" id="character-retry-button" type="button">다시 시도</button>
+      </div>
+      <div class="character-profile-content" id="character-profile-content" hidden></div>
     </section>
 
     <section class="contribution-surface" id="contribution-surface" hidden>
