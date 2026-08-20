@@ -740,10 +740,16 @@
     if (number(item.exceedLevel)) {
       progress.append(textNode("span", `돌파 ${number(item.exceedLevel)}단계`, "equipment-exceed-badge"));
     }
-    itemCopy.append(progress);
+    const basicOptions = node("div", "equipment-identity-options");
+    basicOptions.append(textNode("h6", copy.basicOptions));
+    const basicList = node("ul");
+    const optionLines = basicItemOptions(detail);
+    if (!optionLines.length) basicList.append(textNode("li", copy.emptyOption, "empty-detail"));
+    for (const line of optionLines.slice(0, 12)) basicList.append(textNode("li", line));
+    basicOptions.append(basicList);
+    itemCopy.append(progress, basicOptions);
     identity.append(icon, itemCopy);
     card.append(identity,
-      renderEquipmentColumn(copy.basicOptions, basicItemOptions(detail)),
       renderSoulEngravingColumn(copy.soulEngraving, detail),
       renderStoneColumn(copy.manastones, detail),
     );
@@ -761,11 +767,11 @@
   }
 
   function renderSoulEngravingColumn(title, detail) {
-    const column = node("div", "equipment-detail-column");
+    const column = node("div", "equipment-detail-column equipment-soul-column");
     column.append(textNode("h6", title));
     const list = node("ul");
     const stats = statLines(detail?.subStats).slice(0, 12);
-    for (const line of stats) list.append(textNode("li", line));
+    for (const line of stats) list.append(textNode("li", line, "equipment-soul-stat"));
     const skills = (Array.isArray(detail?.subSkills) ? detail.subSkills : [])
       .slice(0, Math.max(0, 12 - stats.length));
     for (const skill of skills) {
