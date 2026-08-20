@@ -376,7 +376,7 @@
     renderResults({
       status: "ready",
       sampleCount: state.catalog.sampleCount,
-      formulaVersion: state.catalog.formulaVersion,
+      formulaVersion: selected.formulaVersion || state.catalog.formulaVersion,
       confidence: selected.confidence || "medium",
       effects: selected.effects,
     }, "overview");
