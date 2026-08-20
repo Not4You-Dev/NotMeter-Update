@@ -4384,10 +4384,7 @@
     tr.append(bossCell);
 
     tr.append(numericCell(formatDuration(player.durationSeconds), "class-duration", t("duration")));
-    tr.append(numericCell(
-      formatInteger(Math.round(Number(player.dps) || 0)),
-      "accent class-dps",
-      "DPS"));
+    tr.append(createRankingDpsCell(player));
     const detailCell = document.createElement("td");
     detailCell.className = "detail-column";
     const detailLink = document.createElement("span");
@@ -5443,6 +5440,8 @@
           durationSeconds: Number(item.player.U) || 0,
           partyJobNames: null,
           dps: Number(item.player.X) || 0,
+          normalizedDps: Number(item.player.Y) || 0,
+          raidDps: Number(item.player.Z) || 0,
           P: String(item.player.P || ""),
           B: item.bossIndex,
           D: state.dungeonKey === "training-dummy-60s"
@@ -6088,6 +6087,35 @@
     if (label) {
       td.dataset.label = label;
     }
+    return td;
+  }
+
+  function createRankingDpsCell(player) {
+    const dps = Math.max(0, Number(player?.X ?? player?.dps) || 0);
+    const normalizedDps = Math.max(0, Number(player?.Y ?? player?.normalizedDps) || 0);
+    const raidDps = Math.max(0, Number(player?.Z ?? player?.raidDps) || 0);
+    const td = document.createElement("td");
+    td.className = "numeric accent class-dps";
+    td.dataset.label = "DPS";
+
+    const total = document.createElement("strong");
+    total.className = "class-dps-total";
+    total.textContent = formatInteger(Math.round(dps));
+
+    const adjusted = document.createElement("span");
+    adjusted.className = "class-dps-adjusted";
+    const normalized = document.createElement("span");
+    normalized.className = "class-dps-metric normalized";
+    normalized.textContent = `nDPS ${formatInteger(Math.round(normalizedDps))}`;
+    const raid = document.createElement("span");
+    raid.className = "class-dps-metric raid";
+    raid.textContent = `rDPS ${formatInteger(Math.round(raidDps))}`;
+    adjusted.append(normalized, raid);
+
+    td.title = `DPS ${formatInteger(Math.round(dps))}\n` +
+      `nDPS ${formatInteger(Math.round(normalizedDps))}\n` +
+      `rDPS ${formatInteger(Math.round(raidDps))}`;
+    td.append(total, adjusted);
     return td;
   }
 

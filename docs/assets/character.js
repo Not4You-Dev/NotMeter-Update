@@ -34,6 +34,7 @@
       headingDescription: "장비 옵션과 영혼 각인, 마석을 한 화면에서 비교할 수 있습니다.",
       back: "랭킹으로 돌아가기", loading: "공식 캐릭터 정보를 불러오는 중입니다",
       loadingSub: "장비별 영혼 각인과 마석을 함께 확인하고 있습니다.",
+      loadingDetails: "장비 상세 옵션을 빠르게 불러오는 중",
       loadError: "캐릭터 정보를 불러오지 못했습니다", retry: "다시 시도",
       overview: "한눈에 보기", stats: "스탯", equipment: "장비", arcana: "아르카나",
       skills: "스킬", activeSkills: "스킬", stigmaSkills: "스티그마", passiveSkills: "패시브",
@@ -76,6 +77,7 @@
       headingDescription: "Compare gear options, soul engravings, and manastones in one view.",
       back: "Back to rankings", loading: "Loading official character data",
       loadingSub: "Checking item engravings and manastones.", loadError: "Could not load this character",
+      loadingDetails: "Loading detailed gear options",
       retry: "Retry", overview: "Overview", stats: "Stats", equipment: "Equipment",
       arcana: "Arcana", skills: "Skills", activeSkills: "Skills", stigmaSkills: "Stigma", passiveSkills: "Passive",
       collection: "Mount · Wings · Titles",
@@ -113,6 +115,7 @@
       pageTitle: "NotMeter 角色資料", pageSubtitle: "裝備 · 靈魂刻印 · 魔石 · 技能", heading: "角色資料",
       headingDescription: "在同一畫面比較裝備選項、靈魂刻印與魔石。", back: "返回排名",
       loading: "正在載入官方角色資料", loadingSub: "正在確認各裝備的靈魂刻印與魔石。",
+      loadingDetails: "正在快速載入裝備詳細選項",
       loadError: "無法載入角色資料", retry: "重試", overview: "總覽", stats: "屬性",
       equipment: "裝備", arcana: "阿爾卡納", skills: "技能", activeSkills: "技能", stigmaSkills: "烙印技能",
       passiveSkills: "被動技能",
@@ -141,7 +144,7 @@
 
   const state = {
     locale: readLocale(), searchResults: [], searchRace: "all", searchComplete: true,
-    searchRequest: 0, profile: null, profileLoad: null,
+    searchRequest: 0, profile: null, profileLoad: null, profileRequest: 0,
   };
   const elements = {};
 
@@ -239,7 +242,7 @@
     renderLoadingRows();
     setPopover(true);
     try {
-      const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}`);
+      const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}&fast=1`);
       if (requestId !== state.searchRequest) return;
       applySearchPayload(data);
       if (!state.searchComplete) void pollSearchResults(name, requestId);
@@ -264,10 +267,13 @@
 
   async function pollSearchResults(name, requestId) {
     for (let attempt = 0; attempt < 90 && requestId === state.searchRequest; attempt += 1) {
-      await new Promise(resolve => window.setTimeout(resolve, attempt < 8 ? 750 : 1500));
+      await new Promise(resolve => window.setTimeout(resolve, attempt < 10 ? 350 : 1000));
       if (requestId !== state.searchRequest) return;
       try {
-        const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}&_=${Date.now()}`);
+        const data = await fetchJson(
+          `${API_ROOT}/search?name=${encodeURIComponent(name)}&fast=1&_=${Date.now()}`,
+          { cache: "no-store" },
+        );
         if (requestId !== state.searchRequest) return;
         applySearchPayload(data);
         if (state.searchComplete) return;
@@ -429,7 +435,7 @@
   async function resolveLinkedCharacter(name, serverId) {
     showProfileState("loading");
     try {
-      const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}`);
+      const data = await fetchJson(`${API_ROOT}/search?name=${encodeURIComponent(name)}&fast=1`);
       const candidates = Array.isArray(data.results) ? data.results : [];
       const normalizedName = name.normalize("NFC").toLocaleLowerCase();
       const match = candidates.find(item =>
@@ -458,24 +464,14 @@
     if (state.profileLoad && !force) return state.profileLoad;
     if (!refreshOfficial || !state.profile) showProfileState("loading");
     const refreshSuffix = refreshOfficial ? "&refresh=1" : "";
+    const fastSuffix = refreshOfficial ? "" : "&fast=1";
+    const requestId = ++state.profileRequest;
     state.profileLoad = fetchJson(
-      `${API_ROOT}/profile?serverId=${encodeURIComponent(serverId)}&characterId=${encodeURIComponent(characterId)}${refreshSuffix}`,
+      `${API_ROOT}/profile?serverId=${encodeURIComponent(serverId)}&characterId=${encodeURIComponent(characterId)}${refreshSuffix}${fastSuffix}`,
+      { cache: refreshOfficial ? "no-store" : "default" },
     ).then(data => {
-      state.profile = data;
-      const profile = data?.info?.profile || {};
-      saveRecent({
-        characterId: profile.characterId || characterId,
-        name: profile.characterName || params.get("name") || "",
-        serverId: profile.serverId || serverId,
-        serverName: profile.serverName || "",
-        className: profile.className || "",
-        raceName: profile.raceName || "",
-        level: profile.characterLevel || 0,
-        combatPower: profile.combatPower || 0,
-        profileImage: profile.profileImage || "",
-      });
-      renderProfile(data);
-      showProfileState("content");
+      applyProfilePayload(data, params, serverId, characterId);
+      if (data?.complete === false) void pollProfile(params, serverId, characterId, requestId);
       return true;
     }).catch(error => {
       if (refreshOfficial && state.profile) showProfileState("content");
@@ -483,6 +479,42 @@
       return false;
     }).finally(() => { state.profileLoad = null; });
     return state.profileLoad;
+  }
+
+  async function pollProfile(params, serverId, characterId, requestId) {
+    for (let attempt = 0; attempt < 40 && requestId === state.profileRequest; attempt += 1) {
+      await new Promise(resolve => window.setTimeout(resolve, attempt < 8 ? 350 : 750));
+      if (requestId !== state.profileRequest) return;
+      try {
+        const data = await fetchJson(
+          `${API_ROOT}/profile?serverId=${encodeURIComponent(serverId)}&characterId=${encodeURIComponent(characterId)}&fast=1&_=${Date.now()}`,
+          { cache: "no-store" },
+        );
+        if (requestId !== state.profileRequest) return;
+        applyProfilePayload(data, params, serverId, characterId);
+        if (data?.complete !== false) return;
+      } catch {
+        // The profile shell remains usable while detailed item options finish loading.
+      }
+    }
+  }
+
+  function applyProfilePayload(data, params, serverId, characterId) {
+    state.profile = data;
+    const profile = data?.info?.profile || {};
+    saveRecent({
+      characterId: profile.characterId || characterId,
+      name: profile.characterName || params.get("name") || "",
+      serverId: profile.serverId || serverId,
+      serverName: profile.serverName || "",
+      className: profile.className || "",
+      raceName: profile.raceName || "",
+      level: profile.characterLevel || 0,
+      combatPower: profile.combatPower || 0,
+      profileImage: profile.profileImage || "",
+    });
+    renderProfile(data);
+    showProfileState("content");
   }
 
   function showProfileState(name, message = "") {
@@ -508,7 +540,8 @@
     document.title = `${profile.characterName || copy.heading} · NotMeter`;
     content.replaceChildren();
     content.append(
-      renderHero(profile, itemLevel, data?.equipment?.petwing || {}, info.title || {}, data?.fetchedAt),
+      renderHero(profile, itemLevel, data?.equipment?.petwing || {}, info.title || {},
+        data?.fetchedAt, data?.complete !== false),
       renderSectionNav(),
       renderCharacterRankings(profile),
       renderEquipment(regularEquipment, itemDetails),
@@ -519,7 +552,7 @@
     );
   }
 
-  function renderHero(profile, itemLevel, petwing, titles, fetchedAt) {
+  function renderHero(profile, itemLevel, petwing, titles, fetchedAt, profileComplete) {
     const copy = currentCopy();
     const hero = node("section", "character-hero");
     const avatar = node("div", "character-profile-avatar");
@@ -575,7 +608,9 @@
     cp.append(textNode("span", copy.combatPower), cpValue,
       textNode("small", `${formatNumber(profile.combatPower)} CP · ${copy.itemLevel} ${formatNumber(itemLevel)}`));
     const refresh = node("div", "character-profile-refresh");
-    const refreshStatus = textNode("span", `${copy.updatedAt} ${formatDateTime(fetchedAt)}`);
+    const refreshStatus = textNode("span", profileComplete
+      ? `${copy.updatedAt} ${formatDateTime(fetchedAt)}`
+      : copy.loadingDetails);
     const refreshButton = textNode("button", copy.refreshProfile, "character-profile-refresh-button");
     refreshButton.type = "button";
     refreshButton.addEventListener("click", async () => {
@@ -1099,12 +1134,12 @@
     return { name, value: String(value) };
   }
 
-  async function fetchJson(url) {
+  async function fetchJson(url, options = {}) {
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
       const response = await fetch(url, {
-        cache: "no-store", headers: { Accept: "application/json" }, signal: controller.signal,
+        cache: options.cache || "default", headers: { Accept: "application/json" }, signal: controller.signal,
       });
       if (!response.ok) throw new Error(response.status === 404 ? currentCopy().noResults : currentCopy().loadError);
       return await response.json();
