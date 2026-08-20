@@ -280,15 +280,16 @@
     const avatar = node("span", "character-search-avatar");
     avatar.append(createImage(item.profileImage, item.name));
     const identity = node("span", "character-search-name");
-    identity.append(textNode("strong", item.name || "—"), textNode("span", item.raceName || "—"));
+    const serverName = item.serverName || String(item.serverId || "—");
+    identity.append(textNode("strong", item.name || "—"),
+      textNode("span", `${serverName} - ${item.raceName || "—"}`, "character-search-meta"));
     const job = node("span", "character-search-job");
     job.append(createImage(jobIcon(item.className), ""), document.createTextNode(item.className || "—"));
-    const server = textNode("span", item.serverName || String(item.serverId || "—"), "character-search-server");
     const cp = node("strong", "character-search-cp cp-badge");
     cp.title = `${formatNumber(item.combatPower)} CP`;
     cp.append(createImage("./assets/combat-power.png", ""),
       textNode("span", formatCompactCombatPower(item.combatPower)));
-    button.append(avatar, identity, job, server, cp);
+    button.append(avatar, identity, job, cp);
     button.addEventListener("click", () => openCharacter(item));
     return button;
   }
@@ -809,8 +810,15 @@
     const column = node("div", "equipment-detail-column equipment-soul-column");
     column.append(textNode("h6", title));
     const list = node("ul");
-    const stats = statLines(detail?.subStats).slice(0, 12);
-    for (const line of stats) list.append(textNode("li", line, "equipment-soul-stat"));
+    const stats = (Array.isArray(detail?.subStats) ? detail.subStats : [])
+      .map(statParts)
+      .filter(stat => stat.name || stat.value)
+      .slice(0, 12);
+    for (const stat of stats) {
+      const option = node("li", "equipment-soul-stat");
+      option.append(textNode("span", stat.name || "—"), textNode("b", stat.value || "—"));
+      list.append(option);
+    }
     const skills = (Array.isArray(detail?.subSkills) ? detail.subSkills : [])
       .slice(0, Math.max(0, 12 - stats.length));
     for (const skill of skills) {
@@ -950,14 +958,18 @@
 
   function statLines(stats) {
     if (!Array.isArray(stats)) return [];
-    return stats.map(stat => {
-      const name = stat.name || "";
-      let value = stat.value ?? "";
-      if (stat.minValue && String(stat.minValue) !== String(stat.value)) value = `${stat.minValue}~${stat.value}`;
-      const extra = String(stat.extra ?? "");
-      if (extra && extra !== "0" && extra !== "0%") value = `${value} (+${extra.replace(/^\+/, "")})`;
-      return `${name} ${value}`.trim();
-    }).filter(Boolean);
+    return stats.map(statParts)
+      .map(stat => `${stat.name} ${stat.value}`.trim())
+      .filter(Boolean);
+  }
+
+  function statParts(stat) {
+    const name = stat?.name || "";
+    let value = stat?.value ?? "";
+    if (stat?.minValue && String(stat.minValue) !== String(stat.value)) value = `${stat.minValue}~${stat.value}`;
+    const extra = String(stat?.extra ?? "");
+    if (extra && extra !== "0" && extra !== "0%") value = `${value} (+${extra.replace(/^\+/, "")})`;
+    return { name, value: String(value) };
   }
 
   async function fetchJson(url) {

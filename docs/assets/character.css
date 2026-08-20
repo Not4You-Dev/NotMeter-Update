@@ -121,7 +121,7 @@
 
 .character-search-row {
   display: grid;
-  grid-template-columns: 42px minmax(140px, 1.2fr) minmax(90px, 0.7fr) minmax(90px, 0.7fr) minmax(90px, auto);
+  grid-template-columns: 42px minmax(180px, 1.45fr) minmax(110px, 0.75fr) minmax(90px, auto);
   align-items: center;
   gap: 12px;
   min-height: 62px;
@@ -157,6 +157,7 @@
 .character-search-name span,
 .character-search-job,
 .character-search-server { color: #9db4c2; font-size: 12px; }
+.character-search-meta { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .character-search-job { display: flex; align-items: center; gap: 7px; }
 .character-search-job img { width: 26px; height: 26px; object-fit: contain; }
 .character-search-cp {
@@ -664,14 +665,21 @@ body.character-view .ranking-panel { display: none !important; }
 .equipment-detail-column li { overflow: hidden; color: #c5d8e1; font-size: 10px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
 .equipment-detail-column li em { color: var(--accent); font-style: normal; }
 .equipment-detail-column .empty-detail { color: #58798b; }
-.equipment-soul-column ul { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.equipment-soul-column ul { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 .equipment-soul-column .equipment-soul-stat {
-  padding: 5px 6px;
-  border: 1px solid #24495b;
-  border-left: 2px solid #43dcd5;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 28px;
+  padding: 5px 8px;
+  border: 1px solid #214759;
+  border-left: 3px solid #43dcd5;
   border-radius: 6px;
-  background: #0b222e;
+  background: linear-gradient(90deg, rgba(25, 74, 86, .46), rgba(10, 31, 42, .78));
 }
+.equipment-soul-column .equipment-soul-stat span { overflow: hidden; color: #bcd1d9; text-overflow: ellipsis; white-space: nowrap; }
+.equipment-soul-column .equipment-soul-stat b { color: #f2fdff; font-size: 10px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 .equipment-soul-column .equipment-skill-option { grid-column: 1 / -1; padding: 4px 6px; border: 1px solid #24495b; border-radius: 6px; background: #0b222e; }
 .equipment-detail-column .equipment-skill-option {
   display: grid;
