@@ -468,6 +468,8 @@
       backToJobs: "직업 목록으로",
       party: "파티",
       viewDetails: "보기",
+      characterProfile: "캐릭터 정보",
+      characterProfileShort: "정보",
       combatDetails: "전투 상세 정보",
       detailLoading: "전투 상세 정보를 불러오는 중입니다",
       detailUnavailable: "전투 상세 정보를 불러오지 못했습니다 다시 시도해 주세요",
@@ -820,6 +822,8 @@
       backToJobs: "Back to classes",
       party: "PARTY",
       viewDetails: "View",
+      characterProfile: "Character profile",
+      characterProfileShort: "Profile",
       combatDetails: "Combat Details",
       detailLoading: "Loading combat details",
       detailUnavailable: "Combat details are temporarily unavailable. Please try again.",
@@ -901,6 +905,8 @@
     bossResistancePending: "樣本收集中",
     bossResistanceSamplesGuide: "暴擊與迴避會依有效屬性區間分開收集成功與失敗判定；換算公式完成驗證前不顯示抗性數值。招架與格擋屬於不同判定。",
     bossResistanceNoData: "目前沒有可顯示的首領資訊。",
+    characterProfile: "角色資料",
+    characterProfileShort: "角色",
   };
 
   function normalizeLocale(value) {
@@ -1615,6 +1621,12 @@
     document.body.classList.add("character-view");
     elements["character-surface"].hidden = false;
     updatePageIdentity();
+    const rankingCacheLoader = globalThis.NotMeterPublicRankingCache?.load;
+    if (typeof rankingCacheLoader === "function") {
+      void rankingCacheLoader(false).catch(error => {
+        console.warn("character header statistics unavailable", error);
+      });
+    }
     window.NotMeterCharacter?.activate();
   }
 
@@ -3970,6 +3982,7 @@
       cp.append(cpIcon, value);
       character.append(cp);
     }
+    appendCharacterProfileLink(character, player);
     characterCell.append(character);
     tr.append(characterCell);
 
@@ -4338,6 +4351,7 @@
       cp.append(cpIcon, value);
       main.append(cp);
     }
+    appendCharacterProfileLink(main, player);
     characterStack.append(main);
 
     const party = state.dungeonKey === "training-dummy-60s" ? [] : decodeParty(player);
@@ -6101,6 +6115,33 @@
     const clean = String(name || "").replace(/^\[TW\]\s*/i, "").trim();
     const server = serverLabel(Number(serverId));
     return server ? `${clean}[${server}]` : clean;
+  }
+
+  function characterProfileHref(player) {
+    const name = String(player?.name || "").replace(/^\[TW\]\s*/i, "").trim();
+    const serverId = Math.max(0, Math.trunc(Number(player?.serverId) || 0));
+    if (!name || serverId <= 0 || /[*＊]/u.test(name)) return "";
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.hash = "";
+    url.searchParams.set("view", "character");
+    url.searchParams.set("serverId", String(serverId));
+    url.searchParams.set("name", name);
+    return url.href;
+  }
+
+  function appendCharacterProfileLink(container, player) {
+    const href = characterProfileHref(player);
+    if (!href) return;
+    const link = document.createElement("a");
+    link.className = "ranking-character-profile-link";
+    link.href = href;
+    link.textContent = `${t("characterProfileShort")} ›`;
+    link.title = t("characterProfile");
+    link.setAttribute("aria-label", `${formatCharacterName(player.name, player.serverId)} ${t("characterProfile")}`);
+    link.addEventListener("click", event => event.stopPropagation());
+    link.addEventListener("keydown", event => event.stopPropagation());
+    container.append(link);
   }
 
   function serverLabel(serverId) {
