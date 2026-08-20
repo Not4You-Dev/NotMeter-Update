@@ -6133,10 +6133,22 @@
     adjusted.className = "class-dps-adjusted";
     const normalized = document.createElement("span");
     normalized.className = "class-dps-metric normalized";
-    normalized.textContent = `nDPS ${formatInteger(Math.round(normalizedDps))}`;
+    const normalizedLabel = document.createElement("span");
+    normalizedLabel.className = "class-dps-metric-label";
+    normalizedLabel.textContent = "nDPS";
+    const normalizedValue = document.createElement("span");
+    normalizedValue.className = "class-dps-metric-value";
+    normalizedValue.textContent = formatInteger(Math.round(normalizedDps));
+    normalized.append(normalizedLabel, normalizedValue);
     const raid = document.createElement("span");
     raid.className = "class-dps-metric raid";
-    raid.textContent = `rDPS ${formatInteger(Math.round(raidDps))}`;
+    const raidLabel = document.createElement("span");
+    raidLabel.className = "class-dps-metric-label";
+    raidLabel.textContent = "rDPS";
+    const raidValue = document.createElement("span");
+    raidValue.className = "class-dps-metric-value";
+    raidValue.textContent = formatInteger(Math.round(raidDps));
+    raid.append(raidLabel, raidValue);
     adjusted.append(normalized, raid);
 
     td.title = `DPS ${formatInteger(Math.round(dps))}\n` +
