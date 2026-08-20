@@ -6,7 +6,7 @@
     : "https://notmeter.112-168-140-142.sslip.io/character/v1";
   const RECENT_KEY = "notmeter-character-recent-v1";
   const RECENT_LIMIT = 10;
-  const REQUEST_TIMEOUT_MS = 18_000;
+  const REQUEST_TIMEOUT_MS = 30_000;
   const CORE_STAT_TYPES = new Set(["STR", "DEX", "INT", "CON", "AGI", "WIS"]);
   const DIVINE_STAT_TYPES = new Set([
     "Justice", "Freedom", "Illusion", "Life", "Time", "Destruction",
@@ -38,6 +38,9 @@
       rankingEmpty: "공개 닉네임으로 등록된 구간별 TOP 20 기록이 없습니다.",
       rankingError: "랭킹 정보를 불러오지 못했습니다.", rank: "순위", dungeon: "던전", boss: "보스", dps: "DPS",
       combatPower: "전투력", itemLevel: "아이템 레벨", legion: "레기온", none: "없음",
+      updatedAt: "최근 갱신", refreshProfile: "정보 새로고침", refreshingProfile: "갱신 중",
+      refreshComplete: "최신 정보로 갱신했습니다.", refreshCooldown: "최근 갱신 후 5분부터 다시 갱신할 수 있습니다.",
+      refreshFailed: "공식 정보 갱신에 실패해 기존 정보를 유지합니다.",
       server: "서버", job: "직업", race: "종족", level: "레벨", title: "타이틀",
       coreStats: "주요 스탯", divineStats: "주신 스탯", generalStats: "일반·전투 스탯",
       generalStatsNote: "장착 장비의 공식 옵션·영혼 각인·마석을 합산한 값입니다.",
@@ -71,6 +74,9 @@
       rankingLoading: "Checking public rankings.", rankingEmpty: "No public Top 20 bracket record was found.",
       rankingError: "Could not load ranking data.", rank: "Rank", dungeon: "Dungeon", boss: "Boss", dps: "DPS",
       combatPower: "Combat Power", itemLevel: "Item Level", legion: "Legion", none: "None",
+      updatedAt: "Last updated", refreshProfile: "Refresh profile", refreshingProfile: "Refreshing",
+      refreshComplete: "Profile refreshed.", refreshCooldown: "You can refresh again five minutes after the last update.",
+      refreshFailed: "Refresh failed. The cached profile is still displayed.",
       server: "Server", job: "Class", race: "Race", level: "Level", title: "Title",
       coreStats: "Core stats", divineStats: "Divine stats", generalStats: "Combat stats",
       generalStatsNote: "Totals from official equipped item options, engravings, and manastones.",
@@ -101,6 +107,9 @@
       rankingLoading: "正在確認公開排名。", rankingEmpty: "沒有公開暱稱的區間 TOP 20 紀錄。",
       rankingError: "無法載入排名資料。", rank: "名次", dungeon: "副本", boss: "首領", dps: "DPS",
       collection: "坐騎 · 翅膀 · 稱號", combatPower: "戰鬥力", itemLevel: "道具等級",
+      updatedAt: "最近更新", refreshProfile: "更新資料", refreshingProfile: "更新中",
+      refreshComplete: "已更新為最新資料。", refreshCooldown: "最近更新五分鐘後可再次更新。",
+      refreshFailed: "官方資料更新失敗，將繼續顯示快取資料。",
       legion: "軍團", none: "無", server: "伺服器", job: "職業", race: "種族", level: "等級",
       title: "稱號", coreStats: "主要屬性", divineStats: "主神屬性", generalStats: "一般·戰鬥屬性",
       generalStatsNote: "合計官方已裝備道具的選項、靈魂刻印與魔石。", equipmentNote: "同列比較基本選項、靈魂刻印與已鑲嵌魔石。",
@@ -151,7 +160,7 @@
     elements["character-search-input"]?.addEventListener("input", () => {
       if (!elements["character-search-input"].value.trim()) renderRecent();
     });
-    elements["character-retry-button"]?.addEventListener("click", () => void loadProfile(true));
+    elements["character-retry-button"]?.addEventListener("click", () => void loadProfile(true, false));
     document.addEventListener("pointerdown", event => {
       if (!event.target.closest("#global-character-search")) setPopover(false);
     });
@@ -268,10 +277,10 @@
   }
 
   function activate() {
-    void loadProfile(false);
+    void loadProfile(false, false);
   }
 
-  async function loadProfile(force) {
+  async function loadProfile(force, refreshOfficial) {
     const params = new URLSearchParams(window.location.search);
     const serverId = Number(params.get("serverId"));
     const characterId = params.get("characterId") || "";
@@ -280,9 +289,10 @@
       return;
     }
     if (state.profileLoad && !force) return state.profileLoad;
-    showProfileState("loading");
+    if (!refreshOfficial || !state.profile) showProfileState("loading");
+    const refreshSuffix = refreshOfficial ? "&refresh=1" : "";
     state.profileLoad = fetchJson(
-      `${API_ROOT}/profile?serverId=${encodeURIComponent(serverId)}&characterId=${encodeURIComponent(characterId)}`,
+      `${API_ROOT}/profile?serverId=${encodeURIComponent(serverId)}&characterId=${encodeURIComponent(characterId)}${refreshSuffix}`,
     ).then(data => {
       state.profile = data;
       const profile = data?.info?.profile || {};
@@ -299,8 +309,11 @@
       });
       renderProfile(data);
       showProfileState("content");
+      return true;
     }).catch(error => {
-      showProfileState("error", error?.message || currentCopy().loadError);
+      if (refreshOfficial && state.profile) showProfileState("content");
+      else showProfileState("error", error?.message || currentCopy().loadError);
+      return false;
     }).finally(() => { state.profileLoad = null; });
     return state.profileLoad;
   }
@@ -328,7 +341,7 @@
     document.title = `${profile.characterName || copy.heading} · NotMeter`;
     content.replaceChildren();
     content.append(
-      renderHero(profile, itemLevel, data?.equipment?.petwing || {}, info.title || {}),
+      renderHero(profile, itemLevel, data?.equipment?.petwing || {}, info.title || {}, data?.fetchedAt),
       renderSectionNav(),
       renderCharacterRankings(profile),
       renderEquipment(regularEquipment, itemDetails),
@@ -339,7 +352,7 @@
     );
   }
 
-  function renderHero(profile, itemLevel, petwing, titles) {
+  function renderHero(profile, itemLevel, petwing, titles, fetchedAt) {
     const copy = currentCopy();
     const hero = node("section", "character-hero");
     const avatar = node("div", "character-profile-avatar");
@@ -394,6 +407,29 @@
       textNode("strong", formatCompactCombatPower(profile.combatPower)));
     cp.append(textNode("span", copy.combatPower), cpValue,
       textNode("small", `${formatNumber(profile.combatPower)} CP · ${copy.itemLevel} ${formatNumber(itemLevel)}`));
+    const refresh = node("div", "character-profile-refresh");
+    const refreshStatus = textNode("span", `${copy.updatedAt} ${formatDateTime(fetchedAt)}`);
+    const refreshButton = textNode("button", copy.refreshProfile, "character-profile-refresh-button");
+    refreshButton.type = "button";
+    refreshButton.addEventListener("click", async () => {
+      const previousFetchedAt = state.profile?.fetchedAt || "";
+      refreshButton.disabled = true;
+      refreshButton.textContent = copy.refreshingProfile;
+      refreshStatus.textContent = copy.refreshingProfile;
+      const succeeded = await loadProfile(true, true);
+      if (!succeeded) {
+        refreshButton.disabled = false;
+        refreshButton.textContent = copy.refreshProfile;
+        refreshStatus.textContent = copy.refreshFailed;
+        return;
+      }
+      const refreshedAt = state.profile?.fetchedAt || "";
+      refreshStatus.textContent = refreshedAt === previousFetchedAt
+        ? copy.refreshCooldown
+        : copy.refreshComplete;
+    });
+    refresh.append(refreshStatus, refreshButton);
+    cp.append(refresh);
     hero.append(avatar, copyBox, cp);
     return hero;
   }
@@ -915,6 +951,13 @@
   function isCharacterView() { return new URLSearchParams(window.location.search).get("view") === "character"; }
   function number(value) { return Number.isFinite(Number(value)) ? Number(value) : 0; }
   function formatNumber(value) { return new Intl.NumberFormat(state.locale === "zh-TW" ? "zh-TW" : state.locale).format(number(value)); }
+  function formatDateTime(value) {
+    const date = new Date(value || 0);
+    if (!Number.isFinite(date.getTime())) return "—";
+    return new Intl.DateTimeFormat(state.locale === "zh-TW" ? "zh-TW" : state.locale, {
+      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit",
+    }).format(date);
+  }
   function formatCompactCombatPower(value) {
     const combatPower = Math.max(0, number(value));
     if (combatPower >= 1_000_000) return `${formatNumber(Math.floor(combatPower / 1_000))}M`;
