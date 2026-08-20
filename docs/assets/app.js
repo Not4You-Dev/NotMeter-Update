@@ -338,9 +338,9 @@
       statEfficiencyPageTitle: "NotMeter 스탯 효율 계산기",
       statEfficiencyPageSubtitle: "내 캐릭터와 실전 표본을 기준으로 성장 효율을 비교합니다",
       bossResistancePageTitle: "NotMeter 보스 저항 통계",
-      bossResistancePageSubtitle: "전체 기간 누적 표본으로 보스별 강타·완벽 저항과 치명타·회피 판정을 분석합니다",
+      bossResistancePageSubtitle: "전체 기간 누적 표본으로 보스별 강타·완벽 저항을 분석합니다",
       bossResistanceStatsTitle: "보스 저항 통계",
-      bossResistanceStatsDescription: "강타·완벽 저항은 추정값을 표시하고, 치명타·회피는 수치 구간별 판정 표본으로 환산식을 검증합니다.",
+      bossResistanceStatsDescription: "전체 기간 누적 표본으로 보스별 강타·완벽 저항 추정값을 표시합니다.",
       bossResistanceDungeonAria: "보스 저항 통계 던전 선택",
       bossResistanceAllTime: "전체 기간 누적",
       hardHitResistance: "강타 저항",
@@ -348,14 +348,10 @@
       criticalResistance: "치명타 저항",
       evasion: "회피",
       bossResistanceSettingEstimate: "게임 설정 추정",
-      bossResistanceStatEstimate: "수치 환산식",
-      bossResistanceStatReview: "수집 중",
       bossResistanceMeasuredEstimate: "측정 추정값 {value}",
-      bossResistanceDecisionSample: "판정 {hits}회 · 참여 {installations}명",
-      bossResistanceStatPending: "{hits}/{minimum}회 · {installations}/{minimumInstallations}명 수집",
       bossResistanceSample: "누적 표본 {records}회",
       bossResistancePending: "표본 수집 중",
-      bossResistanceSamplesGuide: "치명타·회피는 유효 스탯 구간별 성공·실패를 분리해 수집하며, 검증된 환산식이 나오기 전에는 저항 수치를 표시하지 않습니다. 페리·막기는 회피와 별도 판정입니다.",
+      bossResistanceSamplesGuide: "강타·완벽 저항은 전체 기간 누적 판정 표본을 기준으로 5% 단위 게임 설정값과 측정 추정값을 함께 표시합니다.",
       bossResistanceNoData: "표시할 보스 정보가 없습니다.",
       period: "기간",
       refresh: "새로고침",
@@ -692,9 +688,9 @@
       statEfficiencyPageTitle: "NotMeter Stat Efficiency Calculator",
       statEfficiencyPageSubtitle: "Compare upgrade efficiency for your character using live combat samples",
       bossResistancePageTitle: "NotMeter Boss Resistance Statistics",
-      bossResistancePageSubtitle: "Analyze Power-hit and Perfect resistance plus observed Critical and Evasion outcomes from all-time samples",
+      bossResistancePageSubtitle: "Analyze Power-hit and Perfect resistance from all-time samples",
       bossResistanceStatsTitle: "Boss Resistance Statistics",
-      bossResistanceStatsDescription: "Power-hit and Perfect show resistance estimates. Critical and Evasion collect outcome samples by stat range to validate their conversion curves.",
+      bossResistanceStatsDescription: "All-time samples show estimated Power-hit and Perfect resistance for each boss.",
       bossResistanceDungeonAria: "Select a dungeon for boss resistance statistics",
       bossResistanceAllTime: "All-time total",
       hardHitResistance: "Power-hit resistance",
@@ -702,14 +698,10 @@
       criticalResistance: "Critical resistance",
       evasion: "Evasion",
       bossResistanceSettingEstimate: "Estimated game setting",
-      bossResistanceStatEstimate: "Rating conversion",
-      bossResistanceStatReview: "Collecting",
       bossResistanceMeasuredEstimate: "Measured estimate {value}",
-      bossResistanceDecisionSample: "{hits} outcomes · {installations} players",
-      bossResistanceStatPending: "{hits}/{minimum} outcomes · {installations}/{minimumInstallations} players",
       bossResistanceSample: "Cumulative samples: {records}",
       bossResistancePending: "Collecting samples",
-      bossResistanceSamplesGuide: "Critical and Evasion outcomes are collected separately by effective-stat range. Their resistance ratings remain hidden until the conversion curves are validated. Parry and Block are separate outcomes.",
+      bossResistanceSamplesGuide: "Power-hit and Perfect use all-time outcome samples to show both the nearest 5% game setting and the measured estimate.",
       bossResistanceNoData: "No boss information is available.",
       period: "Period",
       refresh: "Refresh",
@@ -888,9 +880,9 @@
     statEfficiencyPageTitle: "NotMeter 屬性效率計算器",
     statEfficiencyPageSubtitle: "依目前角色與實戰樣本比較成長效率",
     bossResistancePageTitle: "NotMeter 首領抗性統計",
-    bossResistancePageSubtitle: "依全期間累積樣本分析各首領的強擊、完美抗性及暴擊、迴避判定",
+    bossResistancePageSubtitle: "依全期間累積樣本分析各首領的強擊與完美抗性",
     bossResistanceStatsTitle: "首領抗性統計",
-    bossResistanceStatsDescription: "強擊與完美顯示抗性推估；暴擊與迴避則依屬性區間收集判定樣本，驗證數值換算公式。",
+    bossResistanceStatsDescription: "依全期間累積樣本顯示各首領的強擊與完美抗性推估。",
     bossResistanceDungeonAria: "選擇首領抗性統計副本",
     bossResistanceAllTime: "全期間累積",
     hardHitResistance: "強擊抗性",
@@ -898,14 +890,10 @@
     criticalResistance: "暴擊抗性",
     evasion: "迴避",
     bossResistanceSettingEstimate: "遊戲設定推估",
-    bossResistanceStatEstimate: "數值換算公式",
-    bossResistanceStatReview: "收集中",
     bossResistanceMeasuredEstimate: "實測推估值 {value}",
-    bossResistanceDecisionSample: "判定 {hits} 次 · {installations} 人",
-    bossResistanceStatPending: "{hits}/{minimum} 次 · {installations}/{minimumInstallations} 人收集中",
     bossResistanceSample: "累積樣本 {records} 場",
     bossResistancePending: "樣本收集中",
-    bossResistanceSamplesGuide: "暴擊與迴避會依有效屬性區間分開收集成功與失敗判定；換算公式完成驗證前不顯示抗性數值。招架與格擋屬於不同判定。",
+    bossResistanceSamplesGuide: "強擊與完美依全期間累積判定樣本，同時顯示最接近 5% 的遊戲設定值與實測推估值。",
     bossResistanceNoData: "目前沒有可顯示的首領資訊。",
     characterProfile: "角色資料",
     characterProfileShort: "角色",
@@ -3558,35 +3546,13 @@
           "perfect",
           "perfectResistance",
           stats?.estimatedPerfectResistancePercent,
-          stats?.perfectTrials),
-        createBossResistanceMetric(
-          "critical",
-          "criticalResistance",
-          stats?.estimatedCriticalResistance,
-          stats?.criticalTrials,
-          {
-            format: "stat",
-            installations: stats?.criticalInstallationCount,
-            minimum: stats?.statMinimumTrials,
-            minimumInstallations: stats?.statMinimumInstallationCount,
-          }),
-        createBossResistanceMetric(
-          "evasion",
-          "evasion",
-          stats?.estimatedEvasion,
-          stats?.accuracyTrials,
-          {
-            format: "stat",
-            installations: stats?.accuracyInstallationCount,
-            minimum: stats?.statMinimumTrials,
-            minimumInstallations: stats?.statMinimumInstallationCount,
-          }));
+          stats?.perfectTrials));
       rows.append(row);
     });
     elements["boss-resistance-rows"].replaceChildren(rows);
   }
 
-  function createBossResistanceMetric(kind, labelKey, value, hits, options = {}) {
+  function createBossResistanceMetric(kind, labelKey, value, hits) {
     const metric = document.createElement("div");
     metric.className = `boss-resistance-metric ${kind}`;
     const labelElement = document.createElement("span");
@@ -3596,37 +3562,16 @@
     reading.className = "boss-resistance-reading";
     const settingLabel = document.createElement("small");
     settingLabel.className = "boss-resistance-setting-label";
-    const isRawStat = options.format === "stat";
-    settingLabel.textContent = t(isRawStat
-      ? "bossResistanceStatEstimate"
-      : "bossResistanceSettingEstimate");
+    settingLabel.textContent = t("bossResistanceSettingEstimate");
     const settingValue = document.createElement("strong");
     const measuredValue = document.createElement("small");
     measuredValue.className = "boss-resistance-measured";
     const numericValue = Number(value);
     const hitCount = Math.max(0, Math.trunc(Number(hits) || 0));
-    const installationCount = Math.max(0, Math.trunc(Number(options.installations) || 0));
-    const minimum = Math.max(1, Math.trunc(Number(options.minimum) || 1_500));
-    const minimumInstallations = Math.max(1, Math.trunc(Number(options.minimumInstallations) || 25));
     if (value === null || value === undefined || !Number.isFinite(numericValue) || hitCount <= 0) {
-      settingValue.textContent = isRawStat && hitCount > 0
-        ? t("bossResistanceStatReview")
-        : "—";
-      measuredValue.textContent = isRawStat && hitCount > 0
-        ? t("bossResistanceStatPending", {
-          hits: formatInteger(hitCount),
-          minimum: formatInteger(minimum),
-          installations: formatInteger(installationCount),
-          minimumInstallations: formatInteger(minimumInstallations),
-        })
-        : t("bossResistancePending");
+      settingValue.textContent = "—";
+      measuredValue.textContent = t("bossResistancePending");
       metric.classList.add("pending");
-    } else if (isRawStat) {
-      settingValue.textContent = formatInteger(Math.max(0, Math.round(numericValue)));
-      measuredValue.textContent = t("bossResistanceDecisionSample", {
-        hits: formatInteger(hitCount),
-        installations: formatInteger(installationCount),
-      });
     } else {
       const roundedEstimate = Math.max(0, Math.min(100, Math.round(numericValue / 5) * 5));
       settingValue.textContent = formatPercent(roundedEstimate);
@@ -3981,15 +3926,32 @@
     const character = document.createElement("div");
     character.className = "character-main";
     character.append(createJobIcon(job));
+
+    const characterBody = document.createElement("span");
+    characterBody.className = "class-top10-character-body";
+    const identity = document.createElement("span");
+    identity.className = "class-top10-identity";
     const name = document.createElement("span");
     name.className = "character-name";
-    name.textContent = formatCharacterName(player.name, player.serverId);
-    character.append(name);
+    name.textContent = String(player.name || "").replace(/^\[TW\]\s*/i, "").trim();
+    name.title = formatCharacterName(player.name, player.serverId);
+    identity.append(name);
+    const server = serverLabel(Number(player.serverId));
+    if (server) {
+      const serverName = document.createElement("span");
+      serverName.className = "class-top10-server";
+      serverName.textContent = server;
+      identity.append(serverName);
+    }
+    characterBody.append(identity);
+
+    const meta = document.createElement("span");
+    meta.className = "class-top10-character-meta";
     if (isTaiwanName(player.name)) {
       const badge = document.createElement("span");
       badge.className = "tw-badge";
       badge.title = t("taiwanServer");
-      character.append(badge);
+      meta.append(badge);
     }
     const observedCombatPower = Math.max(
       0,
@@ -4007,9 +3969,13 @@
         value: formatInteger(observedCombatPower),
       });
       cp.append(cpIcon, value);
-      character.append(cp);
+      meta.append(cp);
     }
-    appendCharacterProfileLink(character, player);
+    appendCharacterProfileLink(meta, player);
+    if (meta.childElementCount > 0) {
+      characterBody.append(meta);
+    }
+    character.append(characterBody);
     characterCell.append(character);
     tr.append(characterCell);
 

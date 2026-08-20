@@ -595,7 +595,19 @@ body.character-view .ranking-panel { display: none !important; }
 .stat-sigil-Destiny { background-position: 66.667% 100%; }
 .stat-sigil-Space { background-position: 100% 100%; }
 
-.equipment-tabs { display: flex; gap: 7px; margin-bottom: 10px; }
+.equipment-tabs {
+  position: sticky;
+  top: 61px;
+  z-index: 28;
+  display: flex;
+  gap: 7px;
+  margin: -5px -5px 10px;
+  padding: 6px 5px;
+  border-radius: 11px;
+  background: rgba(5, 14, 22, .94);
+  box-shadow: 0 9px 22px rgba(0, 0, 0, .24);
+  backdrop-filter: blur(12px);
+}
 .equipment-stone-summary,
 .equipment-soul-skill-summary {
   display: grid;

@@ -1454,7 +1454,7 @@ p {
 
 .boss-resistance-row {
   display: grid;
-  grid-template-columns: minmax(160px, 1.1fr) repeat(4, minmax(130px, .72fr));
+  grid-template-columns: minmax(160px, 1.1fr) repeat(2, minmax(130px, .72fr));
   gap: 10px;
   align-items: center;
 }
@@ -1547,14 +1547,6 @@ p {
   background: #aab8ff;
 }
 
-.boss-resistance-metric.critical::before {
-  background: #ff8f73;
-}
-
-.boss-resistance-metric.evasion::before {
-  background: #55d9d3;
-}
-
 .boss-resistance-metric-label {
   align-self: center;
   flex: 0 0 auto;
@@ -1589,14 +1581,6 @@ p {
 
 .boss-resistance-metric.hard-hit .boss-resistance-reading > strong {
   color: #ffd274;
-}
-
-.boss-resistance-metric.critical .boss-resistance-reading > strong {
-  color: #ffab96;
-}
-
-.boss-resistance-metric.evasion .boss-resistance-reading > strong {
-  color: #7de6df;
 }
 
 .boss-resistance-measured {
@@ -2694,7 +2678,50 @@ button:focus-visible,
 }
 
 .class-top10-character .character-main {
+  display: grid;
+  min-width: 0;
+  align-items: center;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 8px;
+}
+
+.class-top10-character-body {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  gap: 4px;
+}
+
+.class-top10-identity {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+  line-height: 1.1;
+}
+
+.class-top10-character .character-name {
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.class-top10-server {
+  color: #7897aa;
+  font-size: 9.5px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.class-top10-character-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 .class-top10-cp {
@@ -5891,9 +5918,9 @@ tr:nth-child(3) .rank-badge {
 
   .class-top10-table tbody tr {
     display: grid;
-    min-height: 146px;
+    min-height: 158px;
     grid-template-columns: 44px minmax(0, 1fr) 86px;
-    grid-template-rows: 42px 28px auto;
+    grid-template-rows: minmax(54px, auto) 28px auto;
     gap: 0 6px;
     padding: 7px 8px;
   }
@@ -5913,8 +5940,12 @@ tr:nth-child(3) .rank-badge {
     align-self: center;
   }
 
-  .class-top10-character .character-name {
-    max-width: none;
+  .class-top10-character .character-main {
+    gap: 6px;
+  }
+
+  .class-top10-character-body {
+    gap: 3px;
   }
 
   .class-top10-table .numeric {
