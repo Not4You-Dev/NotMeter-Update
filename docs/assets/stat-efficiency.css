@@ -178,6 +178,8 @@
 .result-directional-card span { color: #c7dfeb; font-size: 10px; font-weight: 850; }
 .result-directional-card strong { color: #6fded6; font-size: 14px; font-variant-numeric: tabular-nums; }
 .result-directional-card small { color: #698998; font-size: 8px; }
+.result-directional-card .result-directional-overall { margin-top: 2px; color: #88aab9; font-weight: 800; }
+.result-directional-card .result-directional-formula { margin-top: 3px; padding-top: 5px; border-top: 1px solid rgba(62, 103, 126, .42); color: #5f8497; }
 .result-details { margin: 0 11px 11px; border: 1px solid #1e414d; border-radius: 8px; background: rgba(5, 18, 27, .72); }
 .result-details > summary { padding: 10px 11px; color: #8dc5c4; cursor: pointer; font-size: 10px; font-weight: 900; list-style-position: inside; }
 .result-details[open] > summary { border-bottom: 1px solid #1e414d; }
