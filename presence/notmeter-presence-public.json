@@ -1,1 +1,1 @@
-{"schema":"notmeter-presence-snapshot-v1","version":1,"generatedAt":1787426678,"expiresAfterSeconds":300,"tokens":[],"tokenExpiresAt":{},"signature":"9FA6E36119585494C96A0EF0613632DE1D6CF6F50F91939BA95402B4A619E80C"}
+{"schema":"notmeter-presence-snapshot-v1","version":1,"generatedAt":1787426980,"expiresAfterSeconds":300,"tokens":["4BBF2ACB71AE10759739F4CF6AE3BAE5"],"tokenExpiresAt":{"4BBF2ACB71AE10759739F4CF6AE3BAE5":1787428092},"signature":"0ACC7F8C7B7166E3E0493D4620BD3F6DD1521A36A1437D592960EE84EF01ECC8"}
