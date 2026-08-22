@@ -151,6 +151,7 @@ globalThis.NotMeterStatsCopyZhTw = Object.freeze({
   recordSampleValue: "{count} 場",
   recordSampleTooltip: "共有 {count} 場戰鬥紀錄，可能包含同一角色的重複紀錄",
   top25: "前 25%",
+  top10Threshold: "前 10%",
   median: "中位數",
   max: "最高",
   distribution: "分布",
