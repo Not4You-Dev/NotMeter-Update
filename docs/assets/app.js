@@ -219,6 +219,12 @@
       advertisement: "광고",
       serviceLinksAria: "NotMeter 바로가기",
       dailyUsersTitle: "최근 집계된 일일 사용자 수",
+      raidDpsVerified: "산식 검증",
+      raidDpsUnavailable: "검증 불가",
+      raidDpsVerifiedTitle: "실제 추가 피해 패킷의 코드·레벨·시전자·적용 구간과 파티 총피해 보존을 모두 검증한 기록입니다.",
+      raidDpsUnavailableTitle: "파티원별 기준 스탯이나 확률·속도 효과의 반사실을 완전히 증명할 수 없어 추정하지 않고 0으로 보관한 기록입니다.",
+      normalizedDpsDescription: "외부 파티 버프가 만든 검증된 추가 피해를 제외한 개인 DPS",
+      raidDpsDescription: "nDPS에 본인이 다른 파티원에게 제공한 검증된 추가 피해를 더한 DPS",
       languageSwitchAria: "언어 전환",
       advertisementAria: "광고",
       fieldBossRegionsAria: "필드보스 지역",
@@ -366,6 +372,7 @@
       recordSampleValue: "{count}회",
       recordSampleTooltip: "전투 기록 {count}회이며 동일 캐릭터의 반복 기록이 포함될 수 있습니다",
       top25: "상위 25%",
+      top10Threshold: "상위 10%",
       median: "중앙값",
       max: "최고",
       distribution: "분포",
@@ -569,6 +576,12 @@
       advertisement: "Ad",
       serviceLinksAria: "NotMeter shortcuts",
       dailyUsersTitle: "Recently counted daily users",
+      raidDpsVerified: "Verified",
+      raidDpsUnavailable: "Unavailable",
+      raidDpsVerifiedTitle: "This record passed proc packet code, level, source, active-interval, and party damage-conservation checks.",
+      raidDpsUnavailableTitle: "Per-member baseline stats or the counterfactual for chance and speed effects could not be proven, so values are stored as zero instead of estimated.",
+      normalizedDpsDescription: "Personal DPS after removing verified extra damage created by external party buffs",
+      raidDpsDescription: "nDPS plus verified extra damage this player granted to other party members",
       languageSwitchAria: "Switch language",
       advertisementAria: "Advertisement",
       fieldBossRegionsAria: "Field boss regions",
@@ -716,6 +729,7 @@
       recordSampleValue: "{count} runs",
       recordSampleTooltip: "{count} combat records; repeated runs by the same character may be included",
       top25: "Top 25%",
+      top10Threshold: "Top 10%",
       median: "Median",
       max: "Highest",
       distribution: "Range",
@@ -897,6 +911,12 @@
     bossResistanceNoData: "目前沒有可顯示的首領資訊。",
     characterProfile: "角色資料",
     characterProfileShort: "角色",
+    raidDpsVerified: "公式已驗證",
+    raidDpsUnavailable: "無法驗證",
+    raidDpsVerifiedTitle: "此紀錄已通過追加傷害封包代碼、等級、施放者、套用區間與隊伍總傷害守恆驗證。",
+    raidDpsUnavailableTitle: "無法完整證明各隊員基準屬性或機率、速度效果的反事實，因此不推估並以 0 儲存。",
+    normalizedDpsDescription: "扣除外部隊伍 Buff 所產生之已驗證追加傷害後的個人 DPS",
+    raidDpsDescription: "nDPS 加上本人提供給其他隊員之已驗證追加傷害",
   };
 
   function normalizeLocale(value) {
@@ -998,8 +1018,6 @@
       openContributionView();
     } else if (pageView === "boss-resistance") {
       openBossResistanceView();
-    } else if (pageView === "stat-efficiency") {
-      openStatEfficiencyView();
     } else if (pageView === "class-top10" || window.location.hash === "#class-top10" ||
         history.state?.notMeterStatsView === "class-top10") {
       openClassTop10View(false);
@@ -1312,10 +1330,6 @@
         openBossResistanceView();
         return;
       }
-      if (event.state?.notMeterStatsView === "stat-efficiency") {
-        openStatEfficiencyView();
-        return;
-      }
       closeFieldBossView();
       closeClassTop10View();
       closeClassPerformanceView();
@@ -1595,7 +1609,7 @@
     const view = new URLSearchParams(window.location.search).get("view");
     return view === "class-top10" || view === "field-boss" || view === "optimization" ||
       view === "class-performance" || view === "contribution" ||
-      view === "boss-resistance" || view === "stat-efficiency" || view === "character" ? view : "ranking";
+      view === "boss-resistance" || view === "character" ? view : "ranking";
   }
 
   function openCharacterView() {
@@ -4127,6 +4141,7 @@
       });
     }
     tr.append(sampleCell);
+    tr.append(numericCell(formatSummaryDps(summaryP90Dps(row)), "summary-p90", t("top10Threshold")));
     tr.append(numericCell(formatDps(row.p75Dps), "accent summary-p75", t("top25")));
     tr.append(numericCell(formatDps(row.medianDps), "median summary-median", t("median")));
     tr.append(numericCell(formatDps(row.maxDps), "max summary-max", t("max")));
@@ -5377,6 +5392,7 @@
           p25Dps: current.p25Dps,
           medianDps: current.medianDps,
           p75Dps: current.p75Dps,
+          p90Dps: current.p90Dps,
           maxDps: current.maxDps,
           dpsPercentiles: state.period === "Weekly" && previous
             ? [previous.p75Dps, current.p75Dps, previous.sampleCount]
@@ -5552,12 +5568,12 @@
       for (const row of rows) {
         const count = Math.max(0, Number(row.N) || 0);
         sampleCount += count;
-        const weight = count / 5;
-        for (const value of [row.L, row.A, row.E, row.H, row.X]) {
-          const dps = Number(value);
-          if (dps > 0 && weight > 0) {
-            samples.push([dps, weight]);
-          }
+        const values = [row.L, row.A, row.E, row.H, row.Q, row.X]
+          .map(Number)
+          .filter(value => value > 0);
+        const weight = values.length > 0 ? count / values.length : 0;
+        for (const dps of values) {
+          if (weight > 0) samples.push([dps, weight]);
         }
       }
       samples.sort((left, right) => left[0] - right[0]);
@@ -5567,6 +5583,7 @@
         p25Dps: weightedQuantile(samples, 0.25),
         medianDps: weightedQuantile(samples, 0.5),
         p75Dps: weightedQuantile(samples, 0.75),
+        p90Dps: weightedQuantile(samples, 0.9),
         maxDps: weightedQuantile(samples, 1),
       });
     }
@@ -5653,7 +5670,7 @@
     for (const row of rows) {
       const values = Array.isArray(row.dpsPercentiles) && row.dpsPercentiles.length >= 10
         ? row.dpsPercentiles
-        : [row.minDps, row.p25Dps, row.medianDps, row.p75Dps, row.maxDps];
+        : [row.minDps, row.p25Dps, row.medianDps, row.p75Dps, row.p90Dps, row.maxDps];
       const weight = Math.max(1, Number(row.sampleCount) || 1) / Math.max(1, values.length);
       for (const value of values) {
         if (Number(value) > 0) {
@@ -5673,6 +5690,7 @@
       p25Dps: weightedQuantile(samples, 0.25),
       medianDps: weightedQuantile(samples, 0.5),
       p75Dps: weightedQuantile(samples, 0.75),
+      p90Dps: weightedQuantile(samples, 0.9),
       maxDps: weightedQuantile(samples, 1),
       dpsPercentiles: weeklyComparison,
     };
@@ -6085,8 +6103,14 @@
 
   function createRankingDpsCell(player) {
     const dps = Math.max(0, Number(player?.X ?? player?.dps) || 0);
-    const normalizedDps = Math.max(0, Number(player?.Y ?? player?.normalizedDps) || 0);
-    const raidDps = Math.max(0, Number(player?.Z ?? player?.raidDps) || 0);
+    const verifiedValue = player?.A ?? player?.raidDpsVerified;
+    const verified = verifiedValue === true || Number(verifiedValue) === 1;
+    const normalizedDps = verified
+      ? Math.max(0, Number(player?.Y ?? player?.normalizedDps) || 0)
+      : 0;
+    const raidDps = verified
+      ? Math.max(0, Number(player?.Z ?? player?.raidDps) || 0)
+      : 0;
     const td = document.createElement("td");
     td.className = "numeric accent class-dps";
     td.dataset.label = "DPS";
@@ -6096,7 +6120,11 @@
     total.textContent = formatInteger(Math.round(dps));
 
     const adjusted = document.createElement("span");
-    adjusted.className = "class-dps-adjusted";
+    adjusted.className = `class-dps-adjusted ${verified ? "verified" : "unavailable"}`;
+    const status = document.createElement("span");
+    status.className = "class-dps-status";
+    status.textContent = verified ? t("raidDpsVerified") : t("raidDpsUnavailable");
+    status.title = verified ? t("raidDpsVerifiedTitle") : t("raidDpsUnavailableTitle");
     const normalized = document.createElement("span");
     normalized.className = "class-dps-metric normalized";
     const normalizedLabel = document.createElement("span");
@@ -6115,11 +6143,12 @@
     raidValue.className = "class-dps-metric-value";
     raidValue.textContent = formatInteger(Math.round(raidDps));
     raid.append(raidLabel, raidValue);
-    adjusted.append(normalized, raid);
+    adjusted.append(status, normalized, raid);
 
     td.title = `DPS ${formatInteger(Math.round(dps))}\n` +
-      `nDPS ${formatInteger(Math.round(normalizedDps))}\n` +
-      `rDPS ${formatInteger(Math.round(raidDps))}`;
+      `nDPS ${formatInteger(Math.round(normalizedDps))} · ${t("normalizedDpsDescription")}\n` +
+      `rDPS ${formatInteger(Math.round(raidDps))} · ${t("raidDpsDescription")}\n` +
+      (verified ? t("raidDpsVerifiedTitle") : t("raidDpsUnavailableTitle"));
     td.append(total, adjusted);
     return td;
   }
@@ -6203,6 +6232,17 @@
       }
     }
     return formatInteger(Math.round(number));
+  }
+
+  function formatSummaryDps(value) {
+    return Number(value) > 0 ? formatDps(value) : "—";
+  }
+
+  function summaryP90Dps(row) {
+    const direct = Number(row?.p90Dps);
+    if (direct > 0) return direct;
+    const percentiles = Array.isArray(row?.dpsPercentiles) ? row.dpsPercentiles : [];
+    return percentiles.length >= 91 ? Number(percentiles[90]) || 0 : 0;
   }
 
   function formatCompact(value) {
