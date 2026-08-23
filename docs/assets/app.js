@@ -15,9 +15,9 @@
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-contribution.json.gz",
   ];
   const CUSTOM_CP_CACHE_URLS = [
-    `${VPS_RANKING_CACHE_ROOT}/custom-cp/summary`,
     "./data/notmeter-ranking-custom-cp.json.gz",
     "https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/notmeter-ranking-custom-cp.json.gz",
+    `${VPS_RANKING_CACHE_ROOT}/custom-cp/summary`,
   ];
   const VPS_FIELD_BOSS_CACHE_URL =
     "https://notmeter.112-168-140-142.sslip.io/field-boss/v1/public";
@@ -2013,20 +2013,6 @@
   async function fetchFieldBossCache(force) {
     const errors = [];
     try {
-      const separator = VPS_FIELD_BOSS_CACHE_URL.includes("?") ? "&" : "?";
-      const cache = await fetchFieldBossCacheJson(
-        `${VPS_FIELD_BOSS_CACHE_URL}${separator}v=${Date.now()}`,
-        force ? "reload" : "no-cache");
-      validateFieldBossCache(cache);
-      if (!Array.isArray(cache.servers) || cache.servers.length === 0) {
-        throw new Error("empty VPS cache");
-      }
-      return { cache, revision: `vps:${Number(cache.generatedAt) || 0}` };
-    } catch (error) {
-      errors.push(`${VPS_FIELD_BOSS_CACHE_URL}: ${error instanceof Error ? error.message : String(error)}`);
-    }
-
-    try {
       const refResponse = await fetch(`${FIELD_BOSS_CACHE_REF_URL}?v=${Date.now()}`, {
         cache: "no-store",
         headers: { Accept: "application/vnd.github+json" },
@@ -2062,6 +2048,23 @@
       } catch (error) {
         errors.push(`${baseUrl}: ${error instanceof Error ? error.message : String(error)}`);
       }
+    }
+
+    // The VPS is an availability fallback only. Normal viewers use the
+    // immutable GitHub cache so periodic field-boss refreshes do not multiply
+    // VPS egress by the number of open browsers.
+    try {
+      const separator = VPS_FIELD_BOSS_CACHE_URL.includes("?") ? "&" : "?";
+      const cache = await fetchFieldBossCacheJson(
+        `${VPS_FIELD_BOSS_CACHE_URL}${separator}v=${Date.now()}`,
+        force ? "reload" : "no-cache");
+      validateFieldBossCache(cache);
+      if (!Array.isArray(cache.servers) || cache.servers.length === 0) {
+        throw new Error("empty VPS cache");
+      }
+      return { cache, revision: `vps:${Number(cache.generatedAt) || 0}` };
+    } catch (error) {
+      errors.push(`${VPS_FIELD_BOSS_CACHE_URL}: ${error instanceof Error ? error.message : String(error)}`);
     }
     throw new Error(`${t("cacheUnavailable")} (${errors.join(" / ")})`);
   }
@@ -2854,9 +2857,9 @@
     const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
     const fileName = `notmeter-ranking-custom-cp-${safeKey}.json.gz`;
     return [
-      `${VPS_RANKING_CACHE_ROOT}/custom-cp/${safeKey}`,
       `./data/${fileName}`,
       `https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/${fileName}`,
+      `${VPS_RANKING_CACHE_ROOT}/custom-cp/${safeKey}`,
     ];
   }
 
