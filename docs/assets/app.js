@@ -34,6 +34,7 @@
   const EXPECTED_CONTRIBUTION_SCHEMA = "notmeter-web-contribution-stats-v1";
   const EXPECTED_CUSTOM_CP_SCHEMA = "notmeter-web-custom-cp-v4";
   const EXPECTED_CUSTOM_CP_RANK_SCHEMA = "notmeter-web-custom-cp-rank-v1";
+  const EXPECTED_CUSTOM_CP_RANK_CHUNK_SCHEMA = "notmeter-web-custom-cp-rank-chunk-v2";
   const DETAIL_SCHEMA = "notmeter-ranking-combat-detail-v1";
   const FIELD_BOSS_CACHE_SCHEMA = "notmeter-field-boss-public-cache-v1";
   const ZH_TW_GAME_DATA_URL = "./assets/game-data.zh-TW.json?v=20260812-2";
@@ -1525,6 +1526,11 @@
       const nextDungeon = cache.dungeons.some(item => item.key === previousDungeon)
         ? previousDungeon
         : cache.dungeons[0]?.key || "";
+      const nextDungeonBossCount = cache.dungeons
+        .find(item => item.key === nextDungeon)?.bossNames?.length || 0;
+      const nextBossIndex = state.bossIndex >= 1 && state.bossIndex <= nextDungeonBossCount
+        ? state.bossIndex
+        : 0;
       const generationChanged = !state.data ||
         String(cache.generatedAt) !== String(state.data.generatedAt);
       let preparedCustomCp = null;
@@ -1534,6 +1540,7 @@
           const prepared = await prepareCustomCpGeneration(
             cache.generatedAt,
             nextDungeon,
+            nextBossIndex,
             force,
             state.mode === "class");
           preparedCustomCp = prepared.summary;
@@ -1557,11 +1564,14 @@
         state.customCpData = preparedCustomCp;
       }
       if (preparedCustomCpRank) {
-        state.customCpRankData.set(nextDungeon, preparedCustomCpRank);
+        state.customCpRankData.set(
+          customCpRankCacheKey(nextDungeon, nextBossIndex),
+          preparedCustomCpRank);
       }
       state.detailMemory.clear();
       void pruneDetailCache(cache.generatedAt);
       state.dungeonKey = nextDungeon;
+      state.bossIndex = nextBossIndex;
       if (!preserveView || state.dungeonKey !== previousDungeon) {
         resetClassSelection();
       }
@@ -2853,7 +2863,11 @@
       String(cache.generatedAt) === String(expectedGeneratedAt || "");
   }
 
-  function customCpRankCacheUrls(dungeonKey) {
+  function customCpRankCacheKey(dungeonKey, bossIndex) {
+    return `${String(dungeonKey || "").toLowerCase()}|${Math.max(0, Number(bossIndex) || 0)}`;
+  }
+
+  function legacyCustomCpRankCacheUrls(dungeonKey) {
     const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
     const fileName = `notmeter-ranking-custom-cp-${safeKey}.json.gz`;
     return [
@@ -2863,38 +2877,56 @@
     ];
   }
 
-  function customCpCacheSourcePairs(dungeonKey) {
-    const rankUrls = customCpRankCacheUrls(dungeonKey);
-    return CUSTOM_CP_CACHE_URLS.map((summaryUrl, index) => ({
-      summaryUrl,
-      rankUrl: rankUrls[index],
-    })).filter(item => item.summaryUrl && item.rankUrl);
+  function customCpRankChunkUrls(dungeonKey, bossIndex) {
+    const safeKey = String(dungeonKey || "").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+    const safeBossIndex = Math.max(0, Number(bossIndex) || 0);
+    const chunkFileName = `notmeter-ranking-custom-cp-${safeKey}-boss-${safeBossIndex}.json.gz`;
+    return [
+      `./data/${chunkFileName}`,
+      `https://raw.githubusercontent.com/Not4You-Dev/NotMeter-Update/main/docs/data/${chunkFileName}`,
+    ];
+  }
+
+  function customCpRankCacheUrls(dungeonKey, bossIndex) {
+    return [
+      ...customCpRankChunkUrls(dungeonKey, bossIndex),
+      ...legacyCustomCpRankCacheUrls(dungeonKey),
+    ];
   }
 
   function validateCustomCpRankCache(
       cache,
       dungeonKey,
+      bossIndex,
       expectedGeneratedAt = state.data?.generatedAt) {
     if (!isMatchingCustomCpRankCache(
         cache,
         dungeonKey,
+        bossIndex,
         expectedGeneratedAt)) {
       throw new Error(t("cacheInvalid"));
     }
   }
 
-  function isMatchingCustomCpRankCache(cache, dungeonKey, expectedGeneratedAt) {
-    return isValidCustomCpRankCache(cache, dungeonKey) &&
+  function isMatchingCustomCpRankCache(cache, dungeonKey, bossIndex, expectedGeneratedAt) {
+    return isValidCustomCpRankCache(cache, dungeonKey, bossIndex) &&
       String(cache.generatedAt) === String(expectedGeneratedAt || "");
   }
 
-  function isValidCustomCpRankCache(cache, dungeonKey) {
-    return Boolean(cache &&
-        cache.schema === EXPECTED_CUSTOM_CP_RANK_SCHEMA &&
-        Number(cache.version) === 1 &&
-        cache.dungeonKey === dungeonKey &&
-        Array.isArray(cache.rankBuckets) &&
-        cache.generatedAt);
+  function isValidCustomCpRankCache(cache, dungeonKey, bossIndex) {
+    if (!cache || cache.dungeonKey !== dungeonKey ||
+        !Array.isArray(cache.rankBuckets) || !cache.generatedAt) {
+      return false;
+    }
+    if (cache.schema === EXPECTED_CUSTOM_CP_RANK_CHUNK_SCHEMA &&
+        Number(cache.version) === 2) {
+      const expectedBossIndex = Math.max(0, Number(bossIndex) || 0);
+      return Number(cache.bossIndex) === expectedBossIndex &&
+        (expectedBossIndex === 0 ||
+          cache.rankBuckets.every(bucket => Number(bucket.B) === expectedBossIndex));
+    }
+    return cache.schema === EXPECTED_CUSTOM_CP_RANK_SCHEMA &&
+      Number(cache.version) === 1;
   }
 
   async function fetchCustomCpCacheForGeneration(_expectedGeneratedAt, force = false) {
@@ -2908,35 +2940,89 @@
 
   async function fetchCustomCpRankCacheForGeneration(
       dungeonKey,
+      bossIndex,
       expectedGeneratedAt,
       force = false) {
     const normalizedExpected = String(expectedGeneratedAt || "");
+    const normalizedBossIndex = Math.max(0, Number(bossIndex) || 0);
+    if (normalizedBossIndex === 0) {
+      try {
+        const manifest = await fetchCompressedJson(
+          customCpRankChunkUrls(dungeonKey, 0),
+          force,
+          candidate => isMatchingCustomCpRankCache(
+            candidate,
+            dungeonKey,
+            0,
+            normalizedExpected) &&
+            candidate.schema === EXPECTED_CUSTOM_CP_RANK_CHUNK_SCHEMA &&
+            Array.isArray(candidate.bossIndexes) &&
+            candidate.bossIndexes.length > 0 &&
+            candidate.rankBuckets.length === 0,
+          normalizedExpected);
+        const chunkBossIndexes = Array.from(new Set(
+          manifest.bossIndexes
+            .map(value => Number(value))
+            .filter(value => Number.isInteger(value) && value > 0)));
+        if (chunkBossIndexes.length === 0) {
+          throw new Error(t("cacheInvalid"));
+        }
+        const chunks = await Promise.all(chunkBossIndexes.map(childBossIndex =>
+          fetchCompressedJson(
+            customCpRankChunkUrls(dungeonKey, childBossIndex),
+            force,
+            candidate => isMatchingCustomCpRankCache(
+              candidate,
+              dungeonKey,
+              childBossIndex,
+              normalizedExpected) &&
+              candidate.schema === EXPECTED_CUSTOM_CP_RANK_CHUNK_SCHEMA,
+            normalizedExpected)));
+        const merged = {
+          ...manifest,
+          rankBuckets: chunks.flatMap(chunk => chunk.rankBuckets),
+        };
+        validateCustomCpRankCache(merged, dungeonKey, 0, normalizedExpected);
+        return merged;
+      } catch (error) {
+        console.warn("split custom CP rank cache unavailable; using legacy fallback", error);
+        const legacy = await fetchCompressedJson(
+          legacyCustomCpRankCacheUrls(dungeonKey),
+          force,
+          candidate => isMatchingCustomCpRankCache(
+            candidate,
+            dungeonKey,
+            0,
+            normalizedExpected) &&
+            candidate.schema === EXPECTED_CUSTOM_CP_RANK_SCHEMA,
+          normalizedExpected);
+        validateCustomCpRankCache(legacy, dungeonKey, 0, normalizedExpected);
+        return legacy;
+      }
+    }
     const cache = await fetchCompressedJson(
-      customCpRankCacheUrls(dungeonKey),
+      customCpRankCacheUrls(dungeonKey, normalizedBossIndex),
       force,
       candidate => isMatchingCustomCpRankCache(
         candidate,
         dungeonKey,
+        normalizedBossIndex,
         normalizedExpected),
       normalizedExpected);
-    validateCustomCpRankCache(cache, dungeonKey, normalizedExpected);
+    validateCustomCpRankCache(cache, dungeonKey, normalizedBossIndex, normalizedExpected);
     return cache;
   }
 
-  async function fetchCompatibleCustomCpPair(dungeonKey, force = false) {
+  async function fetchCompatibleCustomCpPair(dungeonKey, bossIndex, force = false) {
     const errors = [];
-    for (const source of customCpCacheSourcePairs(dungeonKey)) {
+    for (const summaryUrl of CUSTOM_CP_CACHE_URLS) {
       try {
-        const [summary, rank] = await Promise.all([
-          fetchCompressedJson([source.summaryUrl], force, isValidCustomCpCache),
-          fetchCompressedJson(
-            [source.rankUrl],
-            force,
-            candidate => isValidCustomCpRankCache(candidate, dungeonKey)),
-        ]);
-        if (String(summary.generatedAt) !== String(rank.generatedAt)) {
-          throw new Error("cache generation mismatch");
-        }
+        const summary = await fetchCompressedJson([summaryUrl], force, isValidCustomCpCache);
+        const rank = await fetchCustomCpRankCacheForGeneration(
+          dungeonKey,
+          bossIndex,
+          summary.generatedAt,
+          force);
         return { summary, rank };
       } catch (error) {
         errors.push(error instanceof Error ? error.message : String(error));
@@ -2948,10 +3034,11 @@
   async function prepareCustomCpGeneration(
       expectedGeneratedAt,
       dungeonKey,
+      bossIndex,
       force,
       includeRank) {
     if (includeRank) {
-      return fetchCompatibleCustomCpPair(dungeonKey, force);
+      return fetchCompatibleCustomCpPair(dungeonKey, bossIndex, force);
     }
     const summary = await fetchCustomCpCacheForGeneration(expectedGeneratedAt, force);
     return { summary, rank: null };
@@ -2984,24 +3071,28 @@
     return load;
   }
 
-  async function ensureCustomCpRankCache(dungeonKey, force = false) {
+  async function ensureCustomCpRankCache(
+      dungeonKey,
+      bossIndex = state.bossIndex,
+      force = false) {
     const summary = await ensureCustomCpCache(force);
     const expectedGeneratedAt = String(summary.generatedAt || "");
-    const current = state.customCpRankData.get(dungeonKey);
+    const cacheKey = customCpRankCacheKey(dungeonKey, bossIndex);
+    const current = state.customCpRankData.get(cacheKey);
     if (current &&
         String(current.generatedAt) === expectedGeneratedAt &&
         !force) {
       return current;
     }
-    if (state.customCpRankLoads.has(dungeonKey) && !force) {
-      return state.customCpRankLoads.get(dungeonKey);
+    if (state.customCpRankLoads.has(cacheKey) && !force) {
+      return state.customCpRankLoads.get(cacheKey);
     }
     let load;
-    load = fetchCustomCpRankCacheForGeneration(dungeonKey, expectedGeneratedAt, force)
+    load = fetchCustomCpRankCacheForGeneration(dungeonKey, bossIndex, expectedGeneratedAt, force)
       .then(cache => ({ summary, rank: cache }))
       .catch(error => {
         console.warn("custom CP generation mismatch; retrying a compatible cache pair", error);
-        return fetchCompatibleCustomCpPair(dungeonKey, true);
+        return fetchCompatibleCustomCpPair(dungeonKey, bossIndex, true);
       })
       .then(pair => {
         if (String(state.customCpData?.generatedAt || "") !== String(pair.summary.generatedAt)) {
@@ -3010,16 +3101,16 @@
           state.customCpRankData.clear();
           state.customCpRankIndexes.clear();
         }
-        state.customCpRankData.set(dungeonKey, pair.rank);
-        state.customCpRankIndexes.delete(dungeonKey);
+        state.customCpRankData.set(cacheKey, pair.rank);
+        state.customCpRankIndexes.delete(cacheKey);
         return pair.rank;
       })
       .finally(() => {
-        if (state.customCpRankLoads.get(dungeonKey) === load) {
-          state.customCpRankLoads.delete(dungeonKey);
+        if (state.customCpRankLoads.get(cacheKey) === load) {
+          state.customCpRankLoads.delete(cacheKey);
         }
       });
-    state.customCpRankLoads.set(dungeonKey, load);
+    state.customCpRankLoads.set(cacheKey, load);
     return load;
   }
 
@@ -4209,8 +4300,11 @@
   }
 
   function renderClassRanking() {
+    const customRankCacheKey = customCpRankCacheKey(
+      state.dungeonKey,
+      state.bossIndex);
     if (state.cpFilterMode === "custom" &&
-        !state.customCpRankData.has(state.dungeonKey)) {
+        !state.customCpRankData.has(customRankCacheKey)) {
       showState("loading");
       void ensureCustomCpRankCache(state.dungeonKey)
         .then(() => {
@@ -5502,12 +5596,13 @@
   }
 
   function customCpRankIndex(dungeonKey) {
-    if (state.customCpRankIndexes.has(dungeonKey)) {
-      return state.customCpRankIndexes.get(dungeonKey);
+    const cacheKey = customCpRankCacheKey(dungeonKey, state.bossIndex);
+    if (state.customCpRankIndexes.has(cacheKey)) {
+      return state.customCpRankIndexes.get(cacheKey);
     }
-    const buckets = state.customCpRankData.get(dungeonKey)?.rankBuckets;
+    const buckets = state.customCpRankData.get(cacheKey)?.rankBuckets;
     const index = indexCustomCpBuckets(buckets);
-    state.customCpRankIndexes.set(dungeonKey, index);
+    state.customCpRankIndexes.set(cacheKey, index);
     return index;
   }
 
